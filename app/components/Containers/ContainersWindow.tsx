@@ -273,6 +273,6 @@ export default connect((state) => {
     searchValue: state.filters.searchValue,
   };
 }, {
-    changeSearchValue, getCertificateFromContainer, loadAllCertificates,
-    loadAllContainers, removeAllContainers, removeAllCertificates
-  })(ContainersWindow);
+  changeSearchValue, getCertificateFromContainer, loadAllCertificates,
+  loadAllContainers, removeAllContainers, removeAllCertificates
+})(ContainersWindow);

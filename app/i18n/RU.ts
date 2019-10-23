@@ -213,6 +213,7 @@ export default {
     certs_token: "Сертификаты внешних носителей",
     crls: "Список отзыва сертификатов",
     delete_certificate: "Удаление сертификата",
+    delete_certificate_and_container: "Удалить связанный с контейнером сертификат (не рекомендуется)",
     export_cert: "Экспорт сертификата",
     import_key: "Импортировать ключ",
     issuer: "Кем выдан",
@@ -230,7 +231,6 @@ export default {
     subject: "Владелец сертификата",
     thumbprint: "Отпечаток",
     version: "Версия",
-    delete_certificate_and_container: "Удалить связанный с контейнером сертификат (не рекомендуется)",
   },
   CloudCSP: {
     auth: "Сервер авторизации",

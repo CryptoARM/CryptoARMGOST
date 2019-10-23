@@ -10,7 +10,7 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.File({
       filename: APP_LOG_FILE,
-      maxsize: 4 * 4096,
+      maxsize: 16 * 4096,
     }),
   ],
 });

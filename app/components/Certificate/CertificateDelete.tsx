@@ -49,7 +49,7 @@ class CertificateDelete extends React.Component<ICertificateDeleteProps, ICertif
   render() {
     const { container, deleteContainer } = this.state;
     const { localize, locale } = this.context;
-   
+
     const body = container ?
       (
         <div className="input-field col s12">

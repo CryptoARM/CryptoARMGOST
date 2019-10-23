@@ -213,6 +213,7 @@ export default {
     certs_token: "External token/card certificates",
     crls: "Certification revocation list",
     delete_certificate: "Delete certificate",
+    delete_certificate_and_container: "Delete certificate by container (not recomended)",
     export_cert: "Export the certificate",
     import_key: "Import the key",
     issuer: "Certificate Authority",
