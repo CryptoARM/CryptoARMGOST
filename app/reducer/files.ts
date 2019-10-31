@@ -17,6 +17,7 @@ const FileModel = Record({
   id: null,
   mtime: null,
   remoteId: null,
+  socket: null,
 });
 
 const DefaultReducerState = Record({
@@ -59,11 +60,31 @@ export default (files = new DefaultReducerState(), action) => {
       return files.setIn(["entities", payload.fileId, "active"], payload.isActive);
 
     case DELETE_FILE:
+      const file = files.getIn(["entities", payload.fileId]);
+
+      if (file && file.socket && fileExists(file.fullpath)) {
+        try {
+          fs.unlinkSync(file.fullpath);
+        } catch (e) {
+          //
+        }
+      }
+
       return files.deleteIn(["entities", payload.fileId]);
 
     case PACKAGE_DELETE_FILE:
       let newFiles = files;
       payload.filePackage.forEach((id: number) => {
+        const tfile = files.getIn(["entities", id]);
+
+        if (tfile && tfile.socket && fileExists(tfile.fullpath)) {
+          try {
+            fs.unlinkSync(tfile.fullpath);
+          } catch (e) {
+            //
+          }
+        }
+
         newFiles = newFiles.deleteIn(["entities", id]);
       });
 

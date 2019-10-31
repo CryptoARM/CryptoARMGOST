@@ -2,7 +2,7 @@
   "author": "Cifrovye tekhnologii LLC",
   "description": "CryptoARM GOST",
   "name": "cryptoarm-gost",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "main": "./main.js",
   "license": "Apache-2.0",
   "dependencies": {
@@ -14,6 +14,7 @@
     "node-pre-gyp": "^0.13.0",
     "request": "^2.88.0",
     "reselect": "^3.0.1",
+    "socket.io": "^2.0.4",
     "sudo-prompt": "^8.2.3",
     "tslib": "^1.10.0",
     "winston": "^3.0.0"

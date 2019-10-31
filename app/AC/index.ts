@@ -19,6 +19,8 @@ import {
   VERIFY_CERTIFICATE,
   VERIFY_SIGNATURE,
 } from "../constants";
+import { connectedSelector } from "../selectors";
+import { ERROR, SIGNED, UPLOADED, VERIFIED } from "../server/constants";
 import * as signs from "../trusted/sign";
 import { Store } from "../trusted/store";
 import { extFile, fileCoding, fileExists } from "../utils";
@@ -38,12 +40,14 @@ interface IFile {
   active: boolean;
   extra: any;
   remoteId?: string;
+  socket?: string;
 }
 
 interface IFilePath {
   fullpath: string;
   extra?: any;
   remoteId?: string;
+  socket?: string;
 }
 
 interface INormalizedSignInfo {
@@ -74,12 +78,110 @@ export function packageSign(
     setTimeout(() => {
       const signedFilePackage: IFilePath[] = [];
       const signedFileIdPackage: number[] = [];
+      const state = getState();
+      const { connections, remoteFiles } = state;
 
       files.forEach((file) => {
         const newPath = signs.signFile(file.fullpath, cert, policies, format, folderOut);
         if (newPath) {
           signedFileIdPackage.push(file.id);
+          if (!file.socket) {
             signedFilePackage.push({ fullpath: newPath });
+          }
+
+          if (file.socket) {
+            const connection = connections.getIn(["entities", file.socket]);
+            const connectedList = connectedSelector(state, { connected: true });
+
+            if (connection && connection.connected && connection.socket) {
+              connection.socket.emit(SIGNED, { id: file.remoteId });
+            } else if (connectedList.length) {
+              const connectedSocket = connectedList[0].socket;
+
+              connectedSocket.emit(SIGNED, { id: file.remoteId });
+              connectedSocket.broadcast.emit(SIGNED, { id: file.remoteId });
+            }
+
+            try {
+              fs.unlinkSync(file.fullpath);
+            } catch (e) {
+              //
+            }
+
+            if (remoteFiles.uploader) {
+              let cms = signs.loadSign(newPath);
+
+              if (cms.isDetached()) {
+                // tslint:disable-next-line:no-conditional-assignment
+                if (!(cms = signs.setDetachedContent(cms, newPath))) {
+                  throw new Error(("err"));
+                }
+              }
+
+              const signatureInfo = signs.getSignPropertys(cms);
+
+              const normalyzeSignatureInfo: INormalizedSignInfo[] = [];
+
+              signatureInfo.forEach((info: any) => {
+                const subjectCert = info.certs[info.certs.length - 1];
+
+                normalyzeSignatureInfo.push({
+                  digestAlgorithm: subjectCert.signatureDigestAlgorithm,
+                  issuerFriendlyName: subjectCert.issuerFriendlyName,
+                  issuerName: subjectCert.issuerName,
+                  notAfter: new Date(subjectCert.notAfter).getTime(),
+                  notBefore: new Date(subjectCert.notBefore).getTime(),
+                  organizationName: subjectCert.organizationName,
+                  signingTime: info.signingTime ? new Date(info.signingTime).getTime() : undefined,
+                  subjectFriendlyName: info.subject,
+                  subjectName: subjectCert.subjectName,
+
+                });
+              });
+
+              window.request.post({
+                formData: {
+                  extra: JSON.stringify(file.extra),
+                  file: fs.createReadStream(newPath),
+                  id: file.remoteId,
+                  signers: JSON.stringify(normalyzeSignatureInfo),
+                },
+                url: remoteFiles.uploader,
+              }, (err: Error) => {
+                if (err) {
+                  if (connection && connection.connected && connection.socket) {
+                    connection.socket.emit(ERROR, { id: file.remoteId, error: err });
+                  } else if (connectedList.length) {
+                    const connectedSocket = connectedList[0].socket;
+
+                    connectedSocket.emit(ERROR, { id: file.remoteId, error: err });
+                    connectedSocket.broadcast.emit(ERROR, { id: file.remoteId, error: err });
+                  }
+                } else {
+                  if (connection && connection.connected && connection.socket) {
+                    connection.socket.emit(UPLOADED, { id: file.remoteId });
+                  } else if (connectedList.length) {
+                    const connectedSocket = connectedList[0].socket;
+
+                    connectedSocket.emit(UPLOADED, { id: file.remoteId });
+                    connectedSocket.broadcast.emit(UPLOADED, { id: file.remoteId });
+                  }
+
+                  dispatch({
+                    payload: { id: file.id },
+                    type: DELETE_FILE,
+                  });
+                }
+
+                try {
+                  fs.unlinkSync(newPath);
+                } catch (e) {
+                  //
+                }
+              },
+              );
+            }
+          }
 
         } else {
           packageSignResult = false;
@@ -107,7 +209,7 @@ export function filePackageSelect(files: IFilePath[]) {
       const filePackage: IFile[] = [];
 
       files.forEach((file: IFilePath) => {
-        const { fullpath, extra, remoteId } = file;
+        const { fullpath, extra, remoteId, socket } = file;
         const stat = fs.statSync(fullpath);
         const extension = extFile(fullpath);
 
@@ -122,6 +224,7 @@ export function filePackageSelect(files: IFilePath[]) {
           mtime: stat.birthtime,
           remoteId,
           size: stat.size,
+          socket,
         };
 
         filePackage.push(fileProps);
@@ -327,7 +430,7 @@ export function activeContainer(container: number) {
   };
 }
 
-export function selectFile(fullpath: string, name?: string, mtime?: Date, size?: number, remoteId?: string) {
+export function selectFile(fullpath: string, name?: string, mtime?: Date, size?: number, remoteId?: string, socket?: string) {
   let stat;
 
   if (!fileExists(fullpath)) {
@@ -348,6 +451,7 @@ export function selectFile(fullpath: string, name?: string, mtime?: Date, size?:
     mtime: mtime ? mtime : (stat ? stat.birthtime : undefined),
     remoteId,
     filesize: size ? size : (stat ? stat.size : undefined),
+    socket,
   };
 
   return {
@@ -374,7 +478,7 @@ export function deleteFile(fileId: number) {
 export function verifySignature(fileId: string, showOpenDialogForDetached: boolean = true, svsURL?: string) {
   return (dispatch: (action: {}) => void, getState: () => any) => {
     const state = getState();
-    const { documents, files } = state;
+    const { connections, documents, files } = state;
     let signaruteStatus = false;
     let signatureInfo;
     let cms: trusted.cms.SignedData;
@@ -396,6 +500,20 @@ export function verifySignature(fileId: string, showOpenDialogForDetached: boole
 
       signaruteStatus = signs.verifySign(cms);
       signatureInfo = signs.getSignPropertys(cms);
+
+      if (file.socket) {
+        const connectedList = connectedSelector(state, { connected: true });
+        const connection = connections.getIn(["entities", file.socket]);
+
+        if (connection && connection.connected && connection.socket) {
+          connection.socket.emit(VERIFIED, signatureInfo);
+        } else if (connectedList.length) {
+          const connectedSocket = connectedList[0].socket;
+
+          connectedSocket.emit(VERIFIED, signatureInfo);
+          connectedSocket.broadcast.emit(VERIFIED, signatureInfo);
+        }
+      }
 
       signatureInfo = signatureInfo.map((info: any) => {
         return {

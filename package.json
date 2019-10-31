@@ -4,7 +4,7 @@
   },
   "description": "CryptoARM GOST",
   "name": "cryptoarm-gost",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "license": "Apache-2.0",
   "main": "main.js",
   "scripts": {
@@ -109,6 +109,7 @@
     "@types/redux": "^3.6.0",
     "@types/redux-logger": "^3.0.0",
     "@types/request": "^2.48.1",
+    "@types/socket.io": "^1.4.36",
     "@types/systeminformation": "^3.23.0",
     "@types/webpack-env": "^1.13.0",
     "@types/xml2js": "^0.4.3",
@@ -179,6 +180,9 @@
     "redux-thunk": "^2.3.0",
     "request": "^2.87.0",
     "reselect": "^3.0.1",
+    "socket.io": "^2.1.1",
+    "socket.io-client": "^2.1.1",
+    "socket.io-stream": "^0.9.1",
     "source-map-support": "^0.4.18",
     "winston": "^3.0.0",
     "xml2js": "^0.4.19"

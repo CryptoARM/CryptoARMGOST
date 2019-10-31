@@ -15,6 +15,7 @@ interface IFileRedux {
   fullpath: string;
   id: number;
   mtime: Date;
+  socket: string;
 }
 
 interface IFilelistItemProps {
@@ -77,11 +78,15 @@ class FileListItem extends React.Component<IFilelistItemProps, {}> {
           <i className="file-setting-item waves-effect material-icons secondary-content"
             data-activates={"dropdown-btn-set-file-" + this.props.index} onClick={self.stopEvent}>more_vert</i>
           <ul id={"dropdown-btn-set-file-" + this.props.index} className="dropdown-content">
-            <li><a onClick={function(event: any) { self.openFile(event, file.fullpath); }}>{localize("Settings.open_file", locale)}</a></li>
-            <React.Fragment>
-              <li><a onClick={function(event: any) { self.openFileFolder(event, file.fullpath); }}>{localize("Settings.go_to_file", locale)}</a></li>
-              <li><a onClick={this.props.removeFiles}>{localize("Settings.delete_file", locale)}</a></li>
-            </React.Fragment>
+            <li><a onClick={function (event: any) { self.openFile(event, file.fullpath); }}>{localize("Settings.open_file", locale)}</a></li>
+            {
+              file.socket ? null
+                :
+                <React.Fragment>
+                  <li><a onClick={function (event: any) { self.openFileFolder(event, file.fullpath); }}>{localize("Settings.go_to_file", locale)}</a></li>
+                  <li><a onClick={this.props.removeFiles}>{localize("Settings.delete_file", locale)}</a></li>
+                </React.Fragment>
+            }
           </ul>
         </div>
       </div>

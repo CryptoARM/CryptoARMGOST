@@ -13,6 +13,7 @@ import {
   LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT,
   LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE,
 } from "../../constants";
+import { loadingRemoteFilesSelector } from "../../selectors";
 import { mapToArr } from "../../utils";
 import CheckBoxWithLabel from "../CheckBoxWithLabel";
 import EncodingTypeSelector from "../EncodingTypeSelector";
@@ -58,6 +59,7 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
     const { settings } = this.state;
 
     const disabled = this.getDisabled();
+    const classDisabled = disabled ? "disabled" : "";
 
     let encoding = settings.sign.encoding;
 
@@ -89,11 +91,14 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
                         <label htmlFor="name" style={{ color: "rgba(0,0,0,0.87)", fontSize: "14px" }}>{localize("Settings.name", locale)}</label>
                       </div>
                     </div>
-                    <CheckBoxWithLabel onClickCheckBox={this.handleSaveToDocumentsClick}
+                    <CheckBoxWithLabel
+                      disabled={disabled}
+                      onClickCheckBox={this.handleSaveToDocumentsClick}
                       isChecked={settings.saveToDocuments}
                       elementId="saveToDocuments"
                       title={localize("Documents.save_to_documents", locale)} />
                     <SelectFolder
+                      disabled={disabled}
                       directory={settings.saveToDocuments ? DEFAULT_DOCUMENTS_PATH : settings.outfolder}
                       viewDirect={this.handleOutfolderChange}
                       openDirect={this.addDirect.bind(this)}
@@ -174,20 +179,24 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
                 </div>
               </div>
 
-              <div className="col s12">
+              <div className={`col s12 ${classDisabled}`}>
                 <div className="h4">{localize("Encrypt.encrypt_setting", locale)}</div>
                 <div className="settings-content">
                   <div className="col s12 m12 l6">
                     <EncodingTypeSelector EncodingValue={settings.encrypt.encoding} handleChange={this.handleEncryptEncodingChange} />
                   </div>
                   <div className="col s12 m12 l6">
-                    <CheckBoxWithLabel onClickCheckBox={this.handleDeleteClick}
+                    <CheckBoxWithLabel
+                      disabled={disabled}
+                      onClickCheckBox={this.handleDeleteClick}
                       isChecked={settings.encrypt.delete}
                       elementId="delete_files"
                       title={localize("Encrypt.delete_files_after", locale)} />
                   </div>
                   <div className="col s12 m12 l6">
-                    <CheckBoxWithLabel onClickCheckBox={this.handleArchiveClick}
+                    <CheckBoxWithLabel
+                      disabled={disabled}
+                      onClickCheckBox={this.handleArchiveClick}
                       isChecked={settings.encrypt.archive}
                       elementId="archive_files"
                       title={localize("Encrypt.archive_files_before", locale)} />
@@ -222,7 +231,8 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
                       </div> :
                       <div className="col s12">
                         <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT}>
-                          <a className="btn btn-outlined waves-effect waves-light" style={{ width: "100%" }}>
+                          <a className={`btn btn-outlined waves-effect waves-light ${classDisabled}`}
+                            style={{ width: "100%" }}>
                             {localize("Settings.Choose", locale)}
                           </a>
                         </Link>
@@ -282,6 +292,20 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
   }
 
   getDisabled = () => {
+    const { files, loadingFiles } = this.props;
+
+    if (loadingFiles && loadingFiles.length) {
+      return true;
+    }
+
+    if (files && files.length) {
+      for (const file of files) {
+        if (file.socket) {
+          return true;
+        }
+      }
+    }
+
     return false;
   }
 
@@ -328,7 +352,9 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
       settings: settings
         .setIn(["outfolder"], directory)
         .setIn(["saveToDocuments"], !settings.saveToDocuments),
+
     });
+
   }
 
   handleEncodingChange = (encoding: string) => {
@@ -378,6 +404,7 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
 export default connect((state) => {
   return {
     files: mapToArr(state.files.entities),
+    loadingFiles: loadingRemoteFilesSelector(state, { loading: true }),
     recipients: mapToArr(state.settings.getIn(["entities", state.settings.active]).encrypt.recipients)
       .map((recipient) => state.certificates.getIn(["entities", recipient.certId]))
       .filter((recipient) => recipient !== undefined),

@@ -5,6 +5,7 @@ import Media from "react-media";
 import { connect } from "react-redux";
 import { activeFile, deleteFile, filePackageDelete, filePackageSelect, selectFile } from "../../AC";
 import { SIGN } from "../../constants";
+import { loadingRemoteFilesSelector } from "../../selectors";
 import { mapToArr } from "../../utils";
 import FileList from "../Files/FileList";
 import FileTable from "../Files/FileTable";
@@ -24,11 +25,13 @@ interface IFile {
   type: string;
   webkitRelativePath: string;
   remoteId?: string;
+  socket?: string;
 }
 
 interface IFilePath {
   fullpath: string;
   extra?: any;
+  socket?: string;
 }
 
 interface IFileRedux {
@@ -39,6 +42,7 @@ interface IFileRedux {
   id: number;
   mtime: Date;
   remoteId: string;
+  socket: string;
 }
 
 export interface IRemoteFile {
@@ -56,6 +60,7 @@ interface IFileSelectorProps {
   activeFile: (id: number, active?: boolean) => void;
   deleteFile: (fileId: number) => void;
   operation: string;
+  loadingFiles: IRemoteFile[];
   files: IFileRedux[];
   selectFile: (fullpath: string, name?: string, mtime?: Date, size?: number) => void;
   selectedFilesPackage: boolean;
@@ -81,9 +86,13 @@ class FileSelector extends React.Component<IFileSelectorProps, {}> {
   }
 
   shouldComponentUpdate(nextProps: IFileSelectorProps) {
-    const { files, searchValue, selectingFilesPackage } = this.props;
+    const { files, loadingFiles, searchValue, selectingFilesPackage } = this.props;
 
     if (selectingFilesPackage !== nextProps.selectingFilesPackage) {
+      return true;
+    }
+
+    if (loadingFiles.length !== nextProps.loadingFiles.length) {
       return true;
     }
 
@@ -195,14 +204,14 @@ class FileSelector extends React.Component<IFileSelectorProps, {}> {
 
   getBody() {
     const { localize, locale } = this.context;
-    const { files, selectingFilesPackage } = this.props;
+    const { loadingFiles, files, selectingFilesPackage } = this.props;
 
     if (selectingFilesPackage) {
       return <ProgressBars />;
     }
 
-    const active = files.length > 0 ? "active" : "not-active";
-    const collection = files.length > 0 ? "collection" : "";
+    const active = files.length > 0 || loadingFiles.length > 0 ? "active" : "not-active";
+    const collection = files.length > 0 || loadingFiles.length > 0 ? "collection" : "";
     const disabled = this.getDisabled();
 
     return (
@@ -248,6 +257,20 @@ class FileSelector extends React.Component<IFileSelectorProps, {}> {
   }
 
   getDisabled = () => {
+    const { files, loadingFiles } = this.props;
+
+    if (loadingFiles.length) {
+      return true;
+    }
+
+    if (files.length) {
+      for (const file of files) {
+        if (file.socket) {
+          return true;
+        }
+      }
+    }
+
     return false;
   }
 }
@@ -255,6 +278,7 @@ class FileSelector extends React.Component<IFileSelectorProps, {}> {
 export default connect((state) => {
   return {
     files: mapToArr(state.files.entities),
+    loadingFiles: loadingRemoteFilesSelector(state, { loading: true }),
     selectedFilesPackage: state.files.selectedFilesPackage,
     selectingFilesPackage: state.files.selectingFilesPackage,
   };

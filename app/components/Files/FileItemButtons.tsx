@@ -26,6 +26,8 @@ class FileItemButtons extends React.Component<IFileItemButtonsProps, {}> {
       return null;
     }
 
+    const classDisabled = file.socket ? "disabled" : "";
+
     return (
       <div className="row nobottom" style={{ width: "120px" }}>
         {
@@ -41,14 +43,14 @@ class FileItemButtons extends React.Component<IFileItemButtonsProps, {}> {
         }
 
         <div className="col" style={{ width: "40px" }}>
-          <i className="file-setting-item waves-effect material-icons secondary-content"
+          <i className={`file-setting-item waves-effect material-icons secondary-content ${classDisabled}`}
             onClick={(event) => {
               event.stopPropagation();
               shell.showItemInFolder(file.fullpath);
             }}>directions</i>
         </div>
         <div className="col" style={{ width: "40px" }}>
-          <i className="file-setting-item waves-effect material-icons secondary-content"
+          <i className={`file-setting-item waves-effect material-icons secondary-content ${classDisabled}`}
             onClick={(event) => {
               event.stopPropagation();
               this.props.deleteFile(file.id);

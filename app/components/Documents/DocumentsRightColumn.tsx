@@ -23,8 +23,9 @@ import {
   LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE, LOCATION_MAIN, LOCATION_SETTINGS_CONFIG,
   LOCATION_SETTINGS_SELECT, REMOVE, SIGN, UNSIGN, USER_NAME, VERIFY,
 } from "../../constants";
-import { activeFilesSelector } from "../../selectors";
+import { activeFilesSelector, connectedSelector } from "../../selectors";
 import { selectedDocumentsSelector } from "../../selectors/documentsSelector";
+import { DECRYPTED, ENCRYPTED, ERROR, SIGNED, UPLOADED } from "../../server/constants";
 import * as trustedEncrypts from "../../trusted/encrypt";
 import { checkLicense } from "../../trusted/jwt";
 import * as jwt from "../../trusted/jwt";

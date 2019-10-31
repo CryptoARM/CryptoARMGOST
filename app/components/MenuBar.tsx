@@ -10,10 +10,15 @@ import {
   LOCATION_EVENTS, LOCATION_LICENSE, LOCATION_SERVICES,
   LOCATION_SETTINGS, LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT, SETTINGS_JSON, TRUSTED_CRYPTO_LOG,
 } from "../constants";
+import { connectedSelector, loadingRemoteFilesSelector } from "../selectors";
+import { CANCELLED } from "../server/constants";
 import { fileExists, mapToArr } from "../utils";
 import Diagnostic from "./Diagnostic/Diagnostic";
 import LocaleSelect from "./Settings/LocaleSelect";
 import SideMenu from "./SideMenu";
+
+// tslint:disable-next-line:no-var-requires
+require("../server/socketManager");
 
 const remote = window.electron.remote;
 if (remote.getGlobal("sharedObject").logcrypto) {
@@ -51,6 +56,10 @@ class MenuBar extends React.Component<any, IMenuBarState> {
   closeWindow() {
     const { localize, locale } = this.context;
     const { settings, tempContentOfSignedFiles } = this.props;
+
+    if (this.isFilesFromSocket()) {
+      this.removeAllFiles();
+    }
 
     for (const filePath of tempContentOfSignedFiles) {
       if (fileExists(filePath)) {
@@ -185,17 +194,44 @@ class MenuBar extends React.Component<any, IMenuBarState> {
   }
 
   isFilesFromSocket = () => {
+    const { files, loadingFiles } = this.props;
+
+    if (loadingFiles.length) {
+      return true;
+    }
+
+    if (files.length) {
+      for (const file of files) {
+        if (file.socket) {
+          return true;
+        }
+      }
+    }
+
     return false;
   }
 
   removeAllFiles = () => {
     // tslint:disable-next-line:no-shadowed-variable
-    const { filePackageDelete, files } = this.props;
+    const { connections, connectedList, filePackageDelete, files } = this.props;
 
     const filePackage: number[] = [];
 
     for (const file of files) {
       filePackage.push(file.id);
+
+      if (file.socket) {
+        const connection = connections.getIn(["entities", file.socket]);
+
+        if (connection && connection.connected && connection.socket) {
+          connection.socket.emit(CANCELLED, { id: file.remoteId });
+        } else if (connectedList.length) {
+          const connectedSocket = connectedList[0].socket;
+
+          connectedSocket.emit(CANCELLED, { id: file.remoteId });
+          connectedSocket.broadcast.emit(CANCELLED, { id: file.remoteId });
+        }
+      }
     }
 
     filePackageDelete(filePackage);
@@ -205,11 +241,14 @@ class MenuBar extends React.Component<any, IMenuBarState> {
 export default connect((state, ownProps) => {
   return {
     cloudCSPSettings: state.settings.getIn(["entities", state.settings.default]).cloudCSP,
+    connectedList: connectedSelector(state, { connected: true }),
+    connections: state.connections,
     encSettings: state.settings.getIn(["entities", state.settings.default]).encrypt,
     eventsDateFrom: state.events.dateFrom,
     eventsDateTo: state.events.dateTo,
     files: mapToArr(state.files.entities),
     isArchiveLog: state.events.isArchive,
+    loadingFiles: loadingRemoteFilesSelector(state, { loading: true }),
     location: ownProps.location,
     saveToDocuments: state.settings.getIn(["entities", state.settings.default]).saveToDocuments,
     settingsName: state.settings.getIn(["entities", state.settings.default]).name,

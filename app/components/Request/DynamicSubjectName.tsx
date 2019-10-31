@@ -1,5 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
+import { err_inn, err_ogrnip, err_snils, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
+
+const REQULAR_EXPRESSION = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
 export interface IRDNObject {
   /**
@@ -142,7 +145,7 @@ class DynamicSubjectName extends React.Component<IDynamicSubjectNameProps, IDyna
                       disabled={field.ProhibitChange}
                       id={field.Oid}
                       type="text"
-                      className={!this.props.formVerified ? "validate" : field.ProhibitEmpty ? oidValue && oidValue.length > 0 ? "valid" : "invalid" : "valid"}
+                      className={this.validateOidValue(field)}
                       maxLength={field.Length}
                       name={field.Oid}
                       value={oidValue}
@@ -158,6 +161,42 @@ class DynamicSubjectName extends React.Component<IDynamicSubjectNameProps, IDyna
         }
       </div>
     );
+  }
+
+  validateOidValue = (field: IRDNObject) => {
+    const { subject } = this.state;
+    const oidValue = subject[field.Oid] ? subject[field.Oid].value : "";
+    if (this.props.formVerified && field.ProhibitEmpty && !(oidValue && oidValue.length > 0)) {
+      return "invalid";
+    }
+
+    if (field.Oid === "1.2.643.3.131.1.1") {
+      return !oidValue || !oidValue.length ? "validate" : validateInn(oidValue) ? "valid" : "invalid";
+    } else if (field.Oid === "1.2.643.100.1") {
+      return !oidValue || !oidValue.length ? "validate" : validateOgrn(oidValue) ? "valid" : "invalid";
+    } else if (field.Oid === "1.2.643.100.3") {
+      return !oidValue || !oidValue.length ? "validate" : validateSnils(oidValue) ? "valid" : "invalid";
+    } else if (field.Oid === "1.2.643.100.5") {
+      return !oidValue || !oidValue.length ? "validate" : validateOgrnip(oidValue) ? "valid" : "invalid";
+    } else if (field.Oid === "1.2.840.113549.1.9.1") {
+      return !oidValue || !oidValue.length ? "validate" : REQULAR_EXPRESSION.test(oidValue) ? "valid" : "invalid";
+    }
+
+    if (!this.props.formVerified) {
+      return "validate";
+    } else if (field.ProhibitEmpty) {
+      if (oidValue && oidValue.length > 0) {
+        return "valid";
+      } else {
+        return "invalid";
+      }
+    } else {
+      if (oidValue && oidValue.length > 0) {
+        return "valid";
+      } else {
+        return "validate";
+      }
+    }
   }
 
   handleInputChange = (ev: any) => {

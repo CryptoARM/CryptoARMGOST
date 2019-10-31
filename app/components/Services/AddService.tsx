@@ -5,11 +5,13 @@ import { connect } from "react-redux";
 import { getRegRequest, postRegRequest } from "../../AC/caActions";
 import { addService } from "../../AC/servicesActions";
 import { CA_SERVICE } from "../../constants";
-import { uuid } from "../../utils";
+import { uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
 import CryptoProCASettings from "../CA/CryptoProCASettings";
 import DynamicRegistrationForm from "../CA/DynamicRegistrationForm";
 import LoginForm from "../CA/LoginForm";
 import { ICAServiceSettings, IService } from "./types";
+
+const REQULAR_EXPRESSION = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
 interface IAddServiceState {
   activeSettingsTab: boolean;
@@ -325,10 +327,30 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
     let result = true;
 
     Object.keys(RDNmodel).map((key) => {
-      const field = RDNmodel[key];
 
-      if (field.prohibitEmpty && !field.value) {
-        result = false;
+      const field = RDNmodel[key];
+      if (field) {
+        if (field.ProhibitEmpty && !field.value) {
+          result = false;
+          return;
+        }
+
+        if (field.value && (key === "1.2.643.3.131.1.1")) {
+          result = validateInn(field.value);
+          return;
+        } else if (field.value && (key === "1.2.643.100.1")) {
+          result = validateOgrn(field.value);
+          return;
+        } else if (field.value && (key === "1.2.643.100.3")) {
+          result = validateSnils(field.value);
+          return;
+        } else if (field.value && (key === "1.2.643.100.5")) {
+          result = validateOgrnip(field.value);
+          return;
+        } else if (field.value && (key === "1.2.840.113549.1.9.1")) {
+          result = REQULAR_EXPRESSION.test(field.value);
+          return;
+        }
       }
     });
 

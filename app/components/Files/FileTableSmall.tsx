@@ -5,7 +5,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { AutoSizer, Column, Table } from "react-virtualized";
 import { activeFile, deleteFile, selectTempContentOfSignedFiles } from "../../AC";
-import { activeFilesSelector, filteredFilesSelector } from "../../selectors";
+import { activeFilesSelector, filteredFilesSelector, loadingRemoteFilesSelector } from "../../selectors";
 import "../../table.global.css";
 import { bytesToSize, mapToArr } from "../../utils";
 import ProgressBars from "../ProgressBars";
@@ -23,6 +23,7 @@ interface IFileRedux {
   fullpath: string;
   id: number;
   mtime: Date;
+  socket: string;
 }
 
 export interface IRemoteFile {
@@ -39,6 +40,7 @@ export interface IRemoteFile {
 interface IFileTableSmallProps {
   activeFile: (id: number, active?: boolean) => void;
   deleteFile: (fileId: number) => void;
+  loadingFiles: IRemoteFile[];
   location: any;
   filesMap: any;
   operation: string;
@@ -122,14 +124,14 @@ class FileTableSmall extends React.Component<IFileTableSmallProps & IFileTableSm
 
   render() {
     const { locale, localize } = this.context;
-    const { filesMap, searchValue } = this.props;
+    const { loadingFiles, filesMap, searchValue } = this.props;
     const { disableHeader, foundDocuments, scrollToIndex, sortBy, sortDirection, sortedList } = this.state;
 
     const classDisabledNavigation = foundDocuments.length && foundDocuments.length === 1 ? "disabled" : "";
 
     const rowGetter = ({ index }: { index: number }) => this.getDatum(this.state.sortedList, index);
 
-    if (!filesMap.size) {
+    if (!loadingFiles.length && !filesMap.size) {
       return null;
     }
 
@@ -405,6 +407,7 @@ export default connect((state, ownProps: IOwnProps) => ({
   activeFilesArr: mapToArr(activeFilesSelector(state, { active: true })),
   activeFilesMap: activeFilesSelector(state, { active: true }),
   filesMap: filteredFilesSelector(state),
+  loadingFiles: loadingRemoteFilesSelector(state, { loading: true }),
   selectedFilesPackage: state.files.selectedFilesPackage,
   selectingFilesPackage: state.files.selectingFilesPackage,
 }), { activeFile, deleteFile, selectTempContentOfSignedFiles })(FileTableSmall);

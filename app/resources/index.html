@@ -107,6 +107,8 @@
     window.CA_CERTTEMPLATE_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certtemplate.json");
     window.CA_CERTREGUESTS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certrequests.json");
     window.CA_CSR_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "csr.json");
+    window.DSS_TOKENS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "tokens.json");
+    window.DSS_CERTIFICATES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "DSSCertificate.json");
     window.TRUSTED_CRYPTO_LOG = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost.log");
     window.APP_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_operations.log");
     window.APP_ERRORS_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_errors.log");
@@ -132,6 +134,10 @@
 
     if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA'))) {
       fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA'), { mode: 0o700 });
+    }
+
+    if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'DSS'))) {
+      fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'DSS'), { mode: 0o700 });
     }
 
     document.ondragover = function (evt) {

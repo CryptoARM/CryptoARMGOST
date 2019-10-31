@@ -15,7 +15,7 @@ import {
 } from "../../constants";
 import { filteredServicesByType } from "../../selectors/servicesSelectors";
 import * as jwt from "../../trusted/jwt";
-import { arrayToMap, fileCoding, formatDate, mapToArr, uuid, validateInn, validateOgrnip, validateSnils } from "../../utils";
+import { arrayToMap, fileCoding, formatDate, mapToArr, uuid, validateInn, validateOgrnip, validateSnils, validateOgrn } from "../../utils";
 import logger from "../../winstonLogger";
 import ServiceListItem from "../Services/ServiceListItem";
 import { ICertificateRequestCA, IRegRequest } from "../Services/types";
@@ -198,7 +198,6 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                   <div className="content-wrapper z-depth-1 tbody" style={{ height: "400px" }}>
                     <div className="content-item-relative">
                       <div className="row halfbottom" />
-
                       <DynamicSubjectName
                         formVerified={formVerified}
                         model={RDNsubject}
@@ -371,6 +370,8 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
   verifyFields = () => {
     const { template, RDNsubject } = this.state;
+    const REQULAR_EXPRESSION = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+
     if (!template || !template.RDN) {
       return false;
     }
@@ -384,6 +385,24 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
         if (field.ProhibitEmpty && (!RDNsubjectValue || !RDNsubjectValue.value)) {
           result = false;
+          return;
+        }
+
+        if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.643.3.131.1.1")) {
+          result = validateInn(RDNsubjectValue);
+          return;
+        } else if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.643.100.1")) {
+          result = validateOgrn(RDNsubjectValue);
+          return;
+        } else if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.643.100.3")) {
+          result = validateSnils(RDNsubjectValue);
+          return;
+        } else if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.643.100.5")) {
+          result = validateOgrnip(RDNsubjectValue);
+          return;
+        } else if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.840.113549.1.9.1")) {
+          result = REQULAR_EXPRESSION.test(RDNsubjectValue);
+          return;
         }
       }
     });

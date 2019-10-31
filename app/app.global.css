@@ -3217,6 +3217,10 @@ svg:hover {
     background: url(./resources/image/docmenu_remove.svg);
   }
 
+  i.material-icons.docmenu.cancel {
+    background: url(./resources/image/cancel_button.svg);
+  }
+
   i.material-icons.license.install {
     background: url(./resources/image/operations/add_lic.svg);
     background-size: 40px 40px;

@@ -3,21 +3,30 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import {
-  activeFile, filePackageDelete, filePackageSelect,
+  activeFile, filePackageDelete, filePackageSelect, removeAllRemoteFiles,
 } from "../../AC";
-import { activeFilesSelector } from "../../selectors";
+import { deleteAllTemporyLicenses } from "../../AC/licenseActions";
+import { activeFilesSelector, connectedSelector, loadingRemoteFilesSelector } from "../../selectors";
+import { CANCELLED, ERROR, SIGN, SIGNED, UPLOADED } from "../../server/constants";
 import { mapToArr } from "../../utils";
 import FilterDocuments from "../Documents/FilterDocuments";
 import FileSelector from "../Files/FileSelector";
 import Modal from "../Modal";
 import SignatureInfoBlock from "../Signature/SignatureInfoBlock";
 import SignatureAndEncryptRightColumn from "./SignatureAndEncryptRightColumn";
+
+const remote = window.electron.remote;
 const dialog = window.electron.remote.dialog;
 
 interface ISignatureAndEncryptWindowProps {
   activeFilesArr: any;
   isDefaultFilters: boolean;
+  deleteAllTemporyLicenses: () => void;
+  loadingFiles: any;
+  files: any;
+  method: string;
   packageSignResult: any;
+  removeAllRemoteFiles: () => void;
   signatures: any;
   signedPackage: any;
 }
@@ -54,6 +63,15 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
       inDuration: 300,
       outDuration: 225,
     });
+  }
+
+  componentDidUpdate(prevProps: ISignatureAndEncryptWindowProps) {
+    if (this.props.method === SIGN && prevProps.activeFilesArr && prevProps.activeFilesArr.length && (!this.props.activeFilesArr || !this.props.activeFilesArr.length)) {
+      this.props.removeAllRemoteFiles();
+      remote.getCurrentWindow().close();
+
+      this.props.deleteAllTemporyLicenses();
+    }
   }
 
   componentWillReceiveProps(nextProps: ISignatureAndEncryptWindowProps) {
@@ -99,6 +117,8 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
     const { isDefaultFilters } = this.props;
 
     const classDefaultFilters = isDefaultFilters ? "filter_off" : "filter_on";
+    const disabledNavigate = this.isFilesFromSocket();
+    const classDisabled = disabledNavigate ? "disabled" : "";
 
     return (
       <div className="content-noflex">
@@ -107,8 +127,8 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
             <div className="row halfbottom">
               <div className="row halfbottom" />
               <div className="col" style={{ width: "40px", paddingLeft: "40px" }}>
-                <a onClick={this.addFiles.bind(this)}>
-                  <i className="file-setting-item waves-effect material-icons secondary-content pulse">add</i>
+                <a className={`${classDisabled}`} onClick={this.addFiles.bind(this)}>
+                  <i className={`file-setting-item waves-effect material-icons secondary-content pulse ${classDisabled}`}>add</i>
                 </a>
               </div>
               <div className="col" style={{ width: "calc(100% - 140px)" }}>
@@ -124,16 +144,16 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
                 </div>
               </div>
               <div className="col" style={{ width: "40px" }}>
-                <a onClick={this.handleShowModalFilterDocuments}>
+                <a className={`${classDisabled}`} onClick={this.handleShowModalFilterDocuments}>
                   <i className={`file-setting-item waves-effect material-icons secondary-content`}>
-                    <i className={`material-icons ${classDefaultFilters}`} />
+                    <i className={`material-icons ${classDefaultFilters}`} style={disabledNavigate ? {opacity: 0.38} : {opacity: 1}}/>
                   </i>
                 </a>
               </div>
               <div className="col" style={{ width: "40px" }}>
                 <div>
                   <a className="btn-floated" data-activates="dropdown-btn-set-add-files">
-                    <i className="file-setting-item waves-effect material-icons secondary-content">more_vert</i>
+                    <i className={`file-setting-item waves-effect material-icons secondary-content ${classDisabled}`}>more_vert</i>
                   </a>
                   <ul id="dropdown-btn-set-add-files" className="dropdown-content">
                     <li><a onClick={this.selectedAll}>{localize("Settings.selected_all", locale)}</a></li>
@@ -172,7 +192,7 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
                   </div>
                 </React.Fragment>
               ) :
-              <SignatureAndEncryptRightColumn />
+              <SignatureAndEncryptRightColumn removeAllFiles={this.removeAllFiles} />
             }
 
           </div>
@@ -206,12 +226,25 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
 
   removeAllFiles = () => {
     // tslint:disable-next-line:no-shadowed-variable
-    const { filePackageDelete, files } = this.props;
+    const { connections, connectedList, filePackageDelete, files } = this.props;
 
     const filePackage: number[] = [];
 
     for (const file of files) {
       filePackage.push(file.id);
+
+      if (file.socket) {
+        const connection = connections.getIn(["entities", file.socket]);
+
+        if (connection && connection.connected && connection.socket) {
+          connection.socket.emit(CANCELLED, { id: file.remoteId });
+        } else if (connectedList.length) {
+          const connectedSocket = connectedList[0].socket;
+
+          connectedSocket.emit(CANCELLED, { id: file.remoteId });
+          connectedSocket.broadcast.emit(CANCELLED, { id: file.remoteId });
+        }
+      }
     }
 
     filePackageDelete(filePackage);
@@ -264,6 +297,24 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
   handleCloseModalFilterDocuments = () => {
     this.setState({ showModalFilterDocments: false });
   }
+
+  isFilesFromSocket = () => {
+    const { files, loadingFiles } = this.props;
+
+    if (loadingFiles.length) {
+      return true;
+    }
+
+    if (files.length) {
+      for (const file of files) {
+        if (file.socket) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 }
 
 export default connect((state) => {
@@ -275,10 +326,14 @@ export default connect((state) => {
 
   return {
     activeFilesArr: mapToArr(activeFilesSelector(state, { active: true })),
-    isDefaultFilters: state.filters.documents.isDefaultFilters,
+    connectedList: connectedSelector(state, { connected: true }),
+    connections: state.connections,
     files: mapToArr(state.files.entities),
+    isDefaultFilters: state.filters.documents.isDefaultFilters,
+    loadingFiles: loadingRemoteFilesSelector(state, { loading: true }),
+    method: state.remoteFiles.method,
     packageSignResult: state.signatures.packageSignResult,
     signatures,
     signedPackage: state.signatures.signedPackage,
   };
-}, { activeFile, filePackageSelect, filePackageDelete })(SignatureAndEncryptWindow);
+}, { activeFile, deleteAllTemporyLicenses, filePackageSelect, filePackageDelete, removeAllRemoteFiles })(SignatureAndEncryptWindow);

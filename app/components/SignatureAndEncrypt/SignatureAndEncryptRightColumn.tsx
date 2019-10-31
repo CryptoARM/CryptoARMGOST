@@ -20,7 +20,8 @@ import {
   LOCATION_SETTINGS_SELECT,
   REMOVE, SIGN, UNSIGN, USER_NAME, VERIFY,
 } from "../../constants";
-import { activeFilesSelector } from "../../selectors";
+import { activeFilesSelector, connectedSelector, loadingRemoteFilesSelector } from "../../selectors";
+import { DECRYPTED, ENCRYPTED, ERROR, SIGNED, UPLOADED } from "../../server/constants";
 import * as trustedEncrypts from "../../trusted/encrypt";
 import * as jwt from "../../trusted/jwt";
 import { checkLicense } from "../../trusted/jwt";
@@ -36,7 +37,10 @@ interface ISignatureAndEncryptRightColumnSettingsProps {
   activeFilesArr: any;
   isDefaultFilters: boolean;
   isDocumentsReviewed: boolean;
+  loadingFiles: any;
+  files: any;
   packageSignResult: any;
+  removeAllFiles: () => void;
   signatures: any;
   signedPackage: any;
 }
@@ -79,6 +83,9 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     const { localize, locale } = this.context;
     const { activeFiles, isDocumentsReviewed, recipients, setting, settings, signer } = this.props;
     const { file } = this.state;
+
+    const disabledNavigate = this.isFilesFromSocket();
+    const classDisabled = disabledNavigate ? "disabled" : "";
 
     return (
       <React.Fragment>
@@ -162,10 +169,10 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           <hr />
         </div>
 
-        <div className="col s2">
+        <div className={`col s2 ${classDisabled}`}>
           <div className="right import-col">
             <a className="btn-floated" data-activates="dropdown-btn-encrypt">
-              <i className="file-setting-item waves-effect material-icons secondary-content">more_vert</i>
+              <i className={`file-setting-item waves-effect material-icons secondary-content ${classDisabled}`}>more_vert</i>
             </a>
             <ul id="dropdown-btn-encrypt" className="dropdown-content">
               <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT}>
@@ -180,16 +187,16 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         {
           (recipients && recipients.length) ?
             <div style={{ height: "calc(100vh - 400px)" }}>
-              <div className="add-certs">
+              <div className={`add-certs ${classDisabled}`}>
                 <RecipientsList recipients={recipients} handleRemoveRecipient={(recipient) => this.props.deleteRecipient(recipient.id)} />
               </div>
             </div> :
-            <div className="col s12">
+            <div className={`col s12 ${classDisabled}`}>
               <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT}>
                 <a onClick={() => {
                   this.props.activeSetting(this.props.setting.id);
                 }}
-                  className="btn btn-outlined waves-effect waves-light"
+                  className={`btn btn-outlined waves-effect waves-light ${classDisabled}`}
                   style={{ width: "100%" }}>
                   {localize("Settings.Choose", locale)}
                 </a>
@@ -223,66 +230,116 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               null
           }
 
-          <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(SIGN) ? "" : "disabled_docs"}`} onClick={this.handleClickSign}>
-            <div className="col s12 svg_icon">
-              <a data-position="bottom">
-                <i className="material-icons docmenu sign" />
-              </a>
-            </div>
-            <div className="col s12 svg_icon_text">{localize("Documents.docmenu_sign", locale)}</div>
-          </div>
+          {
+            disabledNavigate ?
+              this.props.method === "sign" ?
+                <React.Fragment>
+                  <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(SIGN) ? "" : "disabled_docs"}`} onClick={this.handleClickSign}>
+                    <div className="col s12 svg_icon">
+                      <a data-position="bottom">
+                        <i className="material-icons docmenu sign" />
+                      </a>
+                    </div>
+                    <div className="col s12 svg_icon_text">{localize("Documents.docmenu_sign", locale)}</div>
+                  </div>
 
-          <div className={`col s4 waves-effect waves-cryptoarm  ${this.checkEnableOperationButton(VERIFY) ? "" : "disabled_docs"}`} onClick={this.verifySign}>
-            <div className="col s12 svg_icon">
-              <a data-position="bottom"
-                data-tooltip={localize("Sign.sign_and_verify", locale)}>
-                <i className="material-icons docmenu verifysign" />
+                  <div className="col s4 waves-effect waves-cryptoarm" onClick={this.props.removeAllFiles}>
+                    <div className="col s12 svg_icon">
+                      <a data-position="bottom">
+                        <i className="material-icons docmenu cancel" />
+                      </a>
+                    </div>
+                    <div className="col s12 svg_icon_text">{localize("Common.cancel", locale)}</div>
+                  </div>
+                </React.Fragment>
 
-              </a>
-            </div>
-            <div className="col s12 svg_icon_text">{"Проверить"}</div>
-          </div>
+                :
 
-          <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(UNSIGN) ? "" : "disabled_docs"}`} onClick={this.unSign}>
-            <div className="col s12 svg_icon">
-              <a data-position="bottom">
-                <i className="material-icons docmenu removesign" />
-              </a>
-            </div>
-            <div className="col s12 svg_icon_text">{localize("Documents.docmenu_removesign", locale)}</div>
-          </div>
+                <React.Fragment>
+                  <div className={`col s4 waves-effect waves-cryptoarm  ${this.checkEnableOperationButton(VERIFY) ? "" : "disabled_docs"}`} onClick={this.verifySign}>
+                    <div className="col s12 svg_icon">
+                      <a data-position="bottom"
+                        data-tooltip={localize("Sign.sign_and_verify", locale)}>
+                        <i className="material-icons docmenu verifysign" />
+                      </a>
+                    </div>
+                    <div className="col s12 svg_icon_text">{"Проверить"}</div>
+                  </div>
 
-          <div className="col s12">
-            <div className="row halfbottom" />
-          </div>
+                  <div className="col s4 waves-effect waves-cryptoarm" onClick={this.props.removeAllFiles}>
+                    <div className="col s12 svg_icon">
+                      <a data-position="bottom">
+                        <i className="material-icons docmenu cancel" />
+                      </a>
+                    </div>
+                    <div className="col s12 svg_icon_text">{localize("Common.cancel", locale)}</div>
+                  </div>
+                </React.Fragment>
 
-          <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(ENCRYPT) ? "" : "disabled_docs"}`} onClick={this.encrypt}>
-            <div className="col s12 svg_icon">
-              <a data-position="bottom">
-                <i className="material-icons docmenu encrypt" />
-              </a>
-            </div>
-            <div className="col s12 svg_icon_text">{localize("Documents.docmenu_enctypt", locale)}</div>
-          </div>
+              :
 
-          <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(DECRYPT) ? "" : "disabled_docs"}`} onClick={this.decrypt}>
-            <div className="col s12 svg_icon">
-              <a data-position="bottom">
-                <i className="material-icons docmenu decrypt" />
-              </a>
-            </div>
-            <div className="col s12 svg_icon_text">{localize("Documents.docmenu_dectypt", locale)}</div>
-          </div>
+              <React.Fragment>
+                <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(SIGN) ? "" : "disabled_docs"}`} onClick={this.handleClickSign}>
+                  <div className="col s12 svg_icon">
+                    <a data-position="bottom">
+                      <i className="material-icons docmenu sign" />
+                    </a>
+                  </div>
+                  <div className="col s12 svg_icon_text">{localize("Documents.docmenu_sign", locale)}</div>
+                </div>
 
-          <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(REMOVE) ? "" : "disabled_docs"}`} onClick={this.handleRemoveFiles}>
-            <div className="col s12 svg_icon">
-              <a data-position="bottom"
-                data-tooltip={localize("Sign.sign_and_verify", locale)}>
-                <i className="material-icons docmenu remove" />
-              </a>
-            </div>
-            <div className="col s12 svg_icon_text">{localize("Documents.docmenu_remove", locale)}</div>
-          </div>
+                <div className={`col s4 waves-effect waves-cryptoarm  ${this.checkEnableOperationButton(VERIFY) ? "" : "disabled_docs"}`} onClick={this.verifySign}>
+                  <div className="col s12 svg_icon">
+                    <a data-position="bottom"
+                      data-tooltip={localize("Sign.sign_and_verify", locale)}>
+                      <i className="material-icons docmenu verifysign" />
+                    </a>
+                  </div>
+                  <div className="col s12 svg_icon_text">{"Проверить"}</div>
+                </div>
+
+                <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(UNSIGN) ? "" : "disabled_docs"}`} onClick={this.unSign}>
+                  <div className="col s12 svg_icon">
+                    <a data-position="bottom">
+                      <i className="material-icons docmenu removesign" />
+                    </a>
+                  </div>
+                  <div className="col s12 svg_icon_text">{localize("Documents.docmenu_removesign", locale)}</div>
+                </div>
+
+                <div className="col s12">
+                  <div className="row halfbottom" />
+                </div>
+
+                <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(ENCRYPT) ? "" : "disabled_docs"}`} onClick={this.encrypt}>
+                  <div className="col s12 svg_icon">
+                    <a data-position="bottom">
+                      <i className="material-icons docmenu encrypt" />
+                    </a>
+                  </div>
+                  <div className="col s12 svg_icon_text">{localize("Documents.docmenu_enctypt", locale)}</div>
+                </div>
+
+                <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(DECRYPT) ? "" : "disabled_docs"}`} onClick={this.decrypt}>
+                  <div className="col s12 svg_icon">
+                    <a data-position="bottom">
+                      <i className="material-icons docmenu decrypt" />
+                    </a>
+                  </div>
+                  <div className="col s12 svg_icon_text">{localize("Documents.docmenu_dectypt", locale)}</div>
+                </div>
+
+                <div className={`col s4 waves-effect waves-cryptoarm ${this.checkEnableOperationButton(REMOVE) ? "" : "disabled_docs"}`} onClick={this.handleRemoveFiles}>
+                  <div className="col s12 svg_icon">
+                    <a data-position="bottom"
+                      data-tooltip={localize("Sign.sign_and_verify", locale)}>
+                      <i className="material-icons docmenu remove" />
+                    </a>
+                  </div>
+                  <div className="col s12 svg_icon_text">{localize("Documents.docmenu_remove", locale)}</div>
+                </div>
+              </React.Fragment>
+          }
 
         </div>
       </React.Fragment>
@@ -322,7 +379,6 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (activeFilesArr.length > 0) {
-
       const cert = window.PKISTORE.getPkiObject(signer);
 
       const filesForSign = [];
@@ -384,7 +440,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   resign = (files: IFile[], cert: any) => {
-    const { setting, uploader } = this.props;
+    const { connections, connectedList, setting, uploader } = this.props;
     // tslint:disable-next-line:no-shadowed-variable
     const { deleteFile, selectFile } = this.props;
     const { localize, locale } = this.context;
@@ -415,8 +471,84 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         const newPath = trustedSign.resignFile(file.fullpath, cert, policies, format, folderOut);
 
         if (newPath) {
+          if (file.socket) {
+            const connection = connections.getIn(["entities", file.socket]);
+
+            if (connection && connection.connected && connection.socket) {
+              connection.socket.emit(SIGNED, { id: file.remoteId });
+            } else if (connectedList.length) {
+              const connectedSocket = connectedList[0].socket;
+
+              connectedSocket.emit(SIGNED, { id: file.remoteId });
+              connectedSocket.broadcast.emit(SIGNED, { id: file.remoteId });
+            }
+
+            if (uploader) {
+              let cms = trustedSign.loadSign(newPath);
+
+              if (cms.isDetached()) {
+                if (!(cms = trustedSign.setDetachedContent(cms, newPath))) {
+                  throw ("err");
+                }
+              }
+
+              const signatureInfo = trustedSign.getSignPropertys(cms);
+
+              const normalyzeSignatureInfo: any[] = [];
+
+              signatureInfo.forEach((info) => {
+                const subjectCert = info.certs[info.certs.length - 1];
+
+                normalyzeSignatureInfo.push({
+                  subjectFriendlyName: info.subject,
+                  issuerFriendlyName: subjectCert.issuerFriendlyName,
+                  notBefore: new Date(subjectCert.notBefore).getTime(),
+                  notAfter: new Date(subjectCert.notAfter).getTime(),
+                  digestAlgorithm: subjectCert.signatureDigestAlgorithm,
+                  organizationName: subjectCert.organizationName,
+                  signingTime: info.signingTime ? new Date(info.signingTime).getTime() : undefined,
+                  subjectName: subjectCert.subjectName,
+                  issuerName: subjectCert.issuerName,
+                });
+              });
+
+              window.request.post({
+                formData: {
+                  extra: JSON.stringify(file.extra),
+                  file: fs.createReadStream(newPath),
+                  id: file.remoteId,
+                  signers: JSON.stringify(normalyzeSignatureInfo),
+                },
+                url: uploader,
+              }, (err) => {
+                if (err) {
+                  if (connection && connection.connected && connection.socket) {
+                    connection.socket.emit(ERROR, { id: file.remoteId, error: err });
+                  } else if (connectedList.length) {
+                    const connectedSocket = connectedList[0].socket;
+
+                    connectedSocket.emit(ERROR, { id: file.remoteId, error: err });
+                    connectedSocket.broadcast.emit(ERROR, { id: file.remoteId, error: err });
+                  }
+                } else {
+                  if (connection && connection.connected && connection.socket) {
+                    connection.socket.emit(UPLOADED, { id: file.remoteId });
+                  } else if (connectedList.length) {
+                    const connectedSocket = connectedList[0].socket;
+
+                    connectedSocket.emit(UPLOADED, { id: file.remoteId });
+                    connectedSocket.broadcast.emit(UPLOADED, { id: file.remoteId });
+                  }
+                }
+
+                deleteFile(file.id);
+              },
+              );
+            }
+          } else {
             deleteFile(file.id);
             selectFile(newPath);
+          }
         } else {
           res = false;
         }
@@ -493,7 +625,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   encrypt = () => {
-    const { activeFilesArr, setting, deleteFile, selectFile, recipients } = this.props;
+    const { connectedList, connections, activeFilesArr, setting, deleteFile, selectFile, recipients } = this.props;
     const { localize, locale } = this.context;
 
     if (activeFilesArr.length > 0) {
@@ -521,7 +653,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
       if (policies.archiveFiles) {
         let outURI: string;
-        const archiveName = activeFilesArr.length === 1 ? `${path.parse(activeFilesArr[0].filename).name}.zip` : localize("Encrypt.archive_name", locale);
+        const archiveName = activeFilesArr.length === 1 ? `${activeFilesArr[0].filename}.zip` : localize("Encrypt.archive_name", locale);
         if (folderOut.length > 0) {
           outURI = path.join(folderOut, archiveName);
         } else {
@@ -545,6 +677,17 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           if (newPath) {
             activeFilesArr.forEach((file) => {
               deleteFile(file.id);
+              if (file.socket) {
+                const connection = connections.getIn(["entities", file.socket]);
+                if (connection && connection.connected && connection.socket) {
+                  connection.socket.emit(ENCRYPTED, { id: file.remoteId });
+                } else if (connectedList.length) {
+                  const connectedSocket = connectedList[0].socket;
+
+                  connectedSocket.emit(ENCRYPTED, { id: file.remoteId });
+                  connectedSocket.broadcast.emit(ENCRYPTED, { id: file.remoteId });
+                }
+              }
             });
             selectFile(newPath);
           } else {
@@ -578,6 +721,18 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           if (newPath) {
             deleteFile(file.id);
             selectFile(newPath);
+
+            if (file.socket) {
+              const connection = connections.getIn(["entities", file.socket]);
+              if (connection && connection.connected && connection.socket) {
+                connection.socket.emit(ENCRYPTED, { id: file.remoteId });
+              } else if (connectedList.length) {
+                const connectedSocket = connectedList[0].socket;
+
+                connectedSocket.emit(ENCRYPTED, { id: file.remoteId });
+                connectedSocket.broadcast.emit(ENCRYPTED, { id: file.remoteId });
+              }
+            }
           } else {
             res = false;
           }
@@ -595,7 +750,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   decrypt = () => {
-    const { activeFilesArr, setting, deleteFile, selectFile, licenseStatus, lic_error } = this.props;
+    const { connectedList, connections, activeFilesArr, setting, deleteFile, selectFile, licenseStatus, lic_error } = this.props;
     const { localize, locale } = this.context;
 
     if (licenseStatus !== true) {
@@ -643,32 +798,32 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           const haveDSSRecipient = false;
           const dssRecipient = undefined;
 
-        /*  const ris = cipher.getRecipientInfos(uri, format);
+          /*  const ris = cipher.getRecipientInfos(uri, format);
 
-          let ri: trusted.cms.CmsRecipientInfo;
-          let haveLocalRecipient = false;
-          let haveDSSRecipient = false;
-          let dssRecipient;
+            let ri: trusted.cms.CmsRecipientInfo;
+            let haveLocalRecipient = false;
+            let haveDSSRecipient = false;
+            let dssRecipient;
 
-          for (let i = 0; i < ris.length; i++) {
-            ri = ris.items(i);
+            for (let i = 0; i < ris.length; i++) {
+              ri = ris.items(i);
 
-            certWithKey = this.props.mapCertificates
-              .get("entities")
-              .find((item) => item.issuerName === ri.issuerName && item.serial === ri.serialNumber && item.key);
+              certWithKey = this.props.mapCertificates
+                .get("entities")
+                .find((item) => item.issuerName === ri.issuerName && item.serial === ri.serialNumber && item.key);
 
-            if (certWithKey) {
-              if (!certWithKey.service) {
-                haveLocalRecipient = true;
-                break;
+              if (certWithKey) {
+                if (!certWithKey.service) {
+                  haveLocalRecipient = true;
+                  break;
+                } else {
+                  haveDSSRecipient = true;
+                  dssRecipient = certWithKey;
+                }
               } else {
-                haveDSSRecipient = true;
-                dssRecipient = certWithKey;
+                res = false;
               }
-            } else {
-              res = false;
-            }
-          }*/
+            }*/
 
           if (haveLocalRecipient) {
             filesForDecryptInLocalCSP.push(file);
@@ -687,6 +842,18 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           if (newPath) {
             deleteFile(file.id);
             selectFile(newPath);
+
+            if (file.socket) {
+              const connection = connections.getIn(["entities", file.socket]);
+              if (connection && connection.connected && connection.socket) {
+                connection.socket.emit(DECRYPTED, { id: file.remoteId });
+              } else if (connectedList.length) {
+                const connectedSocket = connectedList[0].socket;
+
+                connectedSocket.emit(DECRYPTED, { id: file.remoteId });
+                connectedSocket.broadcast.emit(DECRYPTED, { id: file.remoteId });
+              }
+            }
           } else {
             res = false;
           }
@@ -720,37 +887,6 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     const { deleteRecipient, recipients } = this.props;
 
     recipients.forEach((recipient) => deleteRecipient(recipient.id));
-  }
-
-  selectedAll = () => {
-    // tslint:disable-next-line:no-shadowed-variable
-    const { files, activeFile } = this.props;
-
-    for (const file of files) {
-      activeFile(file.id);
-    }
-  }
-
-  removeSelectedAll = () => {
-    // tslint:disable-next-line:no-shadowed-variable
-    const { files, activeFile } = this.props;
-
-    for (const file of files) {
-      activeFile(file.id, false);
-    }
-  }
-
-  removeAllFiles = () => {
-    // tslint:disable-next-line:no-shadowed-variable
-    const { filePackageDelete, files } = this.props;
-
-    const filePackage: number[] = [];
-
-    for (const file of files) {
-      filePackage.push(file.id);
-    }
-
-    filePackageDelete(filePackage);
   }
 
   checkEnableOperationButton = (operation: string) => {
@@ -842,6 +978,24 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
     return bytesToSize(sizeInBytes);
   }
+
+  isFilesFromSocket = () => {
+    const { files, loadingFiles } = this.props;
+
+    if (loadingFiles.length) {
+      return true;
+    }
+
+    if (files.length) {
+      for (const file of files) {
+        if (file.socket) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 }
 
 export default connect((state) => {
@@ -854,21 +1008,26 @@ export default connect((state) => {
   return {
     activeFiles: activeFilesSelector(state, { active: true }),
     activeFilesArr: mapToArr(activeFilesSelector(state, { active: true })),
+    connectedList: connectedSelector(state, { connected: true }),
+    connections: state.connections,
     files: mapToArr(state.files.entities),
     isDocumentsReviewed: state.files.documentsReviewed,
     licenseStatus: state.license.status,
     lic_error: state.license.lic_error,
+    loadingFiles: loadingRemoteFilesSelector(state, { loading: true }),
     mapCertificates: state.certificates,
+    method: state.remoteFiles.method,
     recipients: mapToArr(state.settings.getIn(["entities", state.settings.default]).encrypt.recipients)
       .map((recipient) => state.certificates.getIn(["entities", recipient.certId]))
       .filter((recipient) => recipient !== undefined),
+    uploader: state.remoteFiles.uploader,
     setting: state.settings.getIn(["entities", state.settings.default]),
     settings: state.settings.entities,
     signatures,
     signer: state.certificates.getIn(["entities", state.settings.getIn(["entities", state.settings.default]).sign.signer]),
   };
 }, {
-    activeFile, activeSetting, deleteFile, deleteRecipient, documentsReviewed,
-    filePackageSelect, filePackageDelete, packageSign, selectFile,
-    verifyCertificate, selectSignerCertificate, verifySignature,
-  })(SignatureAndEncryptRightColumnSettings);
+  activeFile, activeSetting, deleteFile, deleteRecipient, documentsReviewed,
+  filePackageSelect, filePackageDelete, packageSign, selectFile,
+  verifyCertificate, selectSignerCertificate, verifySignature,
+})(SignatureAndEncryptRightColumnSettings);

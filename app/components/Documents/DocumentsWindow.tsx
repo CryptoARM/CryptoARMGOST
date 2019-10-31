@@ -24,6 +24,7 @@ import {
   REMOVE, SIGN, UNSIGN, USER_NAME, VERIFY,
 } from "../../constants";
 import { selectedDocumentsSelector } from "../../selectors/documentsSelector";
+import { DECRYPTED, ENCRYPTED, ERROR, SIGNED, UPLOADED } from "../../server/constants";
 import * as jwt from "../../trusted/jwt";
 import { checkLicense } from "../../trusted/jwt";
 import * as trustedSign from "../../trusted/sign";

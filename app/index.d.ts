@@ -20,6 +20,8 @@ interface Window {
     CA_CERTREGUESTS_JSON: string;
     CA_CERTTEMPLATE_JSON: string;
     CA_CSR_JSON: string;
+    DSS_TOKENS_JSON: string;
+    DSS_CERTIFICATES_JSON: string,
     LICENSE_PATH: string;
     LICENSE_MNG: any;
     PLATFORM: string;

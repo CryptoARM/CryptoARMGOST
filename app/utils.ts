@@ -5,7 +5,6 @@ import { OrderedMap } from "immutable";
 import PropTypes from "prop-types";
 import React from "react";
 
-
 let err_hint: string[] = ["Доступны только цифры", "Проверьте количество цифр", "Не правильно введены данные"];
 interface ISignatureStatusProps {
   signature: any;
@@ -17,7 +16,7 @@ class SignatureStatus extends React.Component<ISignatureStatusProps, any> {
     locale: PropTypes.string,
     localize: PropTypes.func,
   };
-  
+
 }
 
 export function arrayToMap(arr, RecordModel) {
@@ -136,27 +135,28 @@ export const randomSerial = () => {
 };
 export let err_snils = "";
 export let err_inn = "";
+export let err_ogrn = "";
 export let err_ogrnip = "";
 
 export const validateSnils = (snils: string | number) => {
   let result = false;
-  
+
   if (typeof snils === "number") {
     snils = snils.toString();
   } else if (typeof snils !== "string") {
     snils = "";
   }
 
-  
+
 
   if (!snils.length) {
-    
+
     return false;
   } else if (/[^0-9]/.test(snils)) {
     err_snils = err_hint[0];
-    
+
     return false;
-    
+
   } else if (snils.length !== 11) {
     err_snils = err_hint[1];
     return false;
@@ -168,7 +168,7 @@ export const validateSnils = (snils: string | number) => {
     }
 
     let checkDigit = 0;
-    
+
     if (sum < 100) {
       checkDigit = sum;
     } else if (sum > 101) {
@@ -184,14 +184,13 @@ export const validateSnils = (snils: string | number) => {
       return false;
     }
   }
-  
 
   return result;
 };
 
 export const validateInn = (inn: string | number) => {
   let result = false;
-  
+
   if (typeof inn === "number") {
     inn = inn.toString();
   } else if (typeof inn !== "string") {
@@ -202,10 +201,10 @@ export const validateInn = (inn: string | number) => {
     return false;
   } else if (/[^0-9]/.test(inn)) {
     err_inn = err_hint[0];
-    
+
     return false;
   } else if ([10, 12].indexOf(inn.length) === -1) {
-    
+
     err_inn = err_hint[1];
     return false;
   } else {
@@ -216,7 +215,7 @@ export const validateInn = (inn: string | number) => {
       for (const i in coefficients) {
         n += coefficients[i] * inn[i];
       }
-      
+
       return parseInt(n % 11 % 10, 10);
     };
 
@@ -239,12 +238,45 @@ export const validateInn = (inn: string | number) => {
 
     if (!result) {
       err_inn = err_hint[2];
-      
+
       return false;
     }
   }
 
-  
+
+  return result;
+};
+
+export const validateOgrn = (ogrn: string | number) => {
+  let result = false;
+
+  if (typeof ogrn === "number") {
+    ogrn = ogrn.toString();
+  } else if (typeof ogrn !== "string") {
+    ogrn = "";
+  }
+
+  if (!ogrn.length) {
+    return false;
+  } else if (/[^0-9]/.test(ogrn)) {
+
+    err_ogrn = err_hint[0];
+    return false;
+  } else if (ogrn.length !== 13) {
+
+    err_ogrn = err_hint[1];
+    return false;
+  } else {
+    const n13 = parseInt((parseInt(ogrn.slice(0, -1), 10) % 11).toString().slice(-1), 10);
+    if (n13 === parseInt(ogrn[12], 10)) {
+      result = true;
+    } else {
+
+      err_ogrn = err_hint[2];
+      return false;
+    }
+  }
+
   return result;
 };
 
@@ -260,11 +292,11 @@ export const validateOgrnip = (ogrnip: string | number) => {
   if (!ogrnip.length) {
     return false;
   } else if (/[^0-9]/.test(ogrnip)) {
-    
+
     err_ogrnip = err_hint[0];
     return false;
   } else if (ogrnip.length !== 15) {
-    
+
     err_ogrnip = err_hint[1];
     return false;
   } else {
@@ -272,12 +304,12 @@ export const validateOgrnip = (ogrnip: string | number) => {
     if (n15 === parseInt(ogrnip[14], 10)) {
       result = true;
     } else {
-      
+
       err_ogrnip = err_hint[2];
       return false;
     }
   }
- 
+
   return result;
 };
 
