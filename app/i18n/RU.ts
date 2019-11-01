@@ -373,6 +373,10 @@ export default {
     unsign: "Снятие подписи",
     write_object_for_filter: "Укажите объект для фильтрации",
     write_user_name: "Укажите имя пользователя",
+    delete_service: "Удаление сервиса",
+    add_service: "Добавление сервиса",
+    sent_service: "Отправлен запрос на регистрацию в УЦ",
+    create_request_created: "Запрос на сертификат",
   },
   EventsTable: {
     date_and_time: "Дата и время",

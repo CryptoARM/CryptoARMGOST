@@ -7,7 +7,7 @@ import {
   ALL, CERTIFICATE_GENERATION, CERTIFICATE_IMPORT, CRL_IMPORT,
   CSR_GENERATION, DECRYPT,
   DELETE_CERTIFICATE, DELETE_CONTAINER, ENCRYPT,
-  PKCS12_IMPORT, SIGN, UNSIGN,
+  PKCS12_IMPORT, SIGN, UNSIGN, DELETE_SERVICE, ADD_SERVICE, SENT_SERVICE,REQUEST_CERTIFICATE,
 } from "../../constants";
 import DatePicker from "../DatePicker";
 
@@ -42,6 +42,10 @@ interface IEventsFilters {
     PKCS12_IMPORT: boolean;
     SIGN: boolean;
     UNSIGN: boolean;
+    ADD_SERVICE: boolean;
+    DELETE_SERVICE: boolean;
+    SENT_SERVICE: boolean;
+    REQUEST_CERTIFICATE: boolean;
     [key: string]: boolean;
   };
   userName: string;
@@ -64,7 +68,11 @@ const initialState = {
     ENCRYPT: true,
     PKCS12_IMPORT: true,
     SIGN: true,
+    ADD_SERVICE: true,
+    DELETE_SERVICE: true,
+    SENT_SERVICE:true,
     UNSIGN: true,
+    REQUEST_CERTIFICATE: true,
   },
   userName: "",
 };
@@ -377,6 +385,58 @@ class FilterEvents extends React.Component<IFilterEventsProps, IEventsFilters> {
                             {localize("EventsFilters.delete_container", locale)}
                           </label>
                         </div>
+                        <div className="input-checkbox">
+                          <input
+                            name={DELETE_SERVICE}
+                            type="checkbox"
+                            id={DELETE_SERVICE}
+                            className="filled-in"
+                            checked={operations.DELETE_SERVICE}
+                            onChange={this.handleOperationTypesChange}
+                          />
+                          <label htmlFor={DELETE_SERVICE} className="truncate">
+                            {localize("EventsFilters.delete_service", locale)}
+                          </label>
+                        </div>
+                        <div className="input-checkbox">
+                          <input
+                            name={ADD_SERVICE}
+                            type="checkbox"
+                            id={ADD_SERVICE}
+                            className="filled-in"
+                            checked={operations.ADD_SERVICE}
+                            onChange={this.handleOperationTypesChange}
+                          />
+                          <label htmlFor={ADD_SERVICE} className="truncate">
+                            {localize("EventsFilters.add_service", locale)}
+                          </label>
+                        </div>
+                        <div className="input-checkbox">
+                          <input
+                            name={SENT_SERVICE}
+                            type="checkbox"
+                            id={SENT_SERVICE}
+                            className="filled-in"
+                            checked={operations.SENT_SERVICE}
+                            onChange={this.handleOperationTypesChange}
+                          />
+                          <label htmlFor={SENT_SERVICE} className="truncate">
+                            {localize("EventsFilters.sent_service", locale)}
+                          </label>
+                        </div>
+                        <div className="input-checkbox">
+                          <input
+                            name={REQUEST_CERTIFICATE}
+                            type="checkbox"
+                            id={REQUEST_CERTIFICATE}
+                            className="filled-in"
+                            checked={operations.REQUEST_CERTIFICATE}
+                            onChange={this.handleOperationTypesChange}
+                          />
+                          <label htmlFor={REQUEST_CERTIFICATE} className="truncate">
+                            {localize("EventsFilters.create_request_created", locale)}
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -421,6 +481,10 @@ class FilterEvents extends React.Component<IFilterEventsProps, IEventsFilters> {
       operations.ENCRYPT &&
       operations.PKCS12_IMPORT &&
       operations.SIGN &&
+      operations.DELETE_SERVICE &&
+      operations.ADD_SERVICE &&
+      operations.SENT_SERVICE &&
+      operations.REQUEST_CERTIFICATE &&
       operations.UNSIGN;
   }
 
@@ -476,6 +540,10 @@ class FilterEvents extends React.Component<IFilterEventsProps, IEventsFilters> {
         PKCS12_IMPORT: value,
         SIGN: value,
         UNSIGN: value,
+        DELETE_SERVICE: value,
+        ADD_SERVICE: value,
+        SENT_SERVICE: value,
+        REQUEST_CERTIFICATE,
       },
     });
   }

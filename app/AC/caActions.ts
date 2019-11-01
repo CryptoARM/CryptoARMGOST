@@ -3,10 +3,10 @@ import { ICertificateRequestCA, IRegRequest } from "../components/Services/types
 import {
   DELETE_CERTIFICATE_REQUEST_CA, FAIL, GET_CA_CERTREQUEST,
   GET_CA_CERTREQUEST_STATUS, GET_CA_REGREQUEST, HOME_DIR,
-  POST_CA_CERTREQUEST, POST_CA_CERTREQUEST_СONFIRMATION, POST_CA_REGREQUEST, START, SUCCESS,
+  POST_CA_CERTREQUEST, POST_CA_CERTREQUEST_СONFIRMATION, POST_CA_REGREQUEST, START, SUCCESS, USER_NAME,
 } from "../constants";
 import { uuid } from "../utils";
-
+import logger from "../winstonLogger";
 export async function postApi(url: string, postfields: any, headerfields: string[]) {
   return new Promise((resolve, reject) => {
     const curl = new window.Curl();
@@ -266,6 +266,16 @@ export function postRegRequest(url: string, comment: string, description: string
       try {
         Materialize.toast("Отправлен запрос на регистрацию в УЦ", 3000, "toast-ca_req_send");
 
+        logger.log({
+          level: "info",
+          message: "",
+          operation: "Отправлен запрос на регистрацию в УЦ",
+          operationObject: {
+            in: "login" + service.login,
+            out: "Null",
+          },
+          userName: USER_NAME,
+        });
         data = await postApi(`${url}/regrequest`, JSON.stringify({
           Comment: comment,
           Description: description,

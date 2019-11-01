@@ -2,14 +2,16 @@ import { Map } from "immutable";
 import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
+import logger from "../../winstonLogger";
 import { getRegRequest, postRegRequest } from "../../AC/caActions";
 import { addService } from "../../AC/servicesActions";
-import { CA_SERVICE } from "../../constants";
+import { CA_SERVICE, USER_NAME } from "../../constants";
 import { uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
 import CryptoProCASettings from "../CA/CryptoProCASettings";
 import DynamicRegistrationForm from "../CA/DynamicRegistrationForm";
 import LoginForm from "../CA/LoginForm";
 import { ICAServiceSettings, IService } from "./types";
+
 
 const REQULAR_EXPRESSION = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
@@ -208,8 +210,7 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
             />
           </React.Fragment>
         );
-
-      default:
+        default:
         return null;
     }
   }
@@ -295,7 +296,6 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
       settings: serviceSettings,
       type: serviceType,
     };
-
     if (regNewUser) {
       if (!RDNmodel) {
         this.handelCancel();
@@ -316,7 +316,16 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
       onCancel(service);
     } else {
       Materialize.toast("Отправлен запрос на проверку статуса регистрации в УЦ", 3000, "toast-ca_get_req_send");
-
+      logger.log({
+        level: "info",
+        message: "",
+        operation: localize("EventsFilters.Отправлен запрос на регистрацию в УЦ"),
+        operationObject: {
+          in: "login =" + login,
+          out: "Null",
+        },
+        userName: USER_NAME,
+      });
       getRegRequest(`${serviceSettings.url}`, login, password, service);
       onCancel(service);
     }

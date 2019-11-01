@@ -69,7 +69,16 @@ class DeleteService extends React.Component<IDeleteServiceProps, {}> {
     }
 
     deleteService(service.id);
-
+    logger.log({
+      level: "info",
+      message: "",
+      operation: "Сервис успешно удален",
+      operationObject: {
+        in: "service id =" + service.id,
+        out: "Null",
+      },
+      userName: USER_NAME,
+    });
     $(".toast-delete_service_ok").remove();
     Materialize.toast(localize("Services.delete_service_ok", locale), 2000, "toast-delete_service_ok");
 

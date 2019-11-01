@@ -608,6 +608,16 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
         postCertRequestAuthCert(`${service.settings.url}`, certificateRequestCA, cmsContextSig, values, regrequest, service.id);
       }
 
+      logger.log({
+        level: "info",
+        message: "",
+        operation: "Запрос на сертификат успешно создан",
+        operationObject: {
+          in: "id  " + service.id,
+          out: "Null",
+        },
+        userName: USER_NAME,
+      });
       Materialize.toast(localize("CSR.create_request_created", locale), 2000, "toast-csr_created");
     } catch (e) {
       Materialize.toast(localize("CSR.create_request_error", locale), 4000, "toast-csr_error");

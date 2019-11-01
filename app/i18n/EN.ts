@@ -373,6 +373,10 @@ export default {
     unsign: "Unsign",
     write_object_for_filter: "Write object for filter",
     write_user_name: "Write user name",
+    delete_service: "Service Removal",
+    add_service: "Adding a Service",
+    sent_service: "Registration request sent to CA",
+    create_request_created: "Certificate Request",
   },
   EventsTable: {
     date_and_time: "Date and time",
