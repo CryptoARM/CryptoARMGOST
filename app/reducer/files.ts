@@ -46,10 +46,7 @@ export default (files = new DefaultReducerState(), action) => {
 
     case SELECT_FILE:
       return files
-        .setIn(["entities", randomId], new FileModel({
-          ...payload.file,
-          id: randomId,
-        }))
+        .setIn(["entities", payload.file.id], new FileModel(payload.file))
         .set("documentsReviewed", false);
 
     case ACTIVE_FILE:
@@ -91,6 +88,15 @@ export default (files = new DefaultReducerState(), action) => {
       return newFiles;
 
     case REMOVE_ALL_FILES:
+      files.entities.forEach((file: any) => {
+        if (file && file.socket && fileExists(file.fullpath)) {
+          try {
+            fs.unlinkSync(file.fullpath);
+          } catch (e) {
+            //
+          }
+        }
+      });
       return files = new DefaultReducerState();
 
     case DOCUMENTS_REVIEWED:

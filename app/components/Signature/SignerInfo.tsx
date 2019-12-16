@@ -21,9 +21,9 @@ class SignerInfo extends React.Component<ISignerInfoProps, any> {
     let curStatusStyle;
 
     if (status) {
-      curStatusStyle = "cert_status_ok";
+      curStatusStyle = signer.dssUserID ? "cloud_cert_status_ok" : "cert_status_ok";
     } else {
-      curStatusStyle = "cert_status_error";
+      curStatusStyle = signer.dssUserID  ? "cloud_cert_status_error" : "cert_status_error";
     }
 
     if (signer && !signer.verified) {
@@ -38,7 +38,7 @@ class SignerInfo extends React.Component<ISignerInfoProps, any> {
           </div>
           <div className="col s10">
             <div className="collection-title">{signer.subjectFriendlyName}</div>
-            <div className="collection-info cert-info">{signer.issuerFriendlyName}</div>
+            <div className="collection-info">{signer.issuerFriendlyName}</div>
           </div>
         </div>
       </React.Fragment>

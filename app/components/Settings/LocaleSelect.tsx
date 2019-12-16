@@ -22,7 +22,7 @@ class LocaleSelect extends React.Component<ILocaleSelectProps, {}> {
 
     return (
       <div className="waves-effect waves-light">
-        <a className={locale} onClick={this.handleChange}>{locale}</a>
+        <a className={`headline6 ${locale}`} onClick={this.handleChange}>{locale}</a>
       </div>
     );
   }

@@ -276,7 +276,7 @@ class CertificateExport extends React.Component<ICertificateExportProps, ICertif
 
     let tcert: trusted.pki.Certificate | undefined;
 
-    if (certificate.x509 && certificate.service) {
+    if (certificate.x509 && certificate.dssUserID) {
       try {
         tcert = new trusted.pki.Certificate();
         tcert.import(Buffer.from(certificate.x509), trusted.DataFormat.PEM);

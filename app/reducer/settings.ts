@@ -19,7 +19,9 @@ export const SignModel = Record({
   detached: false,
   encoding: BASE64,
   signer: "",
+  standard: "CMS",
   timestamp: true,
+  timestamp_on_sign: false,
 });
 
 export const EncryptModel = Record({
@@ -27,6 +29,20 @@ export const EncryptModel = Record({
   delete: false,
   encoding: BASE64,
   recipients: OrderedMap({}),
+});
+
+export const TspModel = Record({
+  proxy_port: "",
+  proxy_url: "",
+  url: "",
+  use_proxy: false,
+});
+
+export const OcspModel = Record({
+  proxy_port: "",
+  proxy_url: "",
+  url: "",
+  use_proxy: false,
 });
 
 const DEFAULT_ID = "DEFAULT_ID";
@@ -37,9 +53,11 @@ export const SettingsModel = Record({
   locale: RU,
   mtime: null,
   name: "Настройка #1",
+  ocsp: new OcspModel(),
   outfolder: "",
   saveToDocuments: false,
   sign: new SignModel(),
+  tsp: new TspModel(),
 });
 
 export const DefaultReducerState = Record({
@@ -86,7 +104,7 @@ export default (settings = new DefaultReducerState(), action) => {
       break;
 
     case TOGGLE_SAVE_TO_DOCUMENTS:
-      
+
       settings = settings
         .setIn(["entities", settings.active, "mtime"], new Date().getTime())
         .setIn(["entities", settings.active, "saveToDocuments"], payload.saveToDocuments);

@@ -18,12 +18,14 @@ import {
   START, SUCCESS, TOGGLE_SAVE_TO_DOCUMENTS,
   VERIFY_CERTIFICATE,
   VERIFY_SIGNATURE,
+  REMEMBER_PASSWORD_DSS,
+  DELETE_PASSWORD_DSS,
 } from "../constants";
 import { connectedSelector } from "../selectors";
 import { ERROR, SIGNED, UPLOADED, VERIFIED } from "../server/constants";
 import * as signs from "../trusted/sign";
 import { Store } from "../trusted/store";
-import { extFile, fileCoding, fileExists } from "../utils";
+import { extFile, fileCoding, fileExists, md5 } from "../utils";
 
 export function changeLocation(location: string) {
   return (dispatch: (action: {}) => void) => {
@@ -31,8 +33,8 @@ export function changeLocation(location: string) {
   };
 }
 
-interface IFile {
-  id: number;
+export interface IFile {
+  id: string;
   filename: string;
   mtime: Date;
   fullpath: string;
@@ -51,6 +53,7 @@ interface IFilePath {
 }
 
 interface INormalizedSignInfo {
+  serialNumber: string;
   subjectFriendlyName: string;
   issuerFriendlyName: string;
   notBefore: number;
@@ -67,7 +70,8 @@ export function packageSign(
   policies: string[],
   format: trusted.DataFormat,
   folderOut: string,
-) {
+  folderOutDSS?: string[],
+  ) {
   return (dispatch: (action: {}) => void, getState: () => any) => {
     dispatch({
       type: PACKAGE_SIGN + START,
@@ -77,12 +81,13 @@ export function packageSign(
 
     setTimeout(() => {
       const signedFilePackage: IFilePath[] = [];
-      const signedFileIdPackage: number[] = [];
+      const signedFileIdPackage: string[] = [];
       const state = getState();
       const { connections, remoteFiles } = state;
+      let i: number = 0;
 
       files.forEach((file) => {
-        const newPath = signs.signFile(file.fullpath, cert, policies, format, folderOut);
+        const newPath = folderOutDSS ? folderOutDSS[i] : signs.signFile(file.fullpath, cert, policies, format, folderOut);
         if (newPath) {
           signedFileIdPackage.push(file.id);
           if (!file.socket) {
@@ -125,7 +130,24 @@ export function packageSign(
               signatureInfo.forEach((info: any) => {
                 const subjectCert = info.certs[info.certs.length - 1];
 
+                let x509;
+
+                if (subjectCert.object) {
+                  try {
+                    let cmsContext = subjectCert.object.export(trusted.DataFormat.PEM).toString();
+
+                    cmsContext = cmsContext.replace("-----BEGIN CERTIFICATE-----", "");
+                    cmsContext = cmsContext.replace("-----END CERTIFICATE-----", "");
+                    cmsContext = cmsContext.replace(/\r\n|\n|\r/gm, "");
+
+                    x509 = cmsContext;
+                  } catch (e) {
+                    //
+                  }
+                }
+
                 normalyzeSignatureInfo.push({
+                  serialNumber: subjectCert.serial,
                   digestAlgorithm: subjectCert.signatureDigestAlgorithm,
                   issuerFriendlyName: subjectCert.issuerFriendlyName,
                   issuerName: subjectCert.issuerName,
@@ -135,7 +157,7 @@ export function packageSign(
                   signingTime: info.signingTime ? new Date(info.signingTime).getTime() : undefined,
                   subjectFriendlyName: info.subject,
                   subjectName: subjectCert.subjectName,
-
+                  x509,
                 });
               });
 
@@ -186,6 +208,159 @@ export function packageSign(
         } else {
           packageSignResult = false;
         }
+        i++;
+      });
+
+      dispatch({
+        payload: { packageSignResult },
+        type: PACKAGE_SIGN + SUCCESS,
+      });
+
+      dispatch(filePackageSelect(signedFilePackage));
+      dispatch(filePackageDelete(signedFileIdPackage));
+    }, 0);
+  };
+}
+
+export function packageReSign(
+  files: IFile[],
+  cert: trusted.pki.Certificate,
+  policies: string[],
+  format: trusted.DataFormat,
+  folderOut: string,
+  folderOutDSS?: string[],
+  ) {
+  return (dispatch: (action: {}) => void, getState: () => any) => {
+    dispatch({
+      type: PACKAGE_SIGN + START,
+    });
+
+    let packageSignResult = true;
+
+    setTimeout(() => {
+      const signedFilePackage: IFilePath[] = [];
+      const signedFileIdPackage: string[] = [];
+      const state = getState();
+      const { connections, remoteFiles } = state;
+      let i: number = 0;
+
+      files.forEach((file) => {
+        const newPath = folderOutDSS ? folderOutDSS[i] : signs.signFile(file.fullpath, cert, policies, format, folderOut);
+        if (newPath) {
+          signedFileIdPackage.push(file.id);
+          if (!file.socket) {
+            signedFilePackage.push({ fullpath: newPath });
+          }
+
+          if (file.socket) {
+            const connection = connections.getIn(["entities", file.socket]);
+            const connectedList = connectedSelector(state, { connected: true });
+
+            if (connection && connection.connected && connection.socket) {
+              connection.socket.emit(SIGNED, { id: file.remoteId });
+            } else if (connectedList.length) {
+              const connectedSocket = connectedList[0].socket;
+
+              connectedSocket.emit(SIGNED, { id: file.remoteId });
+              connectedSocket.broadcast.emit(SIGNED, { id: file.remoteId });
+            }
+
+            if (remoteFiles.uploader) {
+              let cms = signs.loadSign(newPath);
+
+              if (cms.isDetached()) {
+                // tslint:disable-next-line:no-conditional-assignment
+                if (!(cms = signs.setDetachedContent(cms, newPath))) {
+                  throw new Error(("err"));
+                }
+              }
+
+              const signatureInfo = signs.getSignPropertys(cms);
+
+              const normalyzeSignatureInfo: INormalizedSignInfo[] = [];
+
+              signatureInfo.forEach((info: any) => {
+                const subjectCert = info.certs[info.certs.length - 1];
+
+                let x509;
+
+                if (subjectCert.object) {
+                  try {
+                    let cmsContext = subjectCert.object.export(trusted.DataFormat.PEM).toString();
+
+                    cmsContext = cmsContext.replace("-----BEGIN CERTIFICATE-----", "");
+                    cmsContext = cmsContext.replace("-----END CERTIFICATE-----", "");
+                    cmsContext = cmsContext.replace(/\r\n|\n|\r/gm, "");
+
+                    x509 = cmsContext;
+                  } catch (e) {
+                    //
+                  }
+                }
+
+                normalyzeSignatureInfo.push({
+                  serialNumber: subjectCert.serial,
+                  digestAlgorithm: subjectCert.signatureDigestAlgorithm,
+                  issuerFriendlyName: subjectCert.issuerFriendlyName,
+                  issuerName: subjectCert.issuerName,
+                  notAfter: new Date(subjectCert.notAfter).getTime(),
+                  notBefore: new Date(subjectCert.notBefore).getTime(),
+                  organizationName: subjectCert.organizationName,
+                  signingTime: info.signingTime ? new Date(info.signingTime).getTime() : undefined,
+                  subjectFriendlyName: info.subject,
+                  subjectName: subjectCert.subjectName,
+                  x509,
+                });
+              });
+
+              window.request.post({
+                formData: {
+                  extra: JSON.stringify(file.extra),
+                  file: fs.createReadStream(newPath),
+                  id: file.remoteId,
+                  signers: JSON.stringify(normalyzeSignatureInfo),
+                },
+                url: remoteFiles.uploader,
+              }, (err: Error) => {
+                if (err) {
+                  if (connection && connection.connected && connection.socket) {
+                    connection.socket.emit(ERROR, { id: file.remoteId, error: err });
+                  } else if (connectedList.length) {
+                    const connectedSocket = connectedList[0].socket;
+
+                    connectedSocket.emit(ERROR, { id: file.remoteId, error: err });
+                    connectedSocket.broadcast.emit(ERROR, { id: file.remoteId, error: err });
+                  }
+                } else {
+                  if (connection && connection.connected && connection.socket) {
+                    connection.socket.emit(UPLOADED, { id: file.remoteId });
+                  } else if (connectedList.length) {
+                    const connectedSocket = connectedList[0].socket;
+
+                    connectedSocket.emit(UPLOADED, { id: file.remoteId });
+                    connectedSocket.broadcast.emit(UPLOADED, { id: file.remoteId });
+                  }
+
+                  dispatch({
+                    payload: { id: file.id },
+                    type: DELETE_FILE,
+                  });
+                }
+
+                try {
+                  fs.unlinkSync(newPath);
+                } catch (e) {
+                  //
+                }
+              },
+              );
+            }
+          }
+
+        } else {
+          packageSignResult = false;
+        }
+        i++;
       });
 
       dispatch({
@@ -220,7 +395,7 @@ export function filePackageSelect(files: IFilePath[]) {
           filename: path.basename(fullpath),
           filesize: stat.size,
           fullpath,
-          id: Date.now() + Math.random(),
+          id: md5(fullpath),
           mtime: stat.birthtime,
           remoteId,
           size: stat.size,
@@ -238,7 +413,7 @@ export function filePackageSelect(files: IFilePath[]) {
   };
 }
 
-export function filePackageDelete(filePackage: number[]) {
+export function filePackageDelete(filePackage: string[]) {
   return {
     payload: { filePackage },
     type: PACKAGE_DELETE_FILE,
@@ -450,12 +625,13 @@ export function selectFile(fullpath: string, name?: string, mtime?: Date, size?:
     fullpath,
     mtime: mtime ? mtime : (stat ? stat.birthtime : undefined),
     remoteId,
+    id: md5(fullpath),
     filesize: size ? size : (stat ? stat.size : undefined),
     socket,
   };
 
   return {
-    generateId: true,
+    // generateId: true,
     payload: { file },
     type: SELECT_FILE,
   };
@@ -611,5 +787,24 @@ export function addCertificateRequestCA(certificateRequestCA: ICertificateReques
       certificateRequestCA,
     },
     type: ADD_CERTIFICATE_REQUEST_CA,
+  };
+}
+
+export function rememberPasswordDSS(id: string, password: string) {
+  return {
+    payload: {
+      id,
+      password,
+    },
+    type: REMEMBER_PASSWORD_DSS,
+  };
+}
+
+export function deletePasswordDSS(id: string) {
+  return {
+    payload: {
+      id,
+    },
+    type: DELETE_PASSWORD_DSS,
   };
 }

@@ -34,7 +34,7 @@ class ContainerListItem extends React.Component<any, any> {
             </div>
             <div className="col s10">
               <div className="collection-title">{container.friendlyName}</div>
-              <div className="collection-info cert-info ">{container.reader}</div>
+              <div className="collection-info ">{container.reader}</div>
             </div>
           </div>
         </div>

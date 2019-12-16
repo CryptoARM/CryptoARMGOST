@@ -118,7 +118,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
             <React.Fragment>
               <div className="input-field input-field-csr col s12">
                 <select className="select" ref="templateSelect" name="templateSelect" onChange={handleCATemplateChange} >
-                <option disabled selected >Выберите шаблон</option>
+                  <option disabled selected >Выберите шаблон</option>
                   {
                     caTemplates.map((template) =>
                       <option key={template.Oid} value={template.Oid}>
@@ -132,27 +132,29 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
             </React.Fragment> :
             null
         }
-        <div className="input-field input-field-csr col s6">
-          <select className="select" ref="keyUsageGroup" value={keyUsageGroup} name="keyUsageGroup" onChange={handleKeyUsageGroupChange} >
-            <option value={KEY_USAGE_SIGN}>{localize("CSR.key_usage_sign", locale)}</option>
-            <option value={KEY_USAGE_ENCIPHERMENT}>{localize("CSR.key_usage_encrypt", locale)}</option>
-            <option value={KEY_USAGE_SIGN_AND_ENCIPHERMENT}>{localize("CSR.key_usage_sign_encrypt", locale)}</option>
-          </select>
-          <label>{localize("CSR.key_usage_group", locale)}</label>
-        </div>
-        <div className="col s6 input-radio input-field-csr">
-          <div className="row halftop" />
-          <input
-            name="exportableKey"
-            className="filled-in"
-            type="checkbox"
-            id="exportableKey"
-            checked={exportableKey}
-            onChange={toggleExportableKey}
-          />
-          <label htmlFor="exportableKey" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.exportable_key", locale)}>
-            {localize("CSR.exportable_key", locale)}
-          </label>
+        <div className="row nobottom">
+          <div className="col s6 input-field input-field-csr">
+            <select className="select" ref="keyUsageGroup" value={keyUsageGroup} name="keyUsageGroup" onChange={handleKeyUsageGroupChange} >
+              <option value={KEY_USAGE_SIGN}>{localize("CSR.key_usage_sign", locale)}</option>
+              <option value={KEY_USAGE_ENCIPHERMENT}>{localize("CSR.key_usage_encrypt", locale)}</option>
+              <option value={KEY_USAGE_SIGN_AND_ENCIPHERMENT}>{localize("CSR.key_usage_sign_encrypt", locale)}</option>
+            </select>
+            <label>{localize("CSR.key_usage_group", locale)}</label>
+          </div>
+          <div className="col s6 input-radio input-field-csr">
+            <div className="row halftop" />
+            <input
+              name="exportableKey"
+              className="filled-in"
+              type="checkbox"
+              id="exportableKey"
+              checked={exportableKey}
+              onChange={toggleExportableKey}
+            />
+            <label htmlFor="exportableKey" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.exportable_key", locale)}>
+              {localize("CSR.exportable_key", locale)}
+            </label>
+          </div>
         </div>
 
         <div className="row nobottom">

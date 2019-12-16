@@ -16,6 +16,7 @@
     "typeRoots": [
       "node_modules/@types"
     ],
+    "types": ["@types/materialize-css"],
     "rootDir": "app",
     "outDir": "tmp"
   },

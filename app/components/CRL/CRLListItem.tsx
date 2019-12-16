@@ -57,7 +57,7 @@ class CRLListItem extends React.Component<ICertificateListItemProps, {}> {
           <div className="rectangle" style={rectangleStyle} />
           <div className="col s11">
             <div className="collection-title ">{crl.issuerFriendlyName}</div>
-            <div className="collection-info cert-info ">{crl.issuerFriendlyName}</div>
+            <div className="collection-info ">{crl.issuerFriendlyName}</div>
           </div>
         </div>
       </div>

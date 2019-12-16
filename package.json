@@ -4,7 +4,7 @@
   },
   "description": "CryptoARM GOST",
   "name": "cryptoarm-gost",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "license": "Apache-2.0",
   "main": "main.js",
   "scripts": {
@@ -18,6 +18,7 @@
     "build-renderer": "cross-env NODE_ENV=production node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.prod.js --progress --profile --colors",
     "start": "cross-env NODE_ENV=production electron ./app/",
     "prestart": "npm run build",
+    "test": "jest",
     "ts": "tsc",
     "start-hot-renderer": "cross-env HOT=1 NODE_ENV=development electron -r babel-register -r babel-polyfill ./app/main.development",
     "postinstall": "concurrently \"npm run build\" \"npm run build-dll\" \"install-app-deps\" \"node node_modules/fbjs-scripts/node/check-dev-engines.js package.json\"",
@@ -85,15 +86,17 @@
   },
   "homepage": "https://cryptoarm.ru/cryptoarm-gost/",
   "devDependencies": {
+    "@jest-runner/electron": "^2.0.2",
     "@types/archiver": "^2.1.2",
     "@types/async": "^2.0.40",
     "@types/classnames": "0.0.32",
     "@types/electron": "^1.4.38",
     "@types/history": "^4.6.0",
+    "@types/jest": "^24.0.21",
     "@types/jquery": "^3.2.13",
     "@types/material-ui": "^0.17.2",
     "@types/materialize-css": "^0.98.0",
-    "@types/node": "^10.12.18",
+    "@types/node": "^10.17.2",
     "@types/nouislider": "^9.0.1",
     "@types/orchestrator": "0.0.30",
     "@types/prop-types": "^15.5.4",
@@ -108,11 +111,14 @@
     "@types/react-virtualized": "^9.21.1",
     "@types/redux": "^3.6.0",
     "@types/redux-logger": "^3.0.0",
+    "@types/redux-mock-store": "^1.0.1",
     "@types/request": "^2.48.1",
     "@types/socket.io": "^1.4.36",
     "@types/systeminformation": "^3.23.0",
     "@types/webpack-env": "^1.13.0",
     "@types/xml2js": "^0.4.3",
+    "babel-core": "^6.26.3",
+    "babel-jest": "^23.6.0",
     "babel-loader": "^7.1.5",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-dev-expression": "^0.2.1",
@@ -138,18 +144,22 @@
     "electron-devtools-installer": "^2.2.4",
     "fbjs-scripts": "^0.7.1",
     "file-loader": "^2.0.0",
+    "jest": "^24.9.0",
+    "jest-fetch-mock": "^2.1.2",
     "mini-css-extract-plugin": "^0.5.0",
     "minimist": "^1.2.0",
     "nan": "^2.6.2",
     "node-sass": "^4.11.0",
     "nouislider": "^10.1.0",
     "redux-logger": "^3.0.1",
+    "redux-mock-store": "^1.5.3",
     "sass-loader": "^6.0.3",
     "style-loader": "^0.16.1",
     "stylelint": "^8.2.0",
     "stylelint-config-standard": "^17.0.0",
+    "ts-jest": "^24.1.0",
     "tslint": "^5.5.0",
-    "typescript": "^2.6.2",
+    "typescript": "^3.6.4",
     "url-loader": "^1.1.2",
     "webpack": "^4.27.1",
     "webpack-bundle-analyzer": "^3.5.0",
@@ -191,5 +201,35 @@
     "node": ">=8.x",
     "npm": ">=3.x",
     "yarn": ">=0.21.3"
+  },
+  "jest": {
+    "automock": false,
+    "setupFiles": [
+      "./setupJest.ts"
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false,
+        "isolatedModules": false
+      }
+    },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/__fixtures__/"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json",
+      "node"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/mocks/fileMock.js",
+      "\\.(s?css|sass)$": "<rootDir>/mocks/styleMock.js"
+    }
   }
 }

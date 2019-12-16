@@ -9,8 +9,11 @@ import { deleteRequestCA } from "../../AC/caActions";
 import { resetCloudCSP } from "../../AC/cloudCspActions";
 import { changeSearchValue } from "../../AC/searchActions";
 import {
-  ADDRESS_BOOK, CA, DEFAULT_CSR_PATH, PROVIDER_CRYPTOPRO,
-  REQUEST, ROOT, USER_NAME,
+  ADDRESS_BOOK, CA, DEFAULT_CSR_PATH, MODAL_ADD_CERTIFICATE,
+  MODAL_CERTIFICATE_IMPORT_DSS, MODAL_CERTIFICATE_REQUEST, MODAL_CERTIFICATE_REQUEST_CA,
+  MODAL_CLOUD_CSP, MODAL_DELETE_CERTIFICATE, MODAL_DELETE_CRL, MODAL_DELETE_REQUEST_CA,
+  MODAL_EXPORT_CERTIFICATE, MODAL_EXPORT_CRL, MODAL_EXPORT_REQUEST_CA,
+  PROVIDER_CRYPTOPRO, REQUEST, ROOT, USER_NAME,
 } from "../../constants";
 import { filteredCertificatesSelector } from "../../selectors";
 import { filteredCrlsSelector } from "../../selectors/crlsSelectors";
@@ -23,6 +26,7 @@ import CRLDelete from "../CRL/CRLDelete";
 import CRLExport from "../CRL/CRLExport";
 import CRLInfo from "../CRL/CRLInfo";
 import Dialog from "../Dialog";
+import DSSConnection from "../DSS/DSSConnection";
 import Modal from "../Modal";
 import PasswordDialog from "../PasswordDialog";
 import ProgressBars from "../ProgressBars";
@@ -31,6 +35,7 @@ import CertificateRequestCA from "../Request/CertificateRequestCA";
 import RequestCADelete from "../Request/RequestCADelete";
 import RequestCAExport from "../Request/RequestCAExport";
 import RequestCAInfo from "../Request/RequestCAInfo";
+import AddCertificate from "./AddCertificate";
 import CertificateChainInfo from "./CertificateChainInfo";
 import CertificateDelete from "./CertificateDelete";
 import CertificateExport from "./CertificateExport";
@@ -39,16 +44,6 @@ import CertificateInfoTabs from "./CertificateInfoTabs";
 import CertificateList from "./CertificateList";
 
 const OS_TYPE = os.type();
-
-const MODAL_DELETE_CERTIFICATE = "MODAL_DELETE_CERTIFICATE";
-const MODAL_EXPORT_CERTIFICATE = "MODAL_EXPORT_CERTIFICATE";
-const MODAL_EXPORT_CRL = "MODAL_EXPORT_CRL";
-const MODAL_DELETE_CRL = "MODAL_DELETE_CRL";
-const MODAL_EXPORT_REQUEST_CA = "MODAL_EXPORT_REQUEST_CA";
-const MODAL_DELETE_REQUEST_CA = "MODAL_DELETE_REQUEST_CA";
-const MODAL_CERTIFICATE_REQUEST = "MODAL_CERTIFICATE_REQUEST";
-const MODAL_CERTIFICATE_REQUEST_CA = "MODAL_CERTIFICATE_REQUEST_CA";
-const MODAL_CLOUD_CSP = "MODAL_CLOUD_CSP";
 
 class CertWindow extends React.Component<any, any> {
   static contextTypes = {
@@ -68,6 +63,8 @@ class CertWindow extends React.Component<any, any> {
       password: "",
       requestCA: null,
       showDialogInstallRootCertificate: false,
+      showModalAddCertificate: false,
+      showModalCertificateImportDSS: false,
       showModalCertificateRequest: false,
       showModalCertificateRequestCA: false,
       showModalCloudCSP: false,
@@ -86,6 +83,9 @@ class CertWindow extends React.Component<any, any> {
 
   handleShowModalByType = (typeOfModal: string) => {
     switch (typeOfModal) {
+      case MODAL_ADD_CERTIFICATE:
+        this.setState({ showModalAddCertificate: true });
+        break;
       case MODAL_DELETE_CERTIFICATE:
         this.setState({ showModalDeleteCertifiacte: true });
         break;
@@ -104,6 +104,9 @@ class CertWindow extends React.Component<any, any> {
       case MODAL_DELETE_REQUEST_CA:
         this.setState({ showModalDeleteRequestCA: true });
         break;
+      case MODAL_CERTIFICATE_IMPORT_DSS:
+        this.setState({ showModalCertificateImportDSS: true });
+        break;
       case MODAL_CERTIFICATE_REQUEST:
         this.setState({ showModalCertificateRequest: true });
         break;
@@ -120,6 +123,9 @@ class CertWindow extends React.Component<any, any> {
 
   handleCloseModalByType = (typeOfModal: string): void => {
     switch (typeOfModal) {
+      case MODAL_ADD_CERTIFICATE:
+        this.setState({ showModalAddCertificate: false });
+        break;
       case MODAL_DELETE_CERTIFICATE:
         this.setState({ showModalDeleteCertifiacte: false });
         break;
@@ -131,6 +137,9 @@ class CertWindow extends React.Component<any, any> {
         break;
       case MODAL_DELETE_CRL:
         this.setState({ showModalDeleteCRL: false });
+        break;
+      case MODAL_CERTIFICATE_IMPORT_DSS:
+        this.setState({ showModalCertificateImportDSS: false });
         break;
       case MODAL_CERTIFICATE_REQUEST:
         this.setState({ showModalCertificateRequest: false });
@@ -154,6 +163,7 @@ class CertWindow extends React.Component<any, any> {
 
   handleCloseModals = () => {
     this.setState({
+      showModalCertificateImportDSS: false,
       showModalCertificateRequest: false,
       showModalCertificateRequestCA: false,
       showModalCloudCSP: false,
@@ -679,7 +689,7 @@ class CertWindow extends React.Component<any, any> {
             ) :
               <React.Fragment>
                 <div className="col s12">
-                  <div className="desktoplic_text_item">Сведения о сертификате:</div>
+                  <div className="primary-text">Сведения о сертификате:</div>
                   <hr />
                 </div>
                 <div className="col s12" style={{ padding: 0 }}>
@@ -727,7 +737,7 @@ class CertWindow extends React.Component<any, any> {
     if (certificate) {
       title = <div className="cert-title-main">
         <div className="collection-title cert-title">{certificate.subjectFriendlyName}</div>
-        <div className="collection-info cert-info cert-title">{certificate.issuerFriendlyName}</div>
+        <div className="collection-info cert-title">{certificate.issuerFriendlyName}</div>
       </div>;
     } else if (crl) {
       title = (
@@ -739,6 +749,29 @@ class CertWindow extends React.Component<any, any> {
     }
 
     return title;
+  }
+
+  showModalAddCertificate = () => {
+    const { localize, locale } = this.context;
+    const { showModalAddCertificate } = this.state;
+
+    if (!showModalAddCertificate) {
+      return;
+    }
+
+    return (
+      <Modal
+        isOpen={showModalAddCertificate}
+        header={localize("Certificate.cert_import", locale)}
+        onClose={() => this.handleCloseModalByType(MODAL_ADD_CERTIFICATE)}
+        style={{ width: "350px" }}>
+
+        <AddCertificate
+          certImport={this.certImport}
+          handleShowModalByType={this.handleShowModalByType}
+          onCancel={() => this.handleCloseModalByType(MODAL_ADD_CERTIFICATE)} />
+      </Modal>
+    );
   }
 
   showModalDeleteCertificate = () => {
@@ -927,6 +960,28 @@ class CertWindow extends React.Component<any, any> {
     );
   }
 
+  showModalCertificateImportDSS = () => {
+    const { localize, locale } = this.context;
+    const { certificate, showModalCertificateImportDSS } = this.state;
+
+    if (!showModalCertificateImportDSS) {
+      return;
+    }
+
+    return (
+      <Modal
+        isOpen={showModalCertificateImportDSS}
+        header={localize("DSS.DSS_connection", locale)}
+        onClose={() => this.handleCloseModalByType(MODAL_CERTIFICATE_IMPORT_DSS)}
+        style={{ width: "500px" }}>
+        <DSSConnection
+          onCancel={() => this.handleCloseModalByType(MODAL_CERTIFICATE_IMPORT_DSS)}
+          handleReloadCertificates={this.handleReloadCertificates}
+        />
+      </Modal>
+    );
+  }
+
   showModalCloudCSP = () => {
     const { localize, locale } = this.context;
     const { showModalCloudCSP } = this.state;
@@ -947,7 +1002,7 @@ class CertWindow extends React.Component<any, any> {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const { cloudCSPSettings, cloudCSPState, certificates, isLoading } = this.props;
+    const { cloudCSPSettings, cloudCSPState, certificates, isLoading, location } = this.props;
     const { certificate, crl } = this.state;
     const { localize, locale } = this.context;
 
@@ -957,6 +1012,10 @@ class CertWindow extends React.Component<any, any> {
 
     if (prevProps.isLoading && !isLoading) {
       $(".btn-floated").dropdown();
+    }
+
+    if (prevProps.location !== location) {
+      this.setState({ certificate: null, crl: null, requestCA: null });
     }
 
     if (prevProps.cloudCSPState !== this.props.cloudCSPState) {
@@ -1033,13 +1092,13 @@ class CertWindow extends React.Component<any, any> {
       return <ProgressBars />;
     }
 
-    const VIEW = certificates.size < 1 && crls.length < 1 ? "not-active" : "";
+    const VIEW = certificates.size < 1 && crls.size < 1 ? "not-active" : "";
 
     return (
-      <div className="main">
-        <div className="content">
+      <div className="content-noflex">
+        <div className="row">
           <div className="col s8 leftcol">
-            <div className="row">
+            <div className="row halfbottom">
               <div className="row halfbottom" />
               <div className="col" style={{ width: "calc(100% - 80px)" }}>
                 <div className="input-field input-field-csr col s12 border_element find_box">
@@ -1065,14 +1124,11 @@ class CertWindow extends React.Component<any, any> {
                   </a>
                   <ul id="dropdown-btn-import" className="dropdown-content">
                     <li><a onClick={this.certImport}>{localize("Certificate.cert_import_from_file", locale)}</a></li>
-                    {
-                      (Number(this.getCPCSPVersion().charAt(0)) < 5) ? null :
-                        <li>
-                          <a onClick={this.importFromCloudCSP}>
-                            {localize("CloudCSP.cert_import_from_cloudCSP", locale)}
-                          </a>
-                        </li>
-                    }
+                    <li>
+                      <a onClick={() => this.handleShowModalByType(MODAL_CERTIFICATE_IMPORT_DSS)}>
+                        {localize("DSS.cert_import_from_DSS", locale)}
+                      </a>
+                    </li>
                     <li><a onClick={() => this.handleShowModalByType(MODAL_CERTIFICATE_REQUEST)}>{localize("CSR.create_request", locale)}</a></li>
                     <li>
                       <a onClick={() => this.handleShowModalByType(MODAL_CERTIFICATE_REQUEST_CA)}>
@@ -1086,36 +1142,33 @@ class CertWindow extends React.Component<any, any> {
                 </div>
               </div>
             </div>
-            <div className="add-certs">
-              <div className={"collection " + VIEW}>
-                <div className="row">
-                  <div className="col s12">
-                    <div style={{ display: "flex" }}>
-                      <div style={{ flex: "1 1 auto", height: "calc(100vh - 130px)" }}>
-                        {
-                          certificates.size < 1 && crls.length < 1 ?
-                            <BlockNotElements name={"active"} title={localize("Certificate.cert_not_found", locale)} /> :
-                            <CertificateList activeCert={this.handleActiveCert} activeCrl={this.handleActiveCRL} activeRequestCA={this.handleActiveRequestCA} operation="certificate" />
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </div>
+            <div className={"collection " + VIEW}>
+              <div style={{ flex: "1 1 auto", height: "calc(100vh - 110px)" }}>
+                {
+                  certificates.size < 1 && crls.size < 1 ?
+                    <BlockNotElements name={"active"} title={localize("Certificate.cert_not_found", locale)} /> :
+                    <CertificateList
+                      selectedCert={this.state.certificate}
+                      selectedCrl={this.state.crl}
+                      activeCert={this.handleActiveCert}
+                      activeCrl={this.handleActiveCRL}
+                      activeRequestCA={this.handleActiveRequestCA}
+                      operation="certificate" />
+                }
               </div>
             </div>
           </div>
+
           <div className="col s4 rightcol">
             <div className="row halfbottom" />
             <div className="row">
-              <div className="col s12">
-                <div style={{ height: "calc(100vh - 110px)" }}>
-                  {this.getCertificateOrCRLInfo()}
-                </div>
+              <div style={{ height: "calc(100vh - 110px)" }}>
+                {this.getCertificateOrCRLInfo()}
               </div>
             </div>
             {
               certificate || crl ?
-                <div className="row fixed-bottom-rightcolumn" style={{ position: "relative", bottom: "70px" }}>
+                <div className="row fixed-bottom-rightcolumn" style={{ bottom: "20px" }}>
                   <div className="col s12">
                     <hr />
                   </div>
@@ -1155,7 +1208,7 @@ class CertWindow extends React.Component<any, any> {
 
             {
               requestCA ?
-                <div className="row fixed-bottom-rightcolumn" style={{ position: "relative", bottom: "70px" }}>
+                <div className="row fixed-bottom-rightcolumn" style={{ bottom: "20px" }}>
                   <div className="col s12">
                     <hr />
                   </div>
@@ -1180,22 +1233,30 @@ class CertWindow extends React.Component<any, any> {
                 : null
             }
 
-            {this.showModalDeleteCertificate()}
-            {this.showModalExportCertificate()}
-            {this.showModalExportCRL()}
-            {this.showModalDeleteCrl()}
-            {this.showModalExportRequestCA()}
-            {this.showModalDeleteRequestCA()}
-            {this.showModalCertificateRequest()}
-            {this.showModalCertificateRequestCA()}
-            {this.showModalCloudCSP()}
           </div>
+          {this.showModalAddCertificate()}
+          {this.showModalDeleteCertificate()}
+          {this.showModalExportCertificate()}
+          {this.showModalExportCRL()}
+          {this.showModalDeleteCrl()}
+          {this.showModalExportRequestCA()}
+          {this.showModalDeleteRequestCA()}
+          {this.showModalCertificateImportDSS()}
+          {this.showModalCertificateRequest()}
+          {this.showModalCertificateRequestCA()}
+          {this.showModalCloudCSP()}
 
+          <Dialog isOpen={this.state.showDialogInstallRootCertificate}
+            header="Внимание!" body="Для установки корневых сертификатов требуются права администратора. Продолжить?"
+            onYes={this.handleInstallTrustedCertificate} onNo={this.handleCloseDialogInstallRootCertificate} />
+          <PasswordDialog value={this.state.password} onChange={this.handlePasswordChange} />
         </div>
-        <Dialog isOpen={this.state.showDialogInstallRootCertificate}
-          header="Внимание!" body="Для установки корневых сертификатов требуются права администратора. Продолжить?"
-          onYes={this.handleInstallTrustedCertificate} onNo={this.handleCloseDialogInstallRootCertificate} />
-        <PasswordDialog value={this.state.password} onChange={this.handlePasswordChange} />
+
+        <div className="fixed-action-btn" style={{ bottom: "30px", right: "380px" }} onClick={() => this.handleShowModalByType(MODAL_ADD_CERTIFICATE)}>
+          <a className="btn-floating btn-large cryptoarm-red">
+            <i className="large material-icons">add</i>
+          </a>
+        </div>
       </div>
     );
   }
@@ -1253,16 +1314,16 @@ class CertWindow extends React.Component<any, any> {
       let curStatusStyle;
 
       if (status) {
-        curStatusStyle = "cert_status_ok";
+        curStatusStyle = certificate.dssUserID ? "cloud_cert_status_ok" : "cert_status_ok";
       } else {
-        curStatusStyle = "cert_status_error";
+        curStatusStyle = certificate.dssUserID ? "cloud_cert_status_error" : "cert_status_error";
       }
 
       return (
         <div className="row">
           <div className="row halfbottom" />
           <div className="col s10">
-            <div className="desktoplic_text_item">Сертификат:</div>
+            <div className="primary-text">Сертификат:</div>
             <hr />
           </div>
           <div className="col s2">
@@ -1342,6 +1403,7 @@ export default connect((state) => {
     crls: filteredCrlsSelector(state),
     isLoading: state.certificates.loading,
     isLoadingFromDSS: state.cloudCSP.loading,
+    location: state.router.location,
     searchValue: state.filters.searchValue,
     servicesMap: state.services.entities,
   };

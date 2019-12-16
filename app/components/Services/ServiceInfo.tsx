@@ -44,18 +44,18 @@ export default class ServiceInfo extends React.Component<IServiceInfoProps, ISer
     return (
       <React.Fragment>
         <div className="col s12">
-          <div className="desktoplic_text_item">{localize("Services.services_connection_options", locale)}</div>
+          <div className="primary-text">{localize("Services.services_connection_options", locale)}</div>
           <hr />
         </div>
 
         <div className="col s12">
           <div className="collection cert-info-list">
             <div className="collection-item certs-collection certificate-info">
-              <div className={"collection-info cert-info-blue"}>{localize("Services.name", locale)}</div>
+              <div className="caption-text">{localize("Services.name", locale)}</div>
               <div className={"collection-title selectable-text"}>{service.name}</div>
             </div>
             <div className="collection-item certs-collection certificate-info">
-              <div className={"collection-info cert-info-blue"}>{localize("Services.adress", locale)}</div>
+              <div className="caption-text">{localize("Services.adress", locale)}</div>
               <div className={"collection-title selectable-text"}>{service.settings.url}</div>
             </div>
           </div>
@@ -63,7 +63,7 @@ export default class ServiceInfo extends React.Component<IServiceInfoProps, ISer
         <div className="row" />
 
         <div className="col s12">
-          <div className="desktoplic_text_item">{localize("Services.services_login_option", locale)}</div>
+          <div className="primary-text">{localize("Services.services_login_option", locale)}</div>
           <hr />
         </div>
 
@@ -74,13 +74,13 @@ export default class ServiceInfo extends React.Component<IServiceInfoProps, ISer
                 null :
                 <React.Fragment>
                   <div className="collection-item certs-collection certificate-info">
-                    <div className="collection-info cert-info-blue">{localize("Services.login", locale)}</div>
+                    <div className="caption-text">{localize("Services.login", locale)}</div>
                     <div className="collection-title selectable-text">{service.login}</div>
                   </div>
 
                   <div className="collection-item certs-collection certificate-info">
                     <div className="col s11" style={{ padding: 0 }}>
-                      <div className="collection-info cert-info-blue">{localize("Services.password", locale)}</div>
+                      <div className="caption-text">{localize("Services.password", locale)}</div>
                       <div className={`collection-title selectable-text ${passwordIsMasked ? "text-security" : ""}`}>{service.password}</div>
                     </div>
                     <div className="col s1">
@@ -97,7 +97,7 @@ export default class ServiceInfo extends React.Component<IServiceInfoProps, ISer
               certificate ?
                 <div className="collection-item certs-collection certificate-info">
                   <div className="col s12" style={{ padding: 0 }}>
-                    <div className="collection-info cert-info-blue">{localize("Services.certificate", locale)}</div>
+                    <div className="caption-text">{localize("Services.certificate", locale)}</div>
                     <CertificateItem certificate={certificate} style={{ padding: 0 }} />
                   </div>
                 </div> :
@@ -109,22 +109,22 @@ export default class ServiceInfo extends React.Component<IServiceInfoProps, ISer
         <div className="row" />
 
         <div className="col s12">
-          <div className="desktoplic_text_item">{localize("Services.services_user_profile_inf", locale)}</div>
+          <div className="primary-text">{localize("Services.services_user_profile_inf", locale)}</div>
           <hr />
         </div>
 
         <div className="col s12">
           <div className="collection cert-info-list">
             <div className="collection-item certs-collection certificate-info">
-              <div className="collection-info cert-info-blue">{localize("Services.email", locale)}</div>
+              <div className="caption-text">{localize("Services.email", locale)}</div>
               <div className="collection-title">{service.email}</div>
             </div>
             <div className="collection-item certs-collection certificate-info">
-              <div className="collection-info cert-info-blue">{localize("Services.key_information", locale)}</div>
+              <div className="caption-text">{localize("Services.key_information", locale)}</div>
               <div className="collection-title">{service.keyPhrase}</div>
             </div>
             <div className="collection-item certs-collection certificate-info">
-              <div className="collection-info cert-info-blue">{localize("Services.comment", locale)}</div>
+              <div className="caption-text">{localize("Services.comment", locale)}</div>
               <div className="collection-title selectable-text">{service.comment}</div>
             </div>
           </div>

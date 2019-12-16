@@ -1,5 +1,6 @@
 import fs from "fs";
 import { Map } from "immutable";
+import * as os from "os";
 import * as path from "path";
 import PropTypes, { any } from "prop-types";
 import React from "react";
@@ -208,7 +209,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                   </div>
                 </div> :
                 <div className="col s12">
-                  <div className="content-wrapper z-depth-1 tbody">
+                  <div className="content-wrapper z-depth-1 tbody" style={{ height: "400px" }}>
                     <div className="content-item-relative">
                       <div className="row halfbottom" />
                       <KeyParameters
@@ -375,37 +376,33 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     if (!template || !template.RDN) {
       return false;
     }
-
     let result = true;
-
-    Object.keys(template.RDN).map((key) => {
-      const field = template.RDN[key];
+    for (let key of Object.keys(template.RDN)) {
+      const templateField = template.RDN[key];
+      const field = RDNsubject[templateField.Oid];
       if (field) {
-        const RDNsubjectValue = RDNsubject[field.Oid];
-
-        if (field.ProhibitEmpty && (!RDNsubjectValue || !RDNsubjectValue.value)) {
+        if (templateField.ProhibitEmpty && (!field || !field.value)) {
           result = false;
-          return;
+          break;
         }
-
-        if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.643.3.131.1.1")) {
-          result = validateInn(RDNsubjectValue);
-          return;
-        } else if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.643.100.1")) {
-          result = validateOgrn(RDNsubjectValue);
-          return;
-        } else if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.643.100.3")) {
-          result = validateSnils(RDNsubjectValue);
-          return;
-        } else if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.643.100.5")) {
-          result = validateOgrnip(RDNsubjectValue);
-          return;
-        } else if ((RDNsubjectValue && RDNsubjectValue.value) && (field.Oid === "1.2.840.113549.1.9.1")) {
-          result = REQULAR_EXPRESSION.test(RDNsubjectValue);
-          return;
+        if (field.value && (field.type === "1.2.643.3.131.1.1")) {
+          result = validateInn(field.value);
+          if (!result) { break; }
+        } else if (field.value && (field.type === "1.2.643.100.1")) {
+          result = validateOgrn(field.value);
+          if (!result) { break; }
+        } else if (field.value && (field.type === "1.2.643.100.3")) {
+          result = validateSnils(field.value);
+          if (!result) { break; }
+        } else if (field.value && (field.type === "1.2.643.100.5")) {
+          result = validateOgrnip(field.value);
+          if (!result) { break; }
+        } else if (field.value && (field.type === "1.2.840.113549.1.9.1")) {
+          result = REQULAR_EXPRESSION.test(field.value);
+          if (!result) { break; }
         }
       }
-    });
+    }
 
     return result;
   }
@@ -556,8 +553,20 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       fs.mkdirSync(path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CSR"), { mode: 0o700 });
     }
 
-    const url = path.join(DEFAULT_CSR_PATH, `requestCA_${RDNsubject["2.5.4.3"] ? RDNsubject["2.5.4.3"].value : ""}_${algorithm}_${formatDate(new Date())}.req`);
-    const urlSig = path.join(DEFAULT_CSR_PATH, `requestCAsign_${RDNsubject["2.5.4.3"] ? RDNsubject["2.5.4.3"].value : ""}_${algorithm}_${formatDate(new Date())}.req`);
+    let urlName = `requestCA_${RDNsubject["2.5.4.3"] ? RDNsubject["2.5.4.3"].value : ""}_${algorithm}_${formatDate(new Date())}.req`;
+    let urlSigName = `requestCAsign_${RDNsubject["2.5.4.3"] ? RDNsubject["2.5.4.3"].value : ""}_${algorithm}_${formatDate(new Date())}.req`;
+
+    if (os.type() === "Windows_NT") {
+      urlName = urlName.replace(/[/\\?%*:|"<>]/g, "-");
+      urlSigName = urlSigName.replace(/[/\\?%*:|"<>]/g, "-");
+    } else {
+      urlName = urlName.replace(/[/\\:]/g, "-");
+      urlSigName = urlSigName.replace(/[/\\:]/g, "-");
+    }
+
+    const url = path.join(DEFAULT_CSR_PATH, urlName);
+    const urlSig = path.join(DEFAULT_CSR_PATH, urlSigName);
+
     try {
       certReq.save(url, trusted.DataFormat.PEM);
 

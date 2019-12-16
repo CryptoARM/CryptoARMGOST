@@ -21,9 +21,9 @@ class CertificateInfo extends React.Component<ICertificateInfoProps, any> {
     let curStatusStyle;
 
     if (status) {
-      curStatusStyle = "cert_status_ok";
+      curStatusStyle = certificate.dssUserID ? "cloud_cert_status_ok" : "cert_status_ok";
     } else {
-      curStatusStyle = "cert_status_error";
+      curStatusStyle = certificate.dssUserID  ? "cloud_cert_status_error" : "cert_status_error";
     }
 
     if (certificate && !certificate.verified) {
@@ -38,7 +38,7 @@ class CertificateInfo extends React.Component<ICertificateInfoProps, any> {
           </div>
           <div className="col s10" style={{ padding: 0 }}>
             <div className="collection-title">{certificate.subjectFriendlyName}</div>
-            <div className="collection-info cert-info">{certificate.issuerFriendlyName}</div>
+            <div className="collection-info">{certificate.issuerFriendlyName}</div>
           </div>
         </div>
       </React.Fragment>

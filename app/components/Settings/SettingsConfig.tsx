@@ -19,7 +19,11 @@ import CheckBoxWithLabel from "../CheckBoxWithLabel";
 import EncodingTypeSelector from "../EncodingTypeSelector";
 import RecipientsList from "../RecipientsList";
 import SelectFolder from "../SelectFolder";
+import SignatureStandardSelector from "../Signature/SignatureStandardSelector";
+import SignatureTypeSelector from "../Signature/SignatureTypeSelector";
 import SignerInfo from "../Signature/SignerInfo";
+import OcspSettings from "./OcspSettings";
+import TspSettings from "./TspSettings";
 
 const dialog = window.electron.remote.dialog;
 
@@ -62,6 +66,8 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
     const classDisabled = disabled ? "disabled" : "";
 
     let encoding = settings.sign.encoding;
+    const signatureStandard = settings.sign.standard;
+    const isDetached = settings.sign.detached;
 
     if (signer && signer.service && encoding !== "BASE-64") {
       encoding = "BASE-64";
@@ -71,135 +77,147 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
       <div className="content-noflex">
         <div className="row">
           <div className="col s8 leftcol">
-            <div className="row halfbottom">
+            <div className="row">
+
               <div className="row halfbottom" />
+
               <div className="row">
                 <div className="col s12">
-                  <div className="h4">{localize("Settings.general", locale)}</div>
-                  <div className="settings-content">
-                    <div className="row" />
-                    <div className="row">
-                      <div className="input-field  col s12">
-                        <input
-                          id="name"
-                          type="text"
-                          name="name"
-                          value={settings.name}
-                          onChange={this.handleInputNameChange}
-                          placeholder={localize("Settings.name", locale)}
-                        />
-                        <label htmlFor="name" style={{ color: "rgba(0,0,0,0.87)", fontSize: "14px" }}>{localize("Settings.name", locale)}</label>
-                      </div>
-                    </div>
-                    <CheckBoxWithLabel
-                      disabled={disabled}
-                      onClickCheckBox={this.handleSaveToDocumentsClick}
-                      isChecked={settings.saveToDocuments}
-                      elementId="saveToDocuments"
-                      title={localize("Documents.save_to_documents", locale)} />
-                    <SelectFolder
-                      disabled={disabled}
-                      directory={settings.saveToDocuments ? DEFAULT_DOCUMENTS_PATH : settings.outfolder}
-                      viewDirect={this.handleOutfolderChange}
-                      openDirect={this.addDirect.bind(this)}
-                    />
+                  <div className="headline6">
+                    {localize("Settings.general", locale)}
                   </div>
-                </div>
-              </div>
-
-              <div className="row halfbottom" >
-                <div className="col s12">
                   <hr />
                 </div>
+
+                <div className="col s12">
+                  <div className="row settings-content">
+                    <div className="col s12 m12 l6">
+                      <CheckBoxWithLabel
+                        disabled={disabled}
+                        onClickCheckBox={this.handleSaveToDocumentsClick}
+                        isChecked={settings.saveToDocuments}
+                        elementId="saveToDocuments"
+                        title={localize("Documents.save_to_documents", locale)} />
+                    </div>
+                    <div className="col s12 m12 l6">
+                      <SelectFolder
+                        disabled={disabled}
+                        directory={settings.saveToDocuments ? DEFAULT_DOCUMENTS_PATH : settings.outfolder}
+                        viewDirect={this.handleOutfolderChange}
+                        openDirect={this.addDirect.bind(this)}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="col s12">
-                <div className="h4">
-                  {localize("Sign.sign_setting", locale)}
-                </div>
-
-                <div className="row settings-content">
-                  <div className="col s12 m12 l6">
-                    <EncodingTypeSelector
-                      EncodingValue={encoding}
-                      handleChange={this.handleEncodingChange}
-                      disabled={signer && signer.service} />
-                  </div>
-                  <div className="col s12 m12 l6">
-                    <CheckBoxWithLabel
-                      disabled={disabled}
-                      onClickCheckBox={this.handleDetachedClick}
-                      isChecked={settings.sign.detached}
-                      elementId="detached-sign"
-                      title={localize("Sign.sign_detached", locale)} />
-                  </div>
-                  <div className="col s12 m6 m12 l6">
-                    <CheckBoxWithLabel onClickCheckBox={this.handleTimestampClick}
-                      disabled={disabled || (signer && signer.service)}
-                      isChecked={settings.sign.timestamp || (signer && signer.service)}
-                      elementId="sign-time"
-                      title={localize("Sign.sign_time", locale)} />
-                  </div>
-                </div>
-
-                <div className="row nobottom">
-                  <div className="col s11">
-                    <div className="desktoplic_text_item">{localize("Sign.signer_cert", locale)}</div>
+              <div className="row">
+                <div className="col s12">
+                  <div className="headline6">
+                    {localize("Sign.sign_setting", locale)}
                     <hr />
                   </div>
-                  <div className="col s1">
-                    <a className="btn-floated" data-activates="dropdown-btn-signer">
-                      <i className="file-setting-item waves-effect material-icons secondary-content">more_vert</i>
-                    </a>
-                    <ul id="dropdown-btn-signer" className="dropdown-content">
-                      <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE}>
-                        <li><a>Заменить</a></li>
-                      </Link>
-                      <li><a onClick={() => this.props.selectSignerCertificate(0)}>{localize("Common.clear", locale)}</a></li>
-                    </ul>
+                </div>
+
+                <div className="col s12">
+                  <div className="row settings-content">
+                    <div className="col s12 m12 l6">
+                      <SignatureStandardSelector
+                        value={signatureStandard}
+                        handleChange={this.handleSignatureStandardChange}
+                        disabled={signer && signer.service} />
+
+                      <SignatureTypeSelector
+                        detached={isDetached}
+                        handleChange={this.handleDetachedChange}
+                        disabled={signer && signer.service} />
+
+                      <EncodingTypeSelector
+                        EncodingValue={encoding}
+                        handleChange={this.handleEncodingChange}
+                        disabled={signer && signer.service} />
+                    </div>
+                    <div className="col s12 m12 l6">
+                      <CheckBoxWithLabel
+                        disabled={disabled}
+                        onClickCheckBox={this.handleTimestampOnSignClick}
+                        isChecked={settings.sign.timestamp_on_sign}
+                        elementId="detached-sign"
+                        title={localize("Cades.set_timestamp_on_sign", locale)} />
+                    </div>
+                    <div className="col s12 m12 l6">
+                      <CheckBoxWithLabel onClickCheckBox={this.handleTimestampClick}
+                        disabled={disabled || (signer && signer.service)}
+                        isChecked={settings.sign.timestamp || (signer && signer.service)}
+                        elementId="sign-time"
+                        title={localize("Cades.set_timestamp_on_data", locale)} />
+                    </div>
                   </div>
-                  {
-                    (signer) ? <SignerInfo signer={signer} style={{ fontSize: "75%" }} /> :
-                      <div className="col s12">
+
+                  <div className="row nobottom">
+                    <div className="col s11">
+                      <div className="primary-text">{localize("Sign.signer_cert", locale)}</div>
+                      <hr />
+                    </div>
+                    <div className="col s1">
+                      <a className="btn-floated" data-activates="dropdown-btn-signer">
+                        <i className="file-setting-item waves-effect material-icons secondary-content">more_vert</i>
+                      </a>
+                      <ul id="dropdown-btn-signer" className="dropdown-content">
                         <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE}>
-                          <a className="btn btn-outlined waves-effect waves-light" style={{ width: "100%" }}>
-                            {localize("Settings.Choose", locale)}
-                          </a>
+                          <li><a>Заменить</a></li>
                         </Link>
-                      </div>
-                  }
+                        <li><a onClick={() => this.props.selectSignerCertificate(0)}>{localize("Common.clear", locale)}</a></li>
+                      </ul>
+                    </div>
+                    {
+                      (signer) ? <SignerInfo signer={signer} /> :
+                        <div className="col s12 right-align">
+                          <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE}>
+                            <a className="btn btn-outlined waves-effect waves-light" style={{ width: "100%", maxWidth: "505px" }}>
+                              {localize("Settings.Choose", locale)}
+                            </a>
+                          </Link>
+                        </div>
+                    }
+                  </div>
                 </div>
               </div>
 
               <div className="row" />
 
-              <div className="row halfbottom" >
+              <div className={`row ${classDisabled}`}>
                 <div className="col s12">
+                  <div className="headline6">
+                    {localize("Encrypt.encrypt_setting", locale)}
+                  </div>
                   <hr />
                 </div>
-              </div>
 
-              <div className={`col s12 ${classDisabled}`}>
-                <div className="h4">{localize("Encrypt.encrypt_setting", locale)}</div>
-                <div className="settings-content">
-                  <div className="col s12 m12 l6">
-                    <EncodingTypeSelector EncodingValue={settings.encrypt.encoding} handleChange={this.handleEncryptEncodingChange} />
-                  </div>
-                  <div className="col s12 m12 l6">
-                    <CheckBoxWithLabel
-                      disabled={disabled}
-                      onClickCheckBox={this.handleDeleteClick}
-                      isChecked={settings.encrypt.delete}
-                      elementId="delete_files"
-                      title={localize("Encrypt.delete_files_after", locale)} />
-                  </div>
-                  <div className="col s12 m12 l6">
-                    <CheckBoxWithLabel
-                      disabled={disabled}
-                      onClickCheckBox={this.handleArchiveClick}
-                      isChecked={settings.encrypt.archive}
-                      elementId="archive_files"
-                      title={localize("Encrypt.archive_files_before", locale)} />
+                <div className="col s12">
+                  <div className="row settings-content">
+                    <div className="col s12 m12 l6">
+                      <EncodingTypeSelector
+                        EncodingValue={settings.encrypt.encoding}
+                        handleChange={this.handleEncryptEncodingChange}
+                      />
+                    </div>
+                    <div className="col s12 m12 l6">
+                      <CheckBoxWithLabel
+                        disabled={disabled}
+                        onClickCheckBox={this.handleDeleteClick}
+                        isChecked={settings.encrypt.delete}
+                        elementId="delete_files"
+                        title={localize("Encrypt.delete_files_after", locale)} />
+                    </div>
+                    <div className="col s12 m12 l6">
+                      <CheckBoxWithLabel
+                        disabled={disabled}
+                        onClickCheckBox={this.handleArchiveClick}
+                        isChecked={settings.encrypt.archive}
+                        elementId="archive_files"
+                        title={localize("Encrypt.archive_files_before", locale)} />
+                    </div>
                   </div>
                 </div>
 
@@ -207,10 +225,10 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
 
                 <div className="col s12">
                   <div className="col s10">
-                    <div className="desktoplic_text_item">Сертификаты шифрования:</div>
+                    <div className="primary-text">Сертификаты шифрования:</div>
                     <hr />
                   </div>
-                  <div className="col s2">
+                  <div className="col s2 settings-content">
                     <div className="right import-col">
                       <a className="btn-floated" data-activates="dropdown-btn-encrypt">
                         <i className="file-setting-item waves-effect material-icons secondary-content">more_vert</i>
@@ -229,16 +247,38 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
                       <div className="col s12">
                         <RecipientsList recipients={recipients} handleRemoveRecipient={(recipient) => this.props.deleteRecipient(recipient.id)} />
                       </div> :
-                      <div className="col s12">
+                      <div className="col s12 right-align">
                         <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT}>
                           <a className={`btn btn-outlined waves-effect waves-light ${classDisabled}`}
-                            style={{ width: "100%" }}>
+                            style={{ width: "100%", maxWidth: "505px" }}>
                             {localize("Settings.Choose", locale)}
                           </a>
                         </Link>
                       </div>
                   }
                 </div>
+              </div>
+
+              <div className="row">
+                <div className="col s12">
+                  <div className="headline6">
+                    {localize("Cades.service_tsp", locale)}
+                  </div>
+                  <hr />
+                </div>
+
+                <TspSettings />
+              </div>
+
+              <div className="row">
+                <div className="col s12">
+                  <div className="headline6">
+                    {localize("Cades.service_ocsp", locale)}
+                  </div>
+                  <hr />
+                </div>
+
+                <OcspSettings />
               </div>
             </div>
           </div>
@@ -327,12 +367,12 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
     });
   }
 
-  handleDetachedClick = () => {
+  handleDetachedChange = (detached: boolean) => {
     const { settings } = this.state;
 
     this.setState({
       settings: settings
-        .setIn(["sign", "detached"], !settings.sign.detached),
+        .setIn(["sign", "detached"], detached),
     });
   }
 
@@ -342,6 +382,15 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
     this.setState({
       settings: settings
         .setIn(["sign", "timestamp"], !settings.sign.timestamp),
+    });
+  }
+
+  handleTimestampOnSignClick = () => {
+    const { settings } = this.state;
+
+    this.setState({
+      settings: settings
+        .setIn(["sign", "timestamp_on_sign"], !settings.sign.timestamp_on_sign),
     });
   }
 
@@ -363,6 +412,15 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
     this.setState({
       settings: settings
         .setIn(["sign", "encoding"], encoding),
+    });
+  }
+
+  handleSignatureStandardChange = (value: string) => {
+    const { settings } = this.state;
+
+    this.setState({
+      settings: settings
+        .setIn(["sign", "standard"], value),
     });
   }
 

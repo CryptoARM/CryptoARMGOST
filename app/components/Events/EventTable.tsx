@@ -201,7 +201,7 @@ class EventTable extends React.Component<IEventTableProps & IEventTableDispatch,
           </div>
         </div>
         {searchValue && foundEvents.length ?
-          <div className="card navigationToolbar valign-wrapper">
+          <div className="card navigationToolbar valign-wrapper" style={{right: "50px"}}>
             <i className={"small material-icons cryptoarm-blue waves-effect " + classDisabledNavigation} onClick={this.handleScrollToFirstOfFoud}>first_page</i>
             <i className={"small material-icons cryptoarm-blue waves-effect " + classDisabledNavigation} onClick={this.handleScrollToBefore}>navigate_before</i>
             <div style={{ color: "black" }}>

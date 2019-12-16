@@ -4,14 +4,17 @@ import { connect } from "react-redux";
 import { Route } from "react-router-dom";
 import { ConnectedRouter as Router, push } from "react-router-redux";
 import {
-  LOCATION_ABOUT, LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT, LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE,
-  LOCATION_CERTIFICATES, LOCATION_CONTAINERS, LOCATION_DOCUMENTS,
-  LOCATION_EVENTS, LOCATION_SERVICES, LOCATION_SETTINGS, LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT,
+  LOCATION_ABOUT, LOCATION_ADDRESS_BOOK, LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT,
+  LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE, LOCATION_CERTIFICATES,
+  LOCATION_CONTAINERS, LOCATION_DOCUMENTS, LOCATION_EVENTS,
+  LOCATION_SERVICES, LOCATION_SETTINGS, LOCATION_SETTINGS_CONFIG,
+  LOCATION_SETTINGS_SELECT,
 } from "../constants";
 import history from "../history";
 import localize from "../i18n/localize";
 import store from "../store/index";
 import AboutWindow from "./About/AboutWindow";
+import AddressBookWindow from "./AddressBook/AddressBookWindow";
 import CertificateSelectionForEncrypt from "./Certificate/CertificateSelectionForEncrypt";
 import CertificateSelectionForSignature from "./Certificate/CertificateSelectionForSignature";
 import CertificateWindow from "./Certificate/CertificateWindow";
@@ -58,6 +61,7 @@ class App extends React.Component<IAppProps, {}> {
           <Route path={LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE} component={CertificateSelectionForSignature} />
           <Route path={LOCATION_CERTIFICATES} component={CertificateWindow} />
           <Route path={LOCATION_CONTAINERS} component={ContainersWindow} />
+          <Route path={LOCATION_ADDRESS_BOOK} component={AddressBookWindow} />
           <Route path={LOCATION_ABOUT} component={AboutWindow} />
           <Route path={LOCATION_DOCUMENTS} component={DocumentsWindow} />
           <Route path={LOCATION_EVENTS} component={EventsWindow} />

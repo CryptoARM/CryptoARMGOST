@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
-import { DEFAULT_DOCUMENTS_PATH, USER_NAME } from "../constants";
+import { DEFAULT_DOCUMENTS_PATH, DEFAULT_PATH, USER_NAME } from "../constants";
 import localize from "../i18n/localize";
+import { IOcsp } from "../reducer/signatures";
 import { fileCoding, fileExists } from "../utils";
 import logger from "../winstonLogger";
 
@@ -65,7 +66,13 @@ export function setDetachedContent(cms: trusted.cms.SignedData, uri: string, sho
   }
 }
 
-export function signFile(uri: string, cert: trusted.pki.Certificate, policies: any, format: trusted.DataFormat, folderOut: string) {
+export function signFile(
+  uri: string,
+  cert: trusted.pki.Certificate,
+  policies: any,
+  format: trusted.DataFormat,
+  folderOut: string,
+) {
   let outURI: string;
 
   if (folderOut.length > 0) {
@@ -88,6 +95,7 @@ export function signFile(uri: string, cert: trusted.pki.Certificate, policies: a
   const newFileUri = outURI.substring(0, outURI.lastIndexOf("."));
 
   try {
+
     const sd: trusted.cms.SignedData = new trusted.cms.SignedData();
     sd.policies = policies;
     sd.content = {
@@ -414,6 +422,9 @@ export function getSignPropertys(cms: trusted.cms.SignedData) {
       signer = signers.items(i);
       cert = signer.certificate;
 
+      const timestamps = [];
+      let ocsp: IOcsp = {};
+
       try {
         ch = trusted.utils.Csp.buildChain(cert);
       } catch (e) {
@@ -426,6 +437,55 @@ export function getSignPropertys(cms: trusted.cms.SignedData) {
         digestAlgorithm: undefined,
         status_verify: undefined,
         subject: undefined,
+        timestamps: [],
+      };
+
+      try {
+        const dataToImport = fs.readFileSync(DEFAULT_PATH + "/test.ocsp");
+        const ocspImported = new trusted.pki.OCSP(dataToImport);
+
+        console.log("ocspImported", ocspImported);
+
+        ocsp.Certificates = ocspImported.Certificates;
+        ocsp.NextUpdate = ocspImported.NextUpdate();
+        ocsp.OCSP = ocspImported;
+        ocsp.OcspCert = ocspImported.OcspCert;
+        ocsp.ProducedAt = ocspImported.ProducedAt;
+        ocsp.RespNumber = ocspImported.RespNumber;
+        ocsp.RespStatus = ocspImported.RespStatus;
+        ocsp.RespStatus = ocspImported.RespStatus;
+        ocsp.RevReason = ocspImported.RevReason();
+        ocsp.RevTime = ocspImported.RevTime();
+        ocsp.SignatureAlgorithmOid = ocspImported.SignatureAlgorithmOid;
+        ocsp.Status = ocspImported.Status();
+        ocsp.ThisUpdate = ocspImported.ThisUpdate();
+      } catch (e) {
+        console.log("------ ERRROR GET OCSP PROPS ------");
+        console.log("For correct work add test.ocsp to app directory");
+        console.log(e);
+      }
+
+      for (const stType in trusted.cms.StampType) {
+        if (Number(stType)) {
+          const timestamp = signer.timestamp(parseInt(stType, 10));
+          if (timestamp) {
+            timestamps.push({
+              Accuracy: timestamp.Accuracy,
+              Certificates: timestamp.Certificates,
+              DataHash: timestamp.DataHash,
+              DataHashAlgOID: timestamp.DataHashAlgOID,
+              HasNonce: timestamp.HasNonce,
+              Ordering: timestamp.Ordering,
+              PolicyID: timestamp.PolicyID,
+              SerialNumber: timestamp.SerialNumber,
+              TSACertificate: timestamp.TSACertificate,
+              TSP: timestamp,
+              Time: timestamp.Time,
+              TsaName: timestamp.TsaName,
+              Type: stType,
+            });
+          }
+        }
       }
 
       if (!ch || !ch.length || ch.length === 0) {
@@ -481,9 +541,11 @@ export function getSignPropertys(cms: trusted.cms.SignedData) {
         alg: cert.signatureAlgorithm,
         certs: certSign,
         digestAlgorithm: cert.signatureDigestAlgorithm,
+        ocsp,
         signingTime: signer.signingTime,
         status_verify: false,
         subject: cert.subjectFriendlyName,
+        timestamps,
       };
       certSign = [];
 

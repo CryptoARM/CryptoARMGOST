@@ -78,7 +78,7 @@ class ServiceListItemBigWidth extends React.Component<IServiceListItemProps, {}>
               <div className="collection-title">{service.name}</div>
             </div>
             <div className="col s6">
-              <div className="collection-info cert-info ">{service.settings.url}</div>
+              <div className="collection-info ">{service.settings.url}</div>
             </div>
           </div>
         </div>

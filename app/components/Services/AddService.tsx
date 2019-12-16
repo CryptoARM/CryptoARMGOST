@@ -335,33 +335,31 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
     const { RDNmodel } = this.state;
     let result = true;
 
-    Object.keys(RDNmodel).map((key) => {
-
+    for (let key of Object.keys(RDNmodel)) {
       const field = RDNmodel[key];
       if (field) {
         if (field.ProhibitEmpty && !field.value) {
           result = false;
-          return;
+          break;
         }
-
         if (field.value && (key === "1.2.643.3.131.1.1")) {
           result = validateInn(field.value);
-          return;
+          if (!result) { break; }
         } else if (field.value && (key === "1.2.643.100.1")) {
           result = validateOgrn(field.value);
-          return;
+          if (!result) { break; }
         } else if (field.value && (key === "1.2.643.100.3")) {
           result = validateSnils(field.value);
-          return;
+          if (!result) { break; }
         } else if (field.value && (key === "1.2.643.100.5")) {
           result = validateOgrnip(field.value);
-          return;
+          if (!result) { break; }
         } else if (field.value && (key === "1.2.840.113549.1.9.1")) {
           result = REQULAR_EXPRESSION.test(field.value);
-          return;
+          if (!result) { break; }
         }
       }
-    });
+    }
 
     if (!this.state.formVerified) {
       this.setState({ formVerified: true });

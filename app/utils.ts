@@ -1,23 +1,13 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
+import * as path from "path";
 
 import { OrderedMap } from "immutable";
 import PropTypes from "prop-types";
 import React from "react";
+import { IFile } from "./AC";
 
 let err_hint: string[] = ["Доступны только цифры", "Проверьте количество цифр", "Не правильно введены данные"];
-interface ISignatureStatusProps {
-  signature: any;
-  handleActiveCert: (cert: any) => void;
-}
-
-class SignatureStatus extends React.Component<ISignatureStatusProps, any> {
-  static contextTypes = {
-    locale: PropTypes.string,
-    localize: PropTypes.func,
-  };
-
-}
 
 export function arrayToMap(arr, RecordModel) {
   return arr.reduce((acc, el) => acc.set(el.id, RecordModel ? new RecordModel(el) : el), new OrderedMap({}))
@@ -364,4 +354,48 @@ export function bytesToSize(bytes: number, decimals = 2) {
   }
 
   return `${(bytes / Math.pow(1024, i)).toFixed(decimals)} ${sizes[i]}`;
+}
+
+export function fileNameForSign(folderOut: any, document: IFile) {
+  let outURI: string;
+  if (folderOut.length > 0) {
+    outURI = path.join(folderOut, path.basename(document.fullpath) + ".sig");
+  } else {
+    outURI = document.fullpath + ".sig";
+  }
+
+  let indexFile: number = 1;
+  let newOutUri: string = outURI;
+  const fileUri = outURI.substring(0, outURI.lastIndexOf("."));
+
+  while (fileExists(newOutUri)) {
+    const parsed = path.parse(fileUri);
+    newOutUri = path.join(parsed.dir, parsed.name + "_(" + indexFile + ")" + parsed.ext + ".sig");
+    indexFile++;
+  }
+  outURI = newOutUri;
+
+  return outURI;
+}
+
+export function fileNameForResign(folderOut: any, document: IFile) {
+  let outURI: string;
+  if (folderOut.length > 0) {
+    outURI = path.join(folderOut, path.basename(document.fullpath));
+    if (path.dirname(document.fullpath) !== folderOut) {
+      let indexFile: number = 1;
+      let newOutUri: string = outURI;
+      const fileUri = outURI.substring(0, outURI.lastIndexOf("."));
+      while (fileExists(newOutUri)) {
+        const parsed = path.parse(fileUri);
+        newOutUri = path.join(parsed.dir, parsed.name + "_(" + indexFile + ")" + parsed.ext + ".sig");
+        indexFile++;
+      }
+      outURI = newOutUri;
+    }
+  } else {
+    outURI = document.fullpath;
+  }
+
+  return outURI;
 }

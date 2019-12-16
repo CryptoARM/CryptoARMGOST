@@ -736,7 +736,7 @@ class CertificateSelectionForSignature extends React.Component<any, any> {
     if (certificate) {
       title = <div className="cert-title-main">
         <div className="collection-title cert-title">{certificate.subjectFriendlyName}</div>
-        <div className="collection-info cert-info cert-title">{certificate.issuerFriendlyName}</div>
+        <div className="collection-info cert-title">{certificate.issuerFriendlyName}</div>
       </div>;
     } else {
       title = <span>{localize("Certificate.cert_info", locale)}</span>;
@@ -789,8 +789,6 @@ class CertificateSelectionForSignature extends React.Component<any, any> {
     );
   }
 
-
-
   render() {
     const { certificates, isLoading, isLoadingFromDSS, searchValue } = this.props;
     const { certificate } = this.state;
@@ -832,14 +830,6 @@ class CertificateSelectionForSignature extends React.Component<any, any> {
                   </a>
                   <ul id="dropdown-btn-import" className="dropdown-content">
                     <li><a onClick={this.certImport}>{localize("Certificate.cert_import_from_file", locale)}</a></li>
-                    {
-                      (Number(this.getCPCSPVersion().charAt(0)) < 5) ? null :
-                        <li>
-                          <a onClick={this.importFromCloudCSP}>
-                            {localize("CloudCSP.cert_import_from_cloudCSP", locale)}
-                          </a>
-                        </li>
-                    }
                     <li><a onClick={() => this.handleShowModalByType(MODAL_CERTIFICATE_REQUEST)}>{localize("CSR.create_request", locale)}</a></li>
                   </ul>
                   <input type="file" id="choose-cert" value="" onChange={(event: any) => {
@@ -870,7 +860,7 @@ class CertificateSelectionForSignature extends React.Component<any, any> {
             <div className="row halfbottom" />
             <div className="row">
               <div className="col s12">
-                <div className="desktoplic_text_item">Сертификат подписи</div>
+                <div className="primary-text">Сертификат подписи</div>
                 <hr />
               </div>
               <div className="col s12">

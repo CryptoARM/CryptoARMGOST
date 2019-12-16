@@ -31,10 +31,10 @@ class HeaderWorkspaceBlock extends React.Component<IHeaderWorkspaceBlockProps, a
     if (second_text) {
       element = <div className="cert-title-main">
         <div className="collection-title cert-title">{text}</div>
-        <div className="collection-info cert-info cert-title">{second_text}</div>
+        <div className="collection-info cert-title">{second_text}</div>
       </div>;
     } else {
-      element = <span>{text}</span>;
+      element = <span className="headline6">{text}</span>;
     }
 
     return (

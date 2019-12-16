@@ -260,7 +260,9 @@ class FileTableSmall extends React.Component<IFileTableSmallProps & IFileTableSm
   }
 
   handleOnRowClick = ({ rowData }: { rowData: any }) => {
-    this.props.activeFile(rowData.id, !rowData.active);
+    if (!rowData.socket) {
+      this.props.activeFile(rowData.id, !rowData.active);
+    }
   }
 
   handleScrollToBefore = () => {

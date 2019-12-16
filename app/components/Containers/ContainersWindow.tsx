@@ -40,10 +40,10 @@ class ContainersWindow extends React.Component<any, any> {
     const view = containers.length < 1 ? "not-active" : "";
 
     return (
-      <div className="main">
-        <div className="content">
+      <div className="content-noflex">
+        <div className="row">
           <div className="col col s8 leftcol">
-            <div className="row">
+            <div className="row halfbottom">
               <div className="row halfbottom" />
               <div className="col" style={{ width: "calc(100% - 40px)" }}>
                 <div className="input-field input-field-csr col s12 border_element find_box">

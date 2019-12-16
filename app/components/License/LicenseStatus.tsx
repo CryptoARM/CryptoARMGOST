@@ -11,7 +11,7 @@ interface IButtonWithExternalLinkProps {
 class ButtonWithExternalLink extends React.Component<IButtonWithExternalLinkProps, {}> {
   render() {
     const { externalName, externalLink } = this.props;
-    
+
     return (
       <span>
         <a className="waves-effect waves-light btn" target="_blank" onClick={(event: any) => this.gotoLink(externalLink)}>
@@ -57,10 +57,10 @@ class LicenseStatus extends React.Component<ILicenseStatusProps, {}> {
 
   render() {
     const { localize, locale } = this.context;
-    
+
 
     const { license, status, lic_format, lic_error } = this.props;
-    
+
     const settings = {
       draggable: false,
     };
@@ -118,7 +118,7 @@ class LicenseStatus extends React.Component<ILicenseStatusProps, {}> {
       style = { color: "#4caf50" };
       return (
           <React.Fragment>
-            <div className="desktoplic_text_item bottomitem">{localize("License.lic_status", locale)}</div>
+            <div className="caption-text">{localize("License.lic_status", locale)}</div>
             <div className="desktoplic_text_item topitem" style={{color: "green"}}>{messageStatus}</div>
             <LicenseInfoField info={messageExpired} style={style} />
           </React.Fragment>
@@ -128,7 +128,7 @@ class LicenseStatus extends React.Component<ILicenseStatusProps, {}> {
       style = { color: "red" };
       return (
           <React.Fragment>
-            <div className="desktoplic_text_item bottomitem">{localize("License.lic_status", locale)}</div>
+            <div className="caption-text">{localize("License.lic_status", locale)}</div>
             <div className="desktoplic_text_item topitem" style={style}>{messageStatus}</div>
             <LicenseInfoField info={messageExpired} style={style} />
           </React.Fragment>

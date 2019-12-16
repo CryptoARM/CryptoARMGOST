@@ -4,11 +4,12 @@ import React from "react";
 import { connect } from "react-redux";
 import { filePackageDelete } from "../AC";
 import {
-  LOCATION_ABOUT, LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT, LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE,
-  LOCATION_CERTIFICATES,
-  LOCATION_CONTAINERS, LOCATION_DOCUMENTS,
-  LOCATION_EVENTS, LOCATION_LICENSE, LOCATION_SERVICES,
-  LOCATION_SETTINGS, LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT, SETTINGS_JSON, TRUSTED_CRYPTO_LOG,
+  LOCATION_ABOUT, LOCATION_ADDRESS_BOOK, LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT,
+  LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE,
+  LOCATION_CERTIFICATES, LOCATION_CONTAINERS,
+  LOCATION_DOCUMENTS, LOCATION_EVENTS, LOCATION_LICENSE,
+  LOCATION_SERVICES, LOCATION_SETTINGS, LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT,
+  SETTINGS_JSON, TRUSTED_CRYPTO_LOG,
 } from "../constants";
 import { connectedSelector, loadingRemoteFilesSelector } from "../selectors";
 import { CANCELLED } from "../server/constants";
@@ -74,40 +75,45 @@ class MenuBar extends React.Component<any, IMenuBarState> {
     const { localize, locale } = this.context;
     const { isArchiveLog, eventsDateFrom, eventsDateTo } = this.props;
     const pathname = this.props.location.pathname;
+    const storename = this.props.location.state ? this.props.location.state.head : "";
 
     switch (pathname) {
       case LOCATION_ABOUT:
-        return `${localize("About.about", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("About.about", locale)}`;
+
+      case LOCATION_ADDRESS_BOOK:
+        return `${localize("About.product_NAME", locale)} - ${localize("AddressBook.address_book", locale)}`;
 
       case LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT:
-        return `${localize("Certificate.certificate_selection_for_encrypt", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("Certificate.certificate_selection_for_encrypt", locale)}`;
 
       case LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE:
-        return `${localize("Certificate.certificate_selection_for_signature", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("Certificate.certificate_selection_for_signature", locale)}`;
 
       case LOCATION_CERTIFICATES:
-        return `${localize("Certificate.certs", locale)} - ${localize("About.product_NAME", locale)}`;
+        const head = storename ? storename : localize("Certificate.certs", locale);
+        return `${localize("About.product_NAME", locale)} - ${head}`;
 
       case LOCATION_CONTAINERS:
-        return `${localize("Containers.containers", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("Containers.containers", locale)}`;
 
       case LOCATION_LICENSE:
-        return `${localize("License.license", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("License.license", locale)}`;
 
       case LOCATION_SETTINGS:
-        return `${localize("Settings.settings", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("Settings.settings", locale)}`;
 
       case LOCATION_SETTINGS_CONFIG:
-        return `${localize("Settings.settings_config", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("Settings.settings_config", locale)}`;
 
       case LOCATION_SETTINGS_SELECT:
-        return `${localize("Settings.settings_select", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("Settings.settings_select", locale)}`;
 
       case LOCATION_DOCUMENTS:
-        return `${localize("Documents.documents", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("Documents.documents", locale)}`;
 
       case LOCATION_EVENTS:
-        let title = `${localize("Events.operations_log", locale)} - ${localize("About.product_NAME", locale)}`;
+        let title = `${localize("About.product_NAME", locale)} - ${localize("Events.operations_log", locale)}`;
 
         if (isArchiveLog && eventsDateFrom && eventsDateTo) {
           title = localize("Events.operations_log", locale) + " [" +
@@ -129,35 +135,23 @@ class MenuBar extends React.Component<any, IMenuBarState> {
         return title;
 
       case LOCATION_SERVICES:
-        return `${localize("Services.services", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("Services.services", locale)}`;
 
       default:
-        return `${localize("SignAndEncrypt.sign_and_encrypt", locale)} - ${localize("About.product_NAME", locale)}`;
+        return `${localize("About.product_NAME", locale)} - ${localize("SignAndEncrypt.sign_and_encrypt", locale)}`;
     }
   }
 
-  componentDidMount() {
-    $(".menu-btn").sideNav({
-      closeOnClick: true,
-    });
-  }
-
   render() {
+    const pathname = this.props.location.pathname;
     const disabledNavigate = this.isFilesFromSocket();
-    const dataActivates = disabledNavigate ? "" : "slide-out";
-    const classDisabled = disabledNavigate ? "disabled" : "";
 
     return (
       <React.Fragment>
         <nav className="app-bar">
           <div className="col s6 m6 l6 app-bar-wrapper">
             <ul className="app-bar-items">
-              <li>
-                <a data-activates={dataActivates} className={"menu-btn waves-effect waves-light " + classDisabled}>
-                  <i className="material-icons">menu</i>
-                </a>
-              </li>
-              <li className="app-bar-text">{this.getTitle()}</li>
+              <li className="headline6 app-bar-text">{this.getTitle()}</li>
               <li>
                 <ul>
                   <li>
@@ -183,9 +177,10 @@ class MenuBar extends React.Component<any, IMenuBarState> {
               </li>
             </ul>
           </div>
-          <ul id="slide-out" className="side-nav">
-            <SideMenu />
+          <ul id="slide-out" className="side-nav fixed" style={{ width: "50px", left: "2px", overflow: "visible", backgroundColor: "rgba(242,245,245,0.8)" }}>
+            <SideMenu pathname={pathname} />
           </ul>
+
         </nav>
         {this.props.children}
         <Diagnostic />

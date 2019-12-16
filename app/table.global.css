@@ -57,7 +57,7 @@
 
 .navigationToolbar {
   bottom: 20px !important;
-  right: 390px !important;
+  right: 460px;
   position: fixed !important;
   padding: 10px !important;
   background-color: rgba(255,255,255,0.8) !important;

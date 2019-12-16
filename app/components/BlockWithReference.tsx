@@ -16,7 +16,7 @@ class BlockWithReference extends React.Component<IBlockWithReferenceProps, {}> {
     return (
       <div className={"cert-item " + name}>
         <i className="material-icons large fullscreen">{icon}</i>
-        <div className="add-file-item-text center-align">{title}</div>
+        <div className="headline6 add-file-item-text center-align">{title}</div>
         <a className="add-file-item-text btn btn-outlined waves-effect waves-light" onClick={onBtnClick}>{titleRef}</a>
       </div>
     );

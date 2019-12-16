@@ -100,15 +100,15 @@ class RequestCAInfo extends React.Component<IRequestCAInfoProps, any> {
     return (
       <React.Fragment>
         <div className="col s12">
-          <div className="desktoplic_text_item">{localize("CA.request_status", locale)}</div>
+          <div className="primary-text">{localize("CA.request_status", locale)}</div>
           <hr />
         </div>
 
         <div className="col s12">
           <div className="collection cert-info-list">
             <div className="collection-item certs-collection certificate-info">
-              <div className={"collection-info cert-info-blue"}>{localize("CA.current_status", locale)}</div>
-              <div className={"collection-title selectable-text"}>{localize(`CARequestStatus.${certrequest.status}`, locale)}</div>
+              <div className="caption-text">{localize("CA.current_status", locale)}</div>
+              <div className="collection-title selectable-text">{localize(`CARequestStatus.${certrequest.status}`, locale)}</div>
             </div>
           </div>
         </div>
@@ -116,7 +116,7 @@ class RequestCAInfo extends React.Component<IRequestCAInfoProps, any> {
         <div className="row" />
 
         <div className="col s12">
-          <div className="desktoplic_text_item">{localize("CA.request_info", locale)}</div>
+          <div className="primary-text">{localize("CA.request_info", locale)}</div>
           <hr />
         </div>
 
@@ -141,8 +141,8 @@ class RequestCAInfo extends React.Component<IRequestCAInfoProps, any> {
       const type = localize(`OIDs.${field.type}`, locale);
       return (
         <div key={field.type} className="collection-item certs-collection certificate-info">
-          <div className={"collection-info cert-info-blue"}>{type ? type : field.type}</div>
-          <div className={"collection-title selectable-text"}>{field.value ? field.value : "-"}</div>
+          <div className="caption-text">{type ? type : field.type}</div>
+          <div className="collection-title selectable-text">{field.value ? field.value : "-"}</div>
         </div>
       );
     });

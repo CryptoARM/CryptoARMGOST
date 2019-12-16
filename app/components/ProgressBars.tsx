@@ -19,7 +19,7 @@ export default function ProgressBars({ }, context: { localize: (str: string, loc
           </div>
         </div>
       </div>
-      <div className="preloader-text">{localize("Settings.wait", locale)}</div>
+      <div className="headline6 preloader-text">{localize("Settings.wait", locale)}</div>
     </div>
   );
 }

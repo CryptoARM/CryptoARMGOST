@@ -152,12 +152,7 @@ class DocumentsWindow extends React.Component<IDocumentsWindowProps, IDocumentsW
           <div className="col s8 leftcol">
             <div className="row halfbottom">
               <div className="row halfbottom" />
-              <div className="col" style={{ width: "40px", paddingLeft: "40px" }}>
-                <a onClick={this.addFiles.bind(this)}>
-                  <i className="file-setting-item waves-effect material-icons secondary-content pulse">add</i>
-                </a>
-              </div>
-              <div className="col" style={{ width: "calc(100% - 140px)" }}>
+              <div className="col" style={{ width: "calc(100% - 80px)" }}>
                 <div className="input-field input-field-csr col s12 border_element find_box">
                   <i className="material-icons prefix">search</i>
                   <input
@@ -207,10 +202,10 @@ class DocumentsWindow extends React.Component<IDocumentsWindowProps, IDocumentsW
               (
                 <React.Fragment>
                   <div className="col s12">
-                    <div className="desktoplic_text_item">{localize("Sign.sign_info", locale)}</div>
+                    <div className="primary-text">{localize("Sign.sign_info", locale)}</div>
                     <hr />
                   </div>
-                  <div style={{ height: "calc(100vh - 100px)" }}>
+                  <div style={{ height: "calc(100vh - 80px)" }}>
                     <div className="add-certs">
                       <SignatureInfoBlock
                         signatures={fileSignatures}
@@ -233,6 +228,12 @@ class DocumentsWindow extends React.Component<IDocumentsWindowProps, IDocumentsW
           </div>
           {this.showModalFilterDocuments()}
           {this.showModalDeleteDocuments()}
+        </div>
+
+        <div className="fixed-action-btn" style={{ bottom: "30px", right: "380px" }} onClick={this.addFiles.bind(this)}>
+          <a className="btn-floating btn-large cryptoarm-red">
+            <i className="large material-icons">add</i>
+          </a>
         </div>
       </div>
     );
@@ -590,8 +591,8 @@ export default connect((state) => {
     signer: state.certificates.getIn(["entities", state.settings.getIn(["entities", state.settings.default]).sign.signer]),
   };
 }, {
-    addDocuments, arhiveDocuments, activeSetting, changeLocation, deleteRecipient, documentsReviewed,
-    filePackageSelect, filePackageDelete, packageSign, loadAllDocuments,
-    removeAllDocuments, removeAllFiles, removeAllRemoteFiles, removeDocuments,
-    selectAllDocuments, selectDocument, selectSignerCertificate,
-  })(DocumentsWindow);
+  addDocuments, arhiveDocuments, activeSetting, changeLocation, deleteRecipient, documentsReviewed,
+  filePackageSelect, filePackageDelete, packageSign, loadAllDocuments,
+  removeAllDocuments, removeAllFiles, removeAllRemoteFiles, removeDocuments,
+  selectAllDocuments, selectDocument, selectSignerCertificate,
+})(DocumentsWindow);

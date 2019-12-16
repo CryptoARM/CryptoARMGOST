@@ -2,6 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { verifyCertificate } from "../../AC";
+import { CRYPTOPRO_DSS } from "../../constants";
 
 const rectangleValidStyle = {
   background: "#4caf50",
@@ -65,17 +66,21 @@ class CertificateListItemBigWidth extends React.Component<ICertificateListItemPr
     const status = cert.status;
 
     if (status) {
-      curStatusStyle = "cert_status_ok";
+      curStatusStyle = cert.dssUserID ? "cloud_cert_status_ok" : "cert_status_ok";
       rectangleStyle = rectangleValidStyle;
     } else {
-      curStatusStyle = "cert_status_error";
+      curStatusStyle = cert.dssUserID  ? "cloud_cert_status_error" : "cert_status_error";
       rectangleStyle = rectangleUnvalidStyle;
     }
 
     curKeyStyle = cert.key.length > 0 ? curKeyStyle = "key " : curKeyStyle = "";
 
     if (curKeyStyle) {
-      curKeyStyle += "localkey";
+      if (cert.dssUserID) {
+        curKeyStyle += "dsskey";
+      } else {
+        curKeyStyle += "localkey";
+      }
     }
 
     if (isOpen) {
@@ -94,10 +99,10 @@ class CertificateListItemBigWidth extends React.Component<ICertificateListItemPr
               <div className="collection-title">{cert.subjectFriendlyName}</div>
             </div>
             <div className="col s3">
-              <div className="collection-info cert-info ">{cert.issuerFriendlyName}</div>
+              <div className="collection-info ">{cert.issuerFriendlyName}</div>
             </div>
             <div className="col s3">
-              <div className="collection-info cert-info ">{new Date(cert.notAfter).toLocaleDateString(locale, {
+              <div className="collection-info ">{new Date(cert.notAfter).toLocaleDateString(locale, {
                 day: "numeric",
                 hour: "numeric",
                 minute: "numeric",

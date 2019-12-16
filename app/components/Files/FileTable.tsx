@@ -265,7 +265,9 @@ class FileTable extends React.Component<IFileTableProps & IFileTableDispatch, IF
   }
 
   handleOnRowClick = ({ rowData }: { rowData: any }) => {
-    this.props.activeFile(rowData.id, !rowData.active);
+    if (!rowData.socket) {
+      this.props.activeFile(rowData.id, !rowData.active);
+    }
   }
 
   handleScrollToBefore = () => {
@@ -359,7 +361,7 @@ class FileTable extends React.Component<IFileTableProps & IFileTableDispatch, IF
         }
       } catch (e) {
         //
-       }
+      }
     });
 
     if (!foundDocuments.length) {

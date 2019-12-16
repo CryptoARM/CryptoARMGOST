@@ -22,7 +22,7 @@ export default class SettingsInfo extends React.Component<ISettingsInfoProps, {}
       <div className="row">
         <div className="add-cert-collection collection cert-info-list">
           <div className="col s12">
-            <div className="desktoplic_text_item">{localize("Settings.name", locale)}</div>
+            <div className="primary-text">{localize("Settings.name", locale)}</div>
             <hr />
           </div>
           <div className="col s12 collection-title selectable-text">
@@ -32,7 +32,7 @@ export default class SettingsInfo extends React.Component<ISettingsInfoProps, {}
           <div className="row" />
 
           <div className="col s12">
-            <div className="desktoplic_text_item">{localize("Sign.sign_setting", locale)}</div>
+            <div className="primary-text">{localize("Sign.sign_setting", locale)}</div>
             <hr />
           </div>
 
@@ -94,7 +94,7 @@ export default class SettingsInfo extends React.Component<ISettingsInfoProps, {}
             <div className="row" />
 
             <div>
-              <div className="desktoplic_text_item">{localize("Encrypt.encrypt_setting", locale)}</div>
+              <div className="primary-text">{localize("Encrypt.encrypt_setting", locale)}</div>
               <hr />
             </div>
 

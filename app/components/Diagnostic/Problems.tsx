@@ -3,8 +3,8 @@ import React from "react";
 import {
   ERROR_CHECK_CSP_LICENSE, ERROR_CHECK_CSP_PARAMS,
   ERROR_LOAD_TRUSTED_CRYPTO,
-  NO_CORRECT_CRYPTOARM_LICENSE, NO_CRYPTOARM_LICENSE,
-  NO_GOST_2001, NO_HAVE_CERTIFICATES_WITH_KEY, NOT_INSTALLED_CSP,
+  ERROR_LOAD_TRUSTED_CURL, NO_CORRECT_CRYPTOARM_LICENSE,
+  NO_CRYPTOARM_LICENSE, NO_GOST_2001, NO_HAVE_CERTIFICATES_WITH_KEY, NOT_INSTALLED_CSP,
 } from "../../errors";
 import HeaderWorkspaceBlock from "../HeaderWorkspaceBlock";
 
@@ -29,6 +29,8 @@ class Problems extends React.Component<IProblemsProps, {}> {
     switch (error) {
       case ERROR_LOAD_TRUSTED_CRYPTO:
         return "Problems.problem_6";
+      case ERROR_LOAD_TRUSTED_CURL:
+        return "Problems.problem_7";
       case NOT_INSTALLED_CSP:
         return "Problems.problem_1";
       case ERROR_CHECK_CSP_LICENSE:

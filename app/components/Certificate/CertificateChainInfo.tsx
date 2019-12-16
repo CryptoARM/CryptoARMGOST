@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import React from "react";
+import { CRYPTOPRO_DSS } from "../../constants";
 
 class CertificateChainInfo extends React.Component<any, any> {
   static contextTypes = {
@@ -95,8 +96,13 @@ class CertificateChainInfo extends React.Component<any, any> {
 
         if (j === 0) {
           curKeyStyle = certificate.key.length > 0 ? "key " : "";
+
           if (curKeyStyle) {
-            curKeyStyle += "localkey";
+            if (certificate.dssUserID) {
+              curKeyStyle += "dsskey";
+            } else {
+              curKeyStyle += "localkey";
+            }
           }
         }
 
@@ -112,12 +118,12 @@ class CertificateChainInfo extends React.Component<any, any> {
               <div className="col s10" onClick={() => onClick(element)}>
                 <div className="r-iconbox-link">
                   <div className="collection-title chain_textblock">{element.subjectFriendlyName}</div>
-                  <div className="collection-info cert-info ">{element.issuerFriendlyName}</div>
+                  <div className="collection-info ">{element.issuerFriendlyName}</div>
                 </div>
               </div>
               <div className="col s1">
                 <div className="row nobottom">
-                  <div className={curStatusStyle + " "} style={{marginLeft: "-15px"}}/>
+                  <div className={curStatusStyle + " "} style={{ marginLeft: "-15px" }} />
                 </div>
               </div>
             </div>
@@ -131,7 +137,7 @@ class CertificateChainInfo extends React.Component<any, any> {
   buildChain = (certItem: any) => {
     let tcert: trusted.pki.Certificate | undefined;
 
-    if (certItem.x509 && certItem.service) {
+    if (certItem.x509 && certItem.dssUserID) {
       try {
         tcert = new trusted.pki.Certificate();
         tcert.import(Buffer.from(certItem.x509), trusted.DataFormat.PEM);

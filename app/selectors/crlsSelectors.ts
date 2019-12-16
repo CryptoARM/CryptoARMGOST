@@ -7,7 +7,7 @@ export const filtersGetter = (state: any) => state.filters;
 export const filteredCrlsSelector = createSelector(crlsGetter, filtersGetter, (crls, filters) => {
   const { searchValue } = filters;
   const search = searchValue.toLowerCase();
-  let arrCrls = mapToArr(crls);
+  let arrCrls = crls;
 
   arrCrls = arrCrls.sort((a, b) => {
     const aCrlIN = a.issuerFriendlyName.toLowerCase();

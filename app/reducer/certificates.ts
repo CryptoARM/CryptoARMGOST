@@ -1,13 +1,15 @@
 import { OrderedMap, Record } from "immutable";
 import {
   ADD_SERVICE_CERTIFICATE, DELETE_CERTIFICATE, DELETE_SERVICE, LOAD_ALL_CERTIFICATES,
-  REMOVE_ALL_CERTIFICATES, START, SUCCESS, VERIFY_CERTIFICATE,
+  REMOVE_ALL_CERTIFICATES, START, SUCCESS, VERIFY_CERTIFICATE, GET_CERTIFICATES_DSS,
 } from "../constants";
 import { arrayToMap } from "../utils";
 
 export const CertificateModel = Record({
   active: false,
   category: null,
+  dssCertID: null,
+  dssUserID: null,
   format: null,
   hasPin: null,
   hash: null,
@@ -59,7 +61,7 @@ export default (certificates = new DefaultReducerState(), action) => {
         .setIn(["entities", payload.certificateId, "verified"], true);
 
     case REMOVE_ALL_CERTIFICATES:
-      const allServicesCerts = certificates.get("entities").filter((certificate: any) => certificate.serviceId !== null);
+      const allServicesCerts = certificates.get("entities").filter((certificate: any) => certificate.dssUserID !== null);
       return certificates = new DefaultReducerState().setIn(["entities"], allServicesCerts);
 
     case ADD_SERVICE_CERTIFICATE:
@@ -72,8 +74,14 @@ export default (certificates = new DefaultReducerState(), action) => {
 
       return certificates;
 
-    case  DELETE_CERTIFICATE:
+    case DELETE_CERTIFICATE:
       return certificates.deleteIn(["entities", payload.id]);
+
+    case GET_CERTIFICATES_DSS + SUCCESS:
+      return certificates
+        .update("entities", (entities) => entities.merge(arrayToMap(payload.certificateMap, CertificateModel)))
+        .set("loading", false)
+        .set("loaded", true);
   }
 
   return certificates;

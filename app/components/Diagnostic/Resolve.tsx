@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { LOCATION_CERTIFICATES, LOCATION_CONTAINERS } from "../../constants";
 import {
   ERROR_CHECK_CSP_LICENSE, ERROR_CHECK_CSP_PARAMS,
-  ERROR_LOAD_TRUSTED_CRYPTO, NO_CORRECT_CRYPTOARM_LICENSE, NO_CRYPTOARM_LICENSE,
+  ERROR_LOAD_TRUSTED_CRYPTO, ERROR_LOAD_TRUSTED_CURL, NO_CORRECT_CRYPTOARM_LICENSE,
+  NO_CRYPTOARM_LICENSE,
   NO_GOST_2001, NO_HAVE_CERTIFICATES_WITH_KEY, NOT_INSTALLED_CSP,
 } from "../../errors";
 import HeaderWorkspaceBlock from "../HeaderWorkspaceBlock";
@@ -43,6 +44,24 @@ class Resolve extends React.Component<IResolveProps, {}> {
             </p>
           </div>
         );
+
+      case ERROR_LOAD_TRUSTED_CURL:
+        return (
+          <div className="resolve-content">
+            <p className="help_paragraf">
+              {localize("Problems.resolve_7_1", locale)}
+            </p>
+            <p className="help_paragraf">
+              {localize("Problems.resolve_7_2", locale)}
+            </p>
+            <p className="help_paragraf">{localize("Problems.resolve_7_3", locale)}
+              <a className="hlink" onClick={(event) => this.gotoLink(localize("Help.link_user_guide", locale))}>
+                {localize("Help.link_user_guide_name", locale)}
+              </a>
+            </p>
+          </div>
+        );
+
       case NOT_INSTALLED_CSP:
         return (
           <div className="resolve-content">
@@ -136,7 +155,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
               </Link>
             </p>
             <p className="help_paragraf">
-              {Number(this.getCPCSPVersion().charAt(0)) < 5 ? localize("Problems.resolve_5_4_1", locale) : localize("Problems.resolve_5_4", locale) }
+              {Number(this.getCPCSPVersion().charAt(0)) < 5 ? localize("Problems.resolve_5_4_1", locale) : localize("Problems.resolve_5_4", locale)}
               <Link to={LOCATION_CERTIFICATES} onClick={() => $("#modal-window-diagnostic").closeModal()}>
                 {localize("Certificate.Certificate", locale)}
               </Link>

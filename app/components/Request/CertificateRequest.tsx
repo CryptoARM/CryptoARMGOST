@@ -1,5 +1,6 @@
 import fs from "fs";
 import noUiSlider from "nouislider";
+import * as os from "os";
 import * as path from "path";
 import PropTypes from "prop-types";
 import React from "react";
@@ -228,7 +229,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
                 </div>
               </div> :
               <div className="col s12">
-                <div className="content-wrapper z-depth-1 tbody">
+                <div className="content-wrapper z-depth-1 tbody" style={{ height: "400px" }}>
                   <div className="content-item-relative">
                     <div className="row halfbottom" />
                     <KeyParameters
@@ -522,7 +523,15 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
     }
 
     try {
-      certReq.save(path.join(DEFAULT_CSR_PATH, `${cn}_${algorithm}_${formatDate(new Date())}.req`), trusted.DataFormat.PEM);
+      let csrFileName =  `${cn}_${algorithm}_${formatDate(new Date())}.req`;
+
+      if (os.type() === "Windows_NT") {
+        csrFileName = csrFileName.replace(/[/\\?%*:|"<>]/g, "-");
+      } else {
+        csrFileName = csrFileName.replace(/[/\\:]/g, "-");
+      }
+
+      certReq.save(path.join(DEFAULT_CSR_PATH, csrFileName), trusted.DataFormat.PEM);
     } catch (e) {
       //
     }

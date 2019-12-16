@@ -140,7 +140,9 @@ export const CA_CERTREGUESTS_JSON = window.CA_CERTREGUESTS_JSON;
 export const CA_CERTTEMPLATE_JSON = window.CA_CERTTEMPLATE_JSON;
 export const CA_CSR_JSON = window.CA_CSR_JSON;
 export const DSS_TOKENS_JSON = window.DSS_TOKENS_JSON;
-export const DSS_CERTIFICATES_JSON = window.DSS_CERTIFICATES_JSON;
+export const DSS_USERS_JSON = window.DSS_USERS_JSON;
+export const CERTIFICATES_DSS_JSON = window.CERTIFICATES_DSS_JSON;
+export const POLICY_DSS_JSON = window.POLICY_DSS_JSON;
 export const TEMPLATES_PATH = window.TEMPLATES_PATH;
 
 export const LicenseManager: trusted.utils.License_Mng = window.LICENSE_MNG;
@@ -170,6 +172,7 @@ export const SET_CONNECTED = "SET_CONNECTED";
 export const SET_DISCONNECTED = "SET_DISCONNECTED";
 
 export const LOCATION_MAIN = "/";
+export const LOCATION_ADDRESS_BOOK = "/addressBook";
 export const LOCATION_CERTIFICATES = "/certificate";
 export const LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE = "/certificateForSignature";
 export const LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT = "/certificateForEncrypt";
@@ -182,6 +185,18 @@ export const LOCATION_SERVICES = "/services";
 export const LOCATION_SETTINGS = "/settings";
 export const LOCATION_SETTINGS_CONFIG = "/settings_config";
 export const LOCATION_SETTINGS_SELECT = "/settings_select";
+
+export const MODAL_ADD_CERTIFICATE = "MODAL_ADD_CERTIFICATE";
+export const MODAL_DELETE_CERTIFICATE = "MODAL_DELETE_CERTIFICATE";
+export const MODAL_EXPORT_CERTIFICATE = "MODAL_EXPORT_CERTIFICATE";
+export const MODAL_EXPORT_CRL = "MODAL_EXPORT_CRL";
+export const MODAL_DELETE_CRL = "MODAL_DELETE_CRL";
+export const MODAL_EXPORT_REQUEST_CA = "MODAL_EXPORT_REQUEST_CA";
+export const MODAL_DELETE_REQUEST_CA = "MODAL_DELETE_REQUEST_CA";
+export const MODAL_CERTIFICATE_IMPORT_DSS = "MODAL_CERTIFICATE_IMPORT_DSS";
+export const MODAL_CERTIFICATE_REQUEST = "MODAL_CERTIFICATE_REQUEST";
+export const MODAL_CERTIFICATE_REQUEST_CA = "MODAL_CERTIFICATE_REQUEST_CA";
+export const MODAL_CLOUD_CSP = "MODAL_CLOUD_CSP";
 
 export const KEY_USAGE_SIGN = "sign";
 export const KEY_USAGE_ENCIPHERMENT  = "encipherment";
@@ -215,8 +230,32 @@ export const GET_CA_CERTREQUEST = "GET_CA_CERTREQUEST";
 export const GET_CA_CERTREQUEST_STATUS = "GET_CA_CERTREQUEST_STATUS";
 export const POST_CA_CERTREQUEST_СONFIRMATION = "POST_CA_CERTREQUEST_СONFIRMATION";
 
-export const DSS_POST_AUTHORIZATION_USER = "DSS_POST_AUTHORIZATION_USER";
-export const DSS_GET_CERTIFICATES = "DSS_GET_CERTIFICATES";
+export const POST_AUTHORIZATION_USER_DSS = "POST_AUTHORIZATION_USER_DSS";
+export const POST_OPERATION_CONFIRMATION = "POST_OPERATION_CONFIRMATION";
+export const CREATE_TEMP_USER_DSS = "CREATE_TEMP_USER_DSS";
+export const GET_CERTIFICATES_DSS = "GET_CERTIFICATES_DSS";
+export const GET_POLICY_DSS = "GET_POLICY_DSS";
+export const REMEMBER_PASSWORD_DSS = "REMEMBER_PASSWORD_DSS";
+export const DELETE_PASSWORD_DSS = "DELETE_PASSWORD_DSS";
+export const POST_TRANSACTION_DSS = "POST_TRANSACTION_DSS";
+export const POST_PERFORM_OPERATION = "POST_PERFORM_OPERATION";
+export const RESPONSE = "_RESPONSE";
+
+export const CRYPTOPRO_DSS = "CRYPTOPRO_DSS";
+export const DSS_ACTIONS = {
+  Issue: 1, // Подтверждение входа пользователя
+  SignDocument: 2,  // Подпись документа
+  SignDocuments: 4, // Подпись пакета документов
+};
+
+export const SIGNATURE_TYPE = {
+  XMLDSig: 0, // Подпись документа в формате XMLDSig
+  GOST3410: 1,  // Электронная подпись по ГОСТ Р 34.10 - 2001 или ГОСТ Р 34.10 - 2012
+  CAdES: 2, // Подпись формата CAdES-BES, CAdES-T, CAdES-X Long Type 1
+  PDF: 3, // Подпись PDF документов
+  MSOffice: 4,  // Подпись документов MS Word и Excel
+  CMS: 5, // Подпись формата CAdES-BES
+};
 
 export const REQUEST_STATUS = {
   Q: "Q", // запрос установлен в очередь на обработку(Новый, Queued);

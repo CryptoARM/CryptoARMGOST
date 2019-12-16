@@ -352,7 +352,7 @@ class DocumentTable extends React.Component<IDocumentsTableProps & IDocumentsTab
     const { locale, localize } = this.context;
 
     return <div className={"add-file-item not-active"} id="items-hidden">
-      <div className="add-file-item-text">{localize("Settings.drag_drop", locale)}</div>
+      <div className="headline6 add-file-item-text">{localize("Settings.drag_drop", locale)}</div>
       <i className="material-icons large fullscreen">fullscreen</i>
     </div>;
   }

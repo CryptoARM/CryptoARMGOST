@@ -1,3 +1,47 @@
+interface ITransactionParameter {
+  Name: string;
+  Value: string;
+}
+
+interface IDocumentContent {
+  Name: string;
+  Content: string;
+  OriginalContent?: string;
+}
+
+interface ITransaction {
+  OperationCode: number;
+  Document: string;
+  Parameters: ITransactionParameter[];
+  Documents: IDocumentContent[];
+}
+
+interface IDocumentSignature {
+  Type: number;
+  Parameters: Object;
+  CertificateId: number;
+  PinCode: string;
+}
+
+interface IDocumentDSS {
+  Content: string;
+  Name: string;
+  Signature: IDocumentSignature;
+}
+
+interface IDocumentPackageDSS {
+  Documents: IDocumentContent[];
+  Signature: IDocumentSignature;
+}
+
+interface IUserDSS {
+  id: string;
+  user: string;
+  password: string;
+  authUrl: string;
+  dssUrl: string;
+}
+
 interface Window {
     APP_LOG_FILE: string;
     APP_ERRORS_LOG_FILE: string;
@@ -21,7 +65,9 @@ interface Window {
     CA_CERTTEMPLATE_JSON: string;
     CA_CSR_JSON: string;
     DSS_TOKENS_JSON: string;
-    DSS_CERTIFICATES_JSON: string,
+    DSS_USERS_JSON: string;
+    CERTIFICATES_DSS_JSON: string,
+    POLICY_DSS_JSON: string,
     LICENSE_PATH: string;
     LICENSE_MNG: any;
     PLATFORM: string;

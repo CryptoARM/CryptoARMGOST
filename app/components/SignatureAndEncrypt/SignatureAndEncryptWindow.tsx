@@ -6,7 +6,7 @@ import {
   activeFile, filePackageDelete, filePackageSelect, removeAllRemoteFiles,
 } from "../../AC";
 import { deleteAllTemporyLicenses } from "../../AC/licenseActions";
-import { activeFilesSelector, connectedSelector, loadingRemoteFilesSelector } from "../../selectors";
+import { activeFilesSelector, connectedSelector, filesInTransactionsSelector, loadingRemoteFilesSelector } from "../../selectors";
 import { CANCELLED, ERROR, SIGN, SIGNED, UPLOADED } from "../../server/constants";
 import { mapToArr } from "../../utils";
 import FilterDocuments from "../Documents/FilterDocuments";
@@ -126,12 +126,7 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
           <div className="col s8 leftcol">
             <div className="row halfbottom">
               <div className="row halfbottom" />
-              <div className="col" style={{ width: "40px", paddingLeft: "40px" }}>
-                <a className={`${classDisabled}`} onClick={this.addFiles.bind(this)}>
-                  <i className={`file-setting-item waves-effect material-icons secondary-content pulse ${classDisabled}`}>add</i>
-                </a>
-              </div>
-              <div className="col" style={{ width: "calc(100% - 140px)" }}>
+              <div className="col" style={{ width: "calc(100% - 80px)" }}>
                 <div className="input-field input-field-csr col s12 border_element find_box">
                   <i className="material-icons prefix">search</i>
                   <input
@@ -146,7 +141,7 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
               <div className="col" style={{ width: "40px" }}>
                 <a className={`${classDisabled}`} onClick={this.handleShowModalFilterDocuments}>
                   <i className={`file-setting-item waves-effect material-icons secondary-content`}>
-                    <i className={`material-icons ${classDefaultFilters}`} style={disabledNavigate ? {opacity: 0.38} : {opacity: 1}}/>
+                    <i className={`material-icons ${classDefaultFilters}`} style={disabledNavigate ? { opacity: 0.38 } : { opacity: 1 }} />
                   </i>
                 </a>
               </div>
@@ -172,10 +167,10 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
               (
                 <React.Fragment>
                   <div className="col s12">
-                    <div className="desktoplic_text_item">{localize("Sign.sign_info", locale)}</div>
+                    <div className="primary-text">{localize("Sign.sign_info", locale)}</div>
                     <hr />
                   </div>
-                  <div style={{ height: "calc(100vh - 100px)" }}>
+                  <div style={{ height: "calc(100vh - 80px)" }}>
                     <div className="add-certs">
                       <SignatureInfoBlock
                         signatures={fileSignatures}
@@ -197,6 +192,12 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
 
           </div>
           {this.showModalFilterDocuments()}
+        </div>
+
+        <div className={`fixed-action-btn ${classDisabled}`} style={{ bottom: "30px", right: "380px" }} onClick={this.addFiles.bind(this)}>
+          <a className="btn-floating btn-large cryptoarm-red">
+            <i className="large material-icons">add</i>
+          </a>
         </div>
       </div>
     );
@@ -226,12 +227,14 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
 
   removeAllFiles = () => {
     // tslint:disable-next-line:no-shadowed-variable
-    const { connections, connectedList, filePackageDelete, files } = this.props;
+    const { connections, connectedList, filesInTransactionList, filePackageDelete, files } = this.props;
 
     const filePackage: number[] = [];
 
     for (const file of files) {
-      filePackage.push(file.id);
+      if (!filesInTransactionList.includes(file.id)) {
+        filePackage.push(file.id);
+      }
 
       if (file.socket) {
         const connection = connections.getIn(["entities", file.socket]);
@@ -329,6 +332,7 @@ export default connect((state) => {
     connectedList: connectedSelector(state, { connected: true }),
     connections: state.connections,
     files: mapToArr(state.files.entities),
+    filesInTransactionList: filesInTransactionsSelector(state),
     isDefaultFilters: state.filters.documents.isDefaultFilters,
     loadingFiles: loadingRemoteFilesSelector(state, { loading: true }),
     method: state.remoteFiles.method,

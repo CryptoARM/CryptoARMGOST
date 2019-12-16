@@ -9,6 +9,7 @@
   "author": "",
   "dependencies": {
     "express": "^4.14.0",
+    "natives": "^1.1.6",
     "socket.io": "^1.6.0",
     "socket.io-client": "^1.6.0",
     "vinyl-buffer": "^1.0.0",

@@ -1,47 +1,43 @@
 import * as fs from "fs";
 import { OrderedMap, Record } from "immutable";
-import { DSS_POST_AUTHORIZATION_USER, DSS_TOKENS_JSON, SUCCESS } from "../constants";
+import { DSS_TOKENS_JSON, POST_AUTHORIZATION_USER_DSS, SUCCESS, POST_OPERATION_CONFIRMATION } from "../constants";
 import { mapToArr } from "../utils";
 
 export const TokenDSSModel = Record({
   access_token: null,
   expires_in: null,
   id: null,
+  time: null,
   token_type: null,
 });
 
 export const DefaultReducerState = Record({
-  entities: OrderedMap({}),
+  tokensAuth: OrderedMap({}),
+  tokensDss: OrderedMap({}),
 });
 
 export default (tokens = new DefaultReducerState(), action) => {
   const { type, payload } = action;
 
   switch (type) {
-    case DSS_POST_AUTHORIZATION_USER + SUCCESS:
-      tokens = tokens.setIn(["entities", payload.id], new TokenDSSModel({
+    case POST_AUTHORIZATION_USER_DSS + SUCCESS:
+      tokens = tokens.setIn(["tokensAuth", payload.id], new TokenDSSModel({
         access_token: payload.access_token,
         expires_in: payload.expires_in,
         id: payload.id,
+        time: new Date().getTime(),
+        token_type: payload.token_type,
+      }));
+      break;
+    case POST_OPERATION_CONFIRMATION + SUCCESS:
+      tokens = tokens.setIn(["tokensDss", payload.id], new TokenDSSModel({
+        access_token: payload.access_token,
+        expires_in: payload.expires_in,
+        id: payload.id,
+        time: new Date().getTime(),
         token_type: payload.token_type,
       }));
       break;
   }
-
-  if (type === DSS_POST_AUTHORIZATION_USER + SUCCESS) {
-    const state = {
-      tokens: mapToArr(tokens.entities),
-    };
-
-    const sstate = JSON.stringify(state, null, 4);
-
-    fs.writeFile(DSS_TOKENS_JSON, sstate, (err: any) => {
-      if (err) {
-        // tslint:disable-next-line:no-console
-        console.log("------- error write to ", DSS_TOKENS_JSON);
-      }
-    });
-  }
-
   return tokens;
 };

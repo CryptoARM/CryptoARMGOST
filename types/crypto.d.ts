@@ -133,6 +133,59 @@ declare namespace native {
             setNewKeysetFlag(newKeysetFlag: boolean): void;
             getNewKeysetFlag(): boolean;
         }
+        class OCSP {
+            constructor(inData: Certificate | Buffer, connSettings?: native.UTILS.ConnectionSettings);
+            Export(): Buffer;
+            Verify(): number;
+            VerifyCertificate(cert: PKI.Certificate): number;
+            RespStatus(): number;
+            SignatureAlgorithmOid(): string;
+            Certificates(): CertificateCollection;
+            ProducedAt(): string;
+            RespNumber(): number;
+            RespIndexByCert(cert: PKI.Certificate, issuer?: PKI.Certificate): number;
+            OcspCert(): PKI.Certificate;
+            Status(respIdx?: number): number;
+            RevTime(respIdx?: number): string;
+            RevReason(respIdx?: number): number;
+            ThisUpdate(respIdx?: number): string;
+            NextUpdate(respIdx?: number): string;
+        }
+        class TSPRequest {
+            constructor(hashAlgOid: string, dataFileName?: string);
+            AddData(data: Buffer): void;
+            GetCertReq(): boolean;
+            SetCertReq(certReq: boolean): void;
+            GetNonce(): boolean;
+            SetNonce(certReq: boolean): void;
+            GetPolicyId(): string;
+            SetPolicyId(policyId: string): void;
+            GetHashAlgOid(): string;
+            SetHashAlgOid(policyId: string): void;
+            GetDataHash(): Buffer;
+            SetDataHash(dataHash: Buffer): void;
+        }
+        class TSP {
+            constructor(inData: TSPRequest | Buffer, connSettings?: native.UTILS.ConnectionSettings);
+            Export(): Buffer;
+            Certificates(): CertificateCollection;
+            TSACertificate(): Certificate;
+            Verify(): number;
+            VerifyCertificate(cert: PKI.Certificate): number;
+            FailInfo(): number;
+            Status(): number;
+            StatusString(): string;
+            DataHashAlgOID(): string;
+            DataHash(): Buffer;
+            PolicyID(): string;
+            SerialNumber(): Buffer;
+            Time(): string;
+            Accuracy(): number;
+            Ordering(): boolean;
+            HasNonce(): boolean;
+            TsaName(): string;
+            TsaNameBlob(): Buffer;
+        }
         class PKCS12 {
             load(filename: string): void;
             save(filename: string): void;
@@ -200,6 +253,17 @@ declare namespace native {
             licenseValidateFormat(lic: string): boolean;
             checkLicense(lic: string): string;
         }
+        class ConnectionSettings {
+            AuthType: number;
+            Address: string;
+            UserName: string;
+            Password: string;
+            ClientCertificate: PKI.Certificate;
+            ProxyAuthType: number;
+            ProxyAddress: string;
+            ProxyUserName: string;
+            ProxyPassword: string;
+        }
     }
     namespace COMMON {
         class Logger {
@@ -209,6 +273,24 @@ declare namespace native {
         }
     }
     namespace CMS {
+        class TimestampParams {
+            getStampType(): number;
+            setStampType(stmp: number): void;
+            getConnSettings(): native.UTILS.ConnectionSettings;
+            setConnSettings(connSett: native.UTILS.ConnectionSettings): void;
+            getTspHashAlg(): String;
+            setTspHashAlg(hashAlg: String): void;
+        }
+        class CadesParams {
+            getCadesType(): number;
+            setCadesType(signType: number): void;
+            getConnSettings(): native.UTILS.ConnectionSettings;
+            setConnSettings(connSett: native.UTILS.ConnectionSettings): void;
+            getTspHashAlg(): String;
+            setTspHashAlg(hashAlg: String): void;
+            getOcspSettings(): native.UTILS.ConnectionSettings;
+            setOcspSettings(connSett: native.UTILS.ConnectionSettings): void;
+        }
         class SignedData {
             constructor();
             getContent(): Buffer;
@@ -224,6 +306,8 @@ declare namespace native {
             getSigners(): SignerCollection;
             isDetached(): boolean;
             verify(signer?: CMS.Signer): boolean;
+            getSignParams(): CMS.TimestampParams | CMS.CadesParams;
+            setSignParams(params: CMS.TimestampParams | CMS.CadesParams): void;
             sign(certs: PKI.Certificate): void;
         }
         class SignerCollection {
@@ -241,6 +325,8 @@ declare namespace native {
             getSignatureAlgorithm(): string;
             getDigestAlgorithm(): string;
             getSigningTime(): string;
+            timestamp(tspType: number): native.PKI.TSP;
+            verifyTimestamp(tspType: number): boolean;
         }
     }
     namespace PKISTORE {
@@ -528,6 +614,20 @@ declare namespace trusted.cms {
          * @memberOf Signer
          */
         readonly serialNumber: string;
+        /**
+         * Return time stamp of specified type
+         *
+         * @type {TSP}
+         * @memberOf Signer
+         */
+        timestamp(tspType: number): pki.TSP;
+        /**
+         * Verifyes time stamp of specified type from signer
+         *
+         * @type {boolean}
+         * @memberOf Signer
+         */
+        verifyTimestamp(tspType: number): boolean;
     }
 }
 declare namespace trusted.cms {
@@ -575,6 +675,128 @@ declare namespace trusted.cms {
     interface ISignedDataContent {
         type: SignedDataContentType;
         data: string | Buffer;
+    }
+    enum StampType {
+        stContent = 1,
+        stSignature = 2,
+        stEscStamp = 4
+    }
+    class TimestampParams extends BaseObject<native.CMS.TimestampParams> {
+        /**
+         * Creates an instance of TimestampParams.
+         *
+         *
+         * @memberOf TimestampParams
+         */
+        constructor();
+        /**
+         * Return time stamp type
+         *
+         * @type {StampType}
+         * @memberOf TimestampParams
+         */
+        /**
+        * Set time stamp type
+        *
+        *
+        * @memberOf TimestampParams
+        */
+        stampType: number;
+        /**
+         * Return connection settings for time stamp service
+         *
+         * @type {trusted.utils.ConnectionSettings}
+         * @memberOf TimestampParams
+         */
+        /**
+        * Set connection settings for time stamp service
+        *
+        *
+        * @memberOf TimestampParams
+        */
+        connSettings: trusted.utils.ConnectionSettings;
+        /**
+         * Return time stamp hash algorithm OID
+         *
+         * @type {String}
+         * @memberOf TimestampParams
+         */
+        /**
+        * Set time stamp hash algorithm OID
+        *
+        *
+        * @memberOf TimestampParams
+        */
+        tspHashAlg: String;
+    }
+    /**
+    * Supported CAdES types
+    *
+    * @enum {number}
+    */
+    enum CadesType {
+        ctCadesXLT1 = 1
+    }
+    class CadesParams extends BaseObject<native.CMS.CadesParams> {
+        /**
+         * Creates an instance of TimestampParams.
+         *
+         *
+         * @memberOf CadesParams
+         */
+        constructor();
+        /**
+         * Return time stamp type
+         *
+         * @type {CadesType}
+         * @memberOf CadesParams
+         */
+        /**
+        * Set time stamp type
+        *
+        *
+        * @memberOf CadesParams
+        */
+        cadesType: number;
+        /**
+         * Return connection settings for time stamp service
+         *
+         * @type {trusted.utils.ConnectionSettings}
+         * @memberOf CadesParams
+         */
+        /**
+        * Set connection settings for time stamp service
+        *
+        *
+        * @memberOf CadesParams
+        */
+        connSettings: trusted.utils.ConnectionSettings;
+        /**
+         * Return time stamp hash algorithm OID
+         *
+         * @type {String}
+         * @memberOf CadesParams
+         */
+        /**
+        * Set time stamp hash algorithm OID
+        *
+        *
+        * @memberOf CadesParams
+        */
+        tspHashAlg: String;
+        /**
+         * Return connection settings for OCSP service
+         *
+         * @type {trusted.utils.ConnectionSettings}
+         * @memberOf CadesParams
+         */
+        /**
+        * Set connection settings for time stamp service
+        *
+        *
+        * @memberOf CadesParams
+        */
+        ocspSettings: trusted.utils.ConnectionSettings;
     }
     /**
      * Wrap CMS_ContentInfo
@@ -726,6 +948,19 @@ declare namespace trusted.cms {
          * @memberOf SignedData
          */
         verify(signer?: cms.Signer): boolean;
+        /**
+         * Return signature creation parameters
+         *
+         * @type {TimestampParams | CadesParams}
+         * @memberOf SignedData
+         */
+        /**
+        * Set signature creation parameters
+        *
+        *
+        * @memberOf SignedData
+        */
+        signParams: TimestampParams | CadesParams;
         /**
          * Create sign
          *
@@ -1129,6 +1364,159 @@ declare namespace trusted.utils {
         accessOperations(): boolean;
         generateTrial(): string;
         checkTrialLicense(): string;
+    }
+}
+declare namespace trusted.utils {
+    /**
+     * Connection settings for TSP and OCSP
+     *
+     * @export
+     * @class ConnectionSettings
+     * @extends {BaseObject<native.UTILS.ConnectionSettings>}
+     */
+    class ConnectionSettings extends BaseObject<native.UTILS.ConnectionSettings> {
+        /**
+         * Service authentication type getter
+         *
+         *
+         * @type {number}
+         * @memberof ConnectionSettings
+         */
+        /**
+        * Service authentication type setter
+        *
+        *
+        * @type {number}
+        * @memberof ConnectionSettings
+        */
+        AuthType: number;
+        /**
+         * Service address getter
+         *
+         *
+         * @type {string}
+         * @memberof ConnectionSettings
+         */
+        /**
+        * Service address setter
+        *
+        *
+        * @type {string}
+        * @memberof ConnectionSettings
+        */
+        Address: string;
+        /**
+         * Service user name getter
+         *
+         *
+         * @type {string}
+         * @memberof ConnectionSettings
+         */
+        /**
+        * Service user name setter
+        *
+        *
+        * @type {string}
+        * @memberof ConnectionSettings
+        */
+        UserName: string;
+        /**
+         * Service password getter
+         *
+         *
+         * @type {string}
+         * @memberof ConnectionSettings
+         */
+        /**
+        * Service password setter
+        *
+        *
+        * @type {string}
+        * @memberof ConnectionSettings
+        */
+        Password: string;
+        /**
+         * Client certificate getter
+         *
+         *
+         * @type {pki.Certificate}
+         * @memberof ConnectionSettings
+         */
+        /**
+        * Client certificate setter
+        *
+        *
+        * @type {pki.Certificate}
+        * @memberof ConnectionSettings
+        */
+        ClientCertificate: pki.Certificate;
+        /**
+         * Proxy authentication type getter
+         *
+         *
+         * @type {number}
+         * @memberof ConnectionSettings
+         */
+        /**
+        * Proxy authentication type setter
+        *
+        *
+        * @type {number}
+        * @memberof ConnectionSettings
+        */
+        ProxyAuthType: number;
+        /**
+         * Proxy address getter
+         *
+         *
+         * @type {string}
+         * @memberof ConnectionSettings
+         */
+        /**
+        * Proxy address setter
+        *
+        *
+        * @type {string}
+        * @memberof ConnectionSettings
+        */
+        ProxyAddress: string;
+        /**
+         * Proxy user name getter
+         *
+         *
+         * @type {string}
+         * @memberof ConnectionSettings
+         */
+        /**
+        * Proxy user name setter
+        *
+        *
+        * @type {string}
+        * @memberof ConnectionSettings
+        */
+        ProxyUserName: string;
+        /**
+         * Proxy password getter
+         *
+         *
+         * @type {string}
+         * @memberof ConnectionSettings
+         */
+        /**
+        * Proxy password setter
+        *
+        *
+        * @type {string}
+        * @memberof ConnectionSettings
+        */
+        ProxyPassword: string;
+        /**
+         * Creates an instance of ConnectionSettings.
+         *
+         *
+         * @memberOf ConnectionSettings
+         */
+        constructor();
     }
 }
 declare namespace trusted.pki {
@@ -2090,6 +2478,123 @@ declare namespace trusted.pki {
          * @memberOf PKCS12
          */
         save(filename: string): void;
+    }
+}
+declare namespace trusted.pki {
+    enum CPRespStatus {
+        successful = 0,
+        malformedRequest = 1,
+        internalError = 2,
+        tryLater = 3,
+        sigRequired = 5,
+        unauthorized = 6,
+        badCRL = 8
+    }
+    enum CPCertStatus {
+        Good = 0,
+        Revoked = 1,
+        Unknown = 2
+    }
+    enum CPCrlReason {
+        CRLREASON_UNSPECIFIED = 0,
+        CRLREASON_KEYCOMPROMISE = 1,
+        CRLREASON_CACOMPROMISE = 2,
+        CRLREASON_AFFILIATIONCHANGED = 3,
+        CRLREASON_SUPERSEDED = 4,
+        CRLREASON_CESSATIONOFOPERATION = 5,
+        CRLREASON_CERTIFICATEHOLD = 6,
+        CRLREASON_REMOVEFROMCRL = 8,
+        CRLREASON_PRIVILEDGEWITHDRAWN = 9,
+        CRLREASON_AACOMPROMISE = 10
+    }
+    /**
+     * Wrap OCSP Response and request sending
+     *
+     * @export
+     * @class OCSP
+     * @extends {BaseObject<native.PKI.OCSP>}
+     */
+    class OCSP extends BaseObject<native.PKI.OCSP> {
+        /**
+         * Creates an instance of Ocsp.
+         * @param {native.PKI.Certificate | Buffer, native.UTILS.ConnectionSettings?} [param]
+         *
+         * @memberOf Certificate
+         */
+        constructor(inData: Certificate | Buffer, connSettings?: trusted.utils.ConnectionSettings);
+        Export(): Buffer;
+        Verify(): number;
+        VerifyCertificate(cert: Certificate): number;
+        readonly RespStatus: CPRespStatus;
+        readonly SignatureAlgorithmOid: string;
+        readonly Certificates: CertificateCollection;
+        readonly ProducedAt: string;
+        readonly RespNumber: number;
+        RespIndexByCert(cert: pki.Certificate, issuer?: pki.Certificate): number;
+        readonly OcspCert: pki.Certificate;
+        Status(respIdx?: number): CPCertStatus;
+        RevTime(respIdx?: number): string;
+        RevReason(respIdx?: number): CPCrlReason;
+        ThisUpdate(respIdx?: number): string;
+        NextUpdate(respIdx?: number): string;
+    }
+}
+declare namespace trusted.pki {
+    /**
+     * Wrap TSPRequest utility object for hashing data before request sending
+     *
+     * @export
+     * @class TSPRequest
+     * @extends {BaseObject<native.PKI.TSPRequest>}
+     */
+    class TSPRequest extends BaseObject<native.PKI.TSPRequest> {
+        /**
+         * Creates an instance of Tsp Request.
+         * @param {hashAlgOid: string, dataFileName?: string} [param]
+         *
+         * @memberOf TSPRequest
+         */
+        constructor(hashAlgOid: string, dataFileName?: string);
+        AddData(data: Buffer): void;
+        CertReq: boolean;
+        Nonce: boolean;
+        PolicyId: string;
+        HashAlgOid: string;
+        DataHash: Buffer;
+    }
+    /**
+     * Wrap TSP timestamp object and request sending
+     *
+     * @export
+     * @class TSP
+     * @extends {BaseObject<native.PKI.TSP>}
+     */
+    class TSP extends BaseObject<native.PKI.TSP> {
+        /**
+         * Creates an instance of Tsp.
+         * @param {Buffer, native.UTILS.ConnectionSettings?} [param]
+         *
+         * @memberOf TSP
+         */
+        constructor(inData: trusted.pki.TSPRequest | Buffer | native.PKI.TSP, connSettings?: trusted.utils.ConnectionSettings);
+        Export(): Buffer;
+        readonly Certificates: CertificateCollection;
+        readonly TSACertificate: Certificate;
+        Verify(): number;
+        VerifyCertificate(cert: Certificate): number;
+        readonly FailInfo: number;
+        readonly Status: number;
+        readonly StatusString: string;
+        readonly DataHashAlgOID: string;
+        readonly DataHash: Buffer;
+        readonly PolicyID: string;
+        readonly SerialNumber: Buffer;
+        readonly Time: string;
+        readonly Accuracy: number;
+        readonly Ordering: boolean;
+        readonly HasNonce: boolean;
+        readonly TsaName: string;
+        readonly TsaNameBlob: Buffer;
     }
 }
 declare namespace trusted.pkistore {

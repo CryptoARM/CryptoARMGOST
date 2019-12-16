@@ -7,8 +7,8 @@ import { loadLicense } from "../../AC/licenseActions";
 import { LOCATION_ABOUT } from "../../constants";
 import {
   BUG, ERROR_CHECK_CSP_LICENSE, ERROR_CHECK_CSP_PARAMS,
-  ERROR_LOAD_TRUSTED_CRYPTO, NO_CORRECT_CRYPTOARM_LICENSE, NO_CRYPTOARM_LICENSE,
-  NO_GOST_2001, NO_HAVE_CERTIFICATES_WITH_KEY, NOT_INSTALLED_CSP, WARNING,
+  ERROR_LOAD_TRUSTED_CRYPTO, ERROR_LOAD_TRUSTED_CURL, NO_CORRECT_CRYPTOARM_LICENSE,
+  NO_CRYPTOARM_LICENSE, NO_GOST_2001, NO_HAVE_CERTIFICATES_WITH_KEY, NOT_INSTALLED_CSP, WARNING,
 } from "../../errors";
 import { filteredCertificatesSelector } from "../../selectors";
 import DiagnosticModal from "../Diagnostic/DiagnosticModal";
@@ -107,7 +107,7 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
             }],
           });
 
-          this.setState({ criticalError: false });
+          this.setState({ criticalError: true });
 
           return false;
         }
@@ -117,6 +117,19 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
         errors: [...this.state.errors, {
           important: BUG,
           type: ERROR_LOAD_TRUSTED_CRYPTO,
+        }],
+      });
+
+      this.setState({ criticalError: true });
+
+      return false;
+    }
+
+    if (window.curlerr) {
+      this.setState({
+        errors: [...this.state.errors, {
+          important: WARNING,
+          type: ERROR_LOAD_TRUSTED_CURL,
         }],
       });
 

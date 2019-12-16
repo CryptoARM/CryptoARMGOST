@@ -5,9 +5,24 @@
 @import "./resources/fonts/material-design-icons/material-icons.css";
 @import "../node_modules/react-phone-number-input/style.css";
 
+main, .content-noflex, .content {
+  padding-left: 50px;
+}
+
+@media only screen and (max-width : 992px) {
+  main, .content-noflex, .content {
+    padding-left: 50px;
+  }
+  .side-nav.fixed {
+    -webkit-transform: translateX(0%);
+            transform: translateX(0%);
+  }
+}
+
 /* Стили заголовка окна  */
 nav.app-bar {
     height: 35px;
+    padding-left: 80px;
 }
 
 nav, nav .nav-wrapper i, nav a.button-collapse, nav a.button-collapse i {
@@ -35,6 +50,29 @@ nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
 
 .cryptoarm-red {
   background-color: #bf3817 !important;
+}
+
+.headline6 {
+  font-size: 1.25rem;
+  letter-spacing: 0.00857142857rem; /* 0.15/(20*0.0625*14) */
+}
+
+.primary-text {
+  color: rgba(0,0,0,0.87);
+  font-size: 1rem;
+  letter-spacing: 0.03571428571rem; /* 0.5/(16*0.0625*14) */
+}
+
+.secondary-text {
+  color: rgba(0,0,0,0.6);
+  font-size: 0.875rem;
+  letter-spacing: 0.02040816326rem; /* 0.25/(14*0.0625*14) */
+}
+
+.caption-text {
+  font-size: 0.875rem;
+  letter-spacing: 0.03809523809rem;
+  color: #334294;
 }
 
 .valid {
@@ -72,7 +110,6 @@ nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
     width: 256px;
 }
 .menu-logo {
-    height: 100px;
     -webkit-app-region: no-drag;
 }
 .logo-text {
@@ -87,19 +124,6 @@ nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
 .menu-elements {
     position: absolute;
     bottom: 0;
-    width: 240px;
-}
-
-.nav-searchbar {
-    width: 50%;
-    overflow: hidden;
-}
-
-.input-field {
-  margin-top: 0;
-  width: 110px;
-  height: 46px;
-  line-height: 15px;
 }
 
 .closer {
@@ -191,7 +215,6 @@ body {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-size: 18px;
     min-height: 700px;
     min-width: 900px;
     width: 100% !important;
@@ -201,11 +224,7 @@ body {
     height: 600px;
 }
 .settings-content {
-    overflow: auto;
-    height: calc(100% - 35px);
-    white-space: nowrap;
-    font-size: 14px;
-    width: 100%;
+    overflow: visible;
 }
 
 .sign-info-content {
@@ -225,16 +244,6 @@ body {
     border-top:1px solid rgba(0,0,0, 0.5);
 }
 
-.select-wrapper input.select-dropdown{
-    height: 42px;
-    line-height: 30px;
-    font-size: 100%;
-}
-
-.select-wrapper+label {
-  top: -3px;
-}
-
 .settins-check-title {
     width: calc(100% - 60px);
 }
@@ -244,9 +253,7 @@ body {
 #directory {
     margin: 0;
 }
-.sign-set-add-folder {
-    width: 100%
-}
+
 /*---input-file components---*/
 #cert-key-import, #choose-file, #choose-cert, #choose-folder, #choose-folder-export {
   visibility: hidden;
@@ -261,12 +268,24 @@ body {
     width: 56px;
     line-height: 56px;
 }
-.collection-title, .collection-info {
+
+.collection-title {
+    font-size: 1rem;
     padding-left: 0;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     padding-top: 0px;
+}
+
+.collection-info {
+  font-size: 0.875rem;
+  color: rgba(0,0,0,0.6);
+  padding-left: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  padding-top: 0px;
 }
 
 .material-icons.secondary-content.file-setting-item {
@@ -330,19 +349,12 @@ body {
 }
 /*--- file list---*/
 .collection {
-    font-size: 75%;
     overflow: initial;
     margin: 0;
     border: none;
 }
 
-.small_cert_collection {
-    font-size: 13px;
-}
 
-.collection-info {
-    font-size: 90%;
-}
 
 .collection-info-files {
     font-size: 90%;
@@ -515,25 +527,6 @@ div::-webkit-scrollbar-thumb {
     color: white;
 }
 
-
-/*---------------------------------Стили главного меню-----------------------*/
-/*.logo-trusted img {
-  width: 60px;
-  height: 60px;
-}*/
-.logo-trusted {
-    position:absolute;
-    padding-left: 0px;
-    margin-left: 80px;
-    margin-top: 6px;
-    padding-top: 5px;
-    height: 60px;
-    width: 60px;
-    background: url(./resources/image/cryptoarm-gost.png);
-    background-size: 60px 60px;
-
-}
-
 /*-------------------------------Стили блоков внутри страницы------------------*/
 .app-bar-items {
     display: flex;
@@ -549,7 +542,6 @@ div::-webkit-scrollbar-thumb {
     width: 100%;
 }
 .app-bar-item, .app-bar-text {
-    font-size: 100%;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -593,6 +585,10 @@ div::-webkit-scrollbar-thumb {
     font-size: 60%;
 }
 
+.fixed-action-btn {
+  z-index: 899 !important;
+}
+
 .btn-text {
   background-color: transparent;
   box-shadow: none;
@@ -605,8 +601,9 @@ div::-webkit-scrollbar-thumb {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: bold;
+  letter-spacing: 0.10204081632rem;
 }
 
 .btn-outlined {
@@ -622,8 +619,9 @@ div::-webkit-scrollbar-thumb {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: bold;
+  letter-spacing: 0.10204081632rem; /* 1.25/(14*0.0625*14px) */
 }
 
 .btn-outlined:hover, .btn-text:hover  {
@@ -679,16 +677,25 @@ div::-webkit-scrollbar-thumb {
 
 /*-------------------------------Стили главного меню------------------*/
 .side-nav {
-    height: 100%;
-    width: 250px;
-    border: 2px solid #bf3817;
+    height: calc(100% - 2px);
     overflow: hidden;
 }
 
-.side-nav a {
-  height: 40px;
-  line-height: 40px;
-  padding: 0 10px;
+.side-nav .fixed {
+  height: calc(100% - 2px);
+  overflow: hidden;
+}
+
+.side-nav li {
+  line-height: 38px;
+}
+
+.side-nav-rectangle {
+	width: 3px;
+	height: 44px;
+  background: #bf3817;
+  float: left;
+  margin-top: 2px;
 }
 
 .col.settings-check {
@@ -697,52 +704,73 @@ div::-webkit-scrollbar-thumb {
   width: 48px;
 }
 
+i.material-icons.sidevan {
+  display: inline-block;
+  text-indent: -9999px;
+  width: 30px;
+  height: 30px;
+  background-size: 30px 30px!important;
+  margin-top: 2px;
+  margin: 10px auto;
+  vertical-align: middle;
+}
+
 i.material-icons.left {
   display: block;
   text-indent: -9999px;
   width: 24px;
   height: 24px;
-  background-size: 24px 24px !important;
+  background-size: 24px 24px!important;
   margin-top: 7px;
 }
 
-i.material-icons.left.sign {
+i.material-icons.left.logo-trusted {
+  background: url(./resources/image/cryptoarm-gost.png);
+  margin: 5px auto;
+  margin-left: -2px;
+}
+
+i.material-icons.sidevan.sign {
   background: url(./resources/image/sidemenu/sign.svg);
 }
 
-i.material-icons.left.cert {
+i.material-icons.sidevan.cert {
   background: url(./resources/image/sidemenu/certificates.svg);
 }
 
-i.material-icons.left.about {
+i.material-icons.sidevan.about {
   background: url(./resources/image/sidemenu/about.svg);
 }
 
-i.material-icons.left.keystore{
+i.material-icons.sidevan.address_book {
+  background: url(./resources/image/sidemenu/address_book.svg);
+}
+
+i.material-icons.sidevan.keystore{
   background: url(./resources/image/sidemenu/key_store.svg);
 }
 
-i.material-icons.left.setting{
+i.material-icons.sidevan.setting{
   background: url(./resources/image/sidemenu/settings.svg);
 }
 
-i.material-icons.left.license{
+i.material-icons.sidevan.license{
     background: url(./resources/image/sidemenu/license.svg);
   }
 
-  i.material-icons.left.exit{
+  i.material-icons.sidevan.exit{
     background: url(./resources/image/sidemenu/exit.svg);
   }
 
-  i.material-icons.left.journal {
+  i.material-icons.sidevan.journal {
     background: url(./resources/image/sidemenu/journal.svg);
   }
 
-  i.material-icons.left.document {
+  i.material-icons.sidevan.document {
     background: url(./resources/image/sidemenu/documents.svg);
   }
 
-  i.material-icons.left.dss {
+  i.material-icons.sidevan.dss {
     background: url(./resources/image/sidemenu/dss.svg);
   }
 
@@ -773,27 +801,6 @@ i.material-icons.left.license{
     display: block;
     overflow: auto;
 }
-/*.add-btn {
-    background-color: rgb(135, 134, 159);
-    border-radius: 100%;
-    overflow: hidden;
-    text-align: center;
-    width: 0;
-    height: 0;
-    visibility: hidden;
-    top: -26px;
-    left: 20px;
-}
-
-.add-btn.active {
-    width: 30px;
-    height: 30px;
-    visibility: visible;
-    z-index: 101;
-}
-.add-btn:hover {
-    background-color: rgb(135, 134, 159);
-}*/
 
 i.material-icons.headbutton {
   height: 30px;
@@ -897,7 +904,6 @@ input[type=search] {
 .cert-bar-text {
     width: calc(100% - 45px);
     color: black;
-    font-size: 75%;
     padding-left: 0.75rem;
 }
 nav .cert-seacrh label i {
@@ -910,15 +916,6 @@ nav .cert-seacrh label i {
     overflow: auto;
     z-index: 2;
 }
-
-.add-certs-cervices {
-  width: 100%;
-  height: calc(100% - 35px);
-  position: relative;
-  overflow: auto;
-  border-top: 2px solid #ffffff;
-}
-
 
 .add-certs-item {
     position: relative;
@@ -946,15 +943,6 @@ nav .cert-seacrh label i {
 }
 .cert-item.not-active {
     display: none;
-}
-.cert-info {
-    color: rgba(0,0,0,0.6);
-}
-
-.cert-info-blue {
-    color: #334294;
-    /*font-size: 95%;*/
-    font-size: 13px;
 }
 
 .chain-info-blue {
@@ -1123,37 +1111,11 @@ nav .cert-seacrh label i {
     display: none;
 }
 
-/*.add-modal-cert-btn{
-    background-color: rgb(135, 134, 159);
-    border-radius: 100%;
-    overflow: hidden;
-    text-align: center;
-    visibility: hidden;
-    width: 0;
-    height: 0;
-    top: -26px;
-    left: 20px;
-}
-
-.add-modal-cert-btn .add-cert-icon {
-    height: 30px;
-    font-size: 1rem;
-    line-height: 30px;
-}
-.add-modal-cert-btn.active {
-    visibility: visible;
-    z-index: 101;
-    width: 30px;
-    height: 30px;
-}
-.add-modal-cert-btn:hover {
-    background-color: rgb(135, 134, 159);
-}*/
-
 .modal {
   max-height: 87% !important ;
   width:  87%;
   max-width: 900px;
+  z-index: 999;
 }
 
 .nooverflow {
@@ -1170,6 +1132,25 @@ nav .cert-seacrh label i {
 
 .dropdown-content {
   min-width: 170px;
+}
+
+#dropdown-certificate-stores {
+  margin-left: 100%;
+  min-width: 220px;
+  display: block;
+}
+
+#dropdown-documents-stores {
+  margin-left: 100%;
+  margin-top: 10px;
+  min-width: 220px;
+  display: block;
+}
+
+#dropdown-about-pages {
+  margin-left: 100%;
+  min-width: 220px;
+  display: block;
 }
 
 .dropdown-content li {
@@ -1202,7 +1183,6 @@ i.material-icons.left {
   width: 24px;
   height: 24px;
   background-size: 24px 24px;
-  margin-top: 10px;
 }
 
 i.material-icons.left.my {
@@ -1229,6 +1209,14 @@ i.material-icons.left.request {
   background: url(./resources/image/cert_stores/request.svg);
 }
 
+i.material-icons.left.crl {
+  background: url(./resources/image/cert_stores/crl.svg);
+}
+
+i.material-icons.left.container {
+  background: url(./resources/image/cert_stores/container.svg);
+}
+
 i.material-icons.left.connect {
   background: url(./resources/image/connect.png);
   background-size: cover;
@@ -1247,25 +1235,12 @@ i.material-icons.left.ca {
 
 
 /*-----------------Главная страница--------------------*/
-.maincontent{
-    height: 54%;
-}
-
 .header .image {
   padding-top: 10px;
   padding-left: 10px;
   padding-right: 10px;
   padding-bottom: 10px;
   height: 184px;
-}
-
-.mainfooter{
-  height: 68px;
-  background-color: #bf3817;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
 }
 
 .logo{
@@ -1279,135 +1254,14 @@ i.material-icons.left.ca {
   margin-left: 55px;
 }
 
-.ctlogo{
-  display: block;
-  text-indent: -9999px;
-  width: 48px;
-  height: 48px;
-  background: url(./resources/image/logo_ct.svg);
-  background-size: 48px 48px;
-}
-
-.appfunction{
-  padding: 30px;
-  height: 100%;
-}
-
-.copyright{
-  font-size: 12px;
-  padding-top: 6px;
-}
-
-.facebook:hover, .vk:hover, .twitter:hover, .mail:hover, .google:hover{
-    cursor: pointer;
-    opacity:0.5;
-}
-
-
-.r-socials{
-    float: right;
-    padding: 10px 0;
-}
-
-.r-socials-list{
-    margin: 0 -2px;
-}
-
-.r-socials-item{
-    margin: 0px;
-    display: inline-block;
-    vertical-align: top;
-    position: relative;
-    padding-right: 5px;
-    padding-left: 5px;
-}
-
-.r-socials-item-link {
-    display: block;
-    text-align: center;
-    font-size: 18px;
-    line-height: 40px;
-    height: 40px;
-    width: 40px;
-}
-
-.r-iconbox {
-    position: relative;
-    margin-top: 5px;
-}
-
-.r-iconbox .iconpos_left {
-    text-align: left;
-}
-
 .r-iconbox-link {
     display: inline;
-}
-
-.r-iconbox .iconpos_left .with_circle .r-iconbox-icon {
-    font-size: 28px;
-    line-height: 70px;
-    height: 70px;
-    width: 70px;
-}
-
-.r-iconbox .iconpos_left{
-    display: block;
-}
-
-
-
-.w-iconbox-title {
-    margin-left: 95px;
-    padding-top: 0;
-    padding-bottom: 12px;
-    margin-bottom: 0;
-}
-
-.w-iconbox-text {
-    margin-left: 95px;
-}
-
-.r-iconbox-icon {
-  float: left;
-}
-
-.r-iconbox-cert-icon {
-  float: left;
-}
-
-h5.r-iconbox-title {
-  font-size: 1.3rem;
-  line-height: 110%;
-  padding-left: 75px;
-  padding-top: 16px;
-  color: #bf3817;
-}
-
-h6.r-iconbox-title {
-display: inline-block;
-    position: absolute;
-    margin-left: 18px;
-    color: #bf3817;
-    font-size: 1.3rem;
-    margin-top: 14px;
-}
-
-.r-iconbox-text p {
-  font-size: 13px;
-  padding-left: 10px;
-  padding-right: 10px;
-  color: gray;
 }
 
 .about{
     margin-top: 1px;
     width: 900px;
     height: 700px;
-    background: url(./resources/image/geo_gray.png);
-}
-
-.license_background{
     background: url(./resources/image/geo_gray.png);
 }
 
@@ -1422,17 +1276,11 @@ display: inline-block;
 
 span.card-title {
   color: #bf3817;
-  font-size: 20px;
 }
 
 .card .card-title {
-  font-size: 20px;
   font-weight: 300;
 }
-
-span.card-title.sub {
-    font-size: 16px;
-  }
 
 .mail-block {
     height: 38px;
@@ -1451,7 +1299,6 @@ span.card-title.sub {
 }
 
 .card-infos{
-  color: gray;
   font-size: 16px;
 }
 
@@ -1481,10 +1328,6 @@ form.col.s12 {
 
 .gray-text {
   color: #666 !important;
-}
-
-.select, #key-length-value {
-  font-size: 0.9rem;
 }
 
 .contact-icon {
@@ -1750,7 +1593,7 @@ a.menuheaderlink:hover {
 .logo-text {
     position: absolute;
     left: 33px;
-    margin-top: 60px;
+    margin-top: 50px;
     color: white;
     font-size: 150%;
     height: 38px;
@@ -1832,14 +1675,6 @@ h5.bmark_onlinelic{
   margin: 0.82rem 0 0.656rem 0;
   padding-top: 22px;
    text-align: center;
-}
-
-p.message_onlinelic{
-  font-size: 1.10rem;
-  color:white;
-  line-height: 110%;
-  margin: 0.82rem 0 0.656rem 0;
- text-align: center;
 }
 
 .desktoplic_text_item{
@@ -1941,15 +1776,6 @@ p.message_onlinelic{
   overflow: hidden;
 }
 
-.password-modal-main {
-    height: 100%;
-}
-
-.password-modal-content {
-  height: calc(100% - 35px);
-  padding: 10px;
-  font-size: 80%;
-}
 .input-field-password {
   width: calc(100%);
 }
@@ -1974,10 +1800,6 @@ p.message_onlinelic{
   align-items: center;
   position: absolute;
 }
-.icon-info-modal-password {
-  display: flex;
-  align-items: center;
-}
 
 .icon-info {
   margin-right: 10px;
@@ -1996,7 +1818,6 @@ p.message_onlinelic{
 }
 .error-text {
     color: #9c3b23;
-    font-size: 90%;
 }
 .error-info.not-active, .about-error-info.not-active {
     display: none;
@@ -2141,21 +1962,6 @@ a.cert-back-btn.waves-effect.waves-light {
     height: 100%;
     margin-bottom: 0;
 }
-.enter-service {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: calc(100% - 32px);
-}
-.info-texts {
-    font-size: 85%;
-    padding-left: 20px;
-}
-.cryptobanner {
-    height: 100%;
-    padding-left: 20px;
-}
 .info-main {
     display: flex;
     flex-direction: row;
@@ -2198,18 +2004,6 @@ a.cert-back-btn.waves-effect.waves-light {
 .diamond:active {
   box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset, 0 -1px 0 rgba(255, 255, 255, .1);
 }
-.reg-login-diamond {
-    top: 28%;
-    left: 26%;
-}
-.reg-social-diamond {
-    top: 55%;
-    left: 42%;
-}
-.exit-diamond {
-    top: 55%;
-    left: 74%;
-}
 .reg-cert-diamond {
     top: 28%;
     left: 58%;
@@ -2228,26 +2022,6 @@ a.cert-back-btn.waves-effect.waves-light {
 .diamond:hover .external-diamond {
     background-color: rgba(182, 71, 41, 0.5);
     border: 2px solid rgba(182, 71, 41, 0.5);
-}
-.diamond-text {
-    transform: rotate(45deg);
-    font-size: 80%;
-    position: absolute;
-    bottom: 30px;
-    width: 90px;
-    text-align: center;
-    color: #ffffff;
-}
-.diamond-text-bottom {
-    bottom: 40px;
-}
-.enter-service-but {
-    background-color: #ffffff;
-    font-size: 60%;
-    color: #000000;
-}
-.enter-service-but:hover {
-    background-color: #ffffff;
 }
 .material-icons.exit-app {
     transform: rotate(45deg);
@@ -2299,51 +2073,7 @@ a.cert-back-btn.waves-effect.waves-light {
     width: 40px;
     height: 40px;
 }
-.around-border {
-    background-size: 100%;
-    width: 90px;
-    height: 90px;
-}
-.social-border {
-    width: 100px;
-    height: 100px;
-    border: 3px solid #ffffff;
-    border-radius: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.twit-size {
-    height: 70px;
-}
-.vk-size {
-    height: 50px;
-}
-.google-size {
-    width: 70px;
-    height: 70px;
-}
-.mail-size {
-    width: 64px;
-    height: 65px;
-}
-.down-social-icons {
-    padding: 10px 180px;
-    align-items: flex-start;
-}
-.social-border:hover {
-    cursor: pointer;
-    opacity: 0.5;
-}
-.diam-icon {
-    transform: rotate(45deg);
-    width: 70px;
-    height: 70px;
-    background-size: 100%;
-    left: 70px;
-    position: absolute;
-    top: 30px;
-}
+
 .login-password-diam {
     width: 90px;
     height: 90px;
@@ -2352,6 +2082,10 @@ a.cert-back-btn.waves-effect.waves-light {
 
 .localkey {
   background: url(./resources/image/key.svg);
+}
+
+.dsskey {
+  background: url(./resources/image/dss/dss_key.svg);
 }
 
 .key {
@@ -2382,6 +2116,22 @@ a.cert-back-btn.waves-effect.waves-light {
     height: 32px;
     width: 32px;
     text-align: center;
+}
+
+.cloud_cert_status_ok {
+  background: url(./resources/image/dss/cloud_cert_ok.svg);
+  background-size: 100%;
+  height: 32px;
+  width: 32px;
+  text-align: center;
+}
+
+.cloud_cert_status_error {
+  background: url(./resources/image/dss/cloud_cert_error.svg);
+  background-size: 100%;
+  height: 32px;
+  width: 32px;
+  text-align: center;
 }
 
 .block {
@@ -2564,18 +2314,7 @@ i.material-icons.left.chain_10 {
     padding: 4px;
     min-height: 40px;
 }
-.cs-icon {
-    padding-top: 6px;
-    padding-right: 5px;
-}
-.cs-icon-size {
-    width: 30px;
-    height: 30px;
-    background-size: 100%;
-}
-.cs-title, .cs-info {
-    padding: 0;
-}
+
 .collection .collection-item .collection-title.si-title,
 .collection .collection-item .collection-info.si-info {
     padding: 0;
@@ -2600,37 +2339,6 @@ i.material-icons.left.chain_10 {
     color: #ffffff;
 }
 
-.numberCircle {
-  border-radius: 50%;
-  position: relative;
-  width: 36px;
-  height: 36px;
-  padding: 8px;
-
-  background: #fff;
-  border: 2px solid #2196f3;
-  color: #2196f3;
-  text-align: center;
-
-  font: 32px;
-  z-index: 2;
-}
-
-.statusOval {
-  background-color: #fff;
-  border-radius: 50%;
-  -moz-border-radius: 10px; -webkit-border-radius: 10px;
-  display: table;
-  font-size: 1em;
-  height: 100%;
-  margin: 0 auto;
-  width: 125px;
-  display: table-cell;
-  text-align: center;
-  vertical-align: middle;
-  float: right;
-}
-
 .rectangle {
 	width: 3px;
 	height: 45px;
@@ -2647,19 +2355,6 @@ i.material-icons.left.chain_10 {
     margin-top: 36px;
     height: 18px;
     width: 2px;
-    z-index: 2;
-}
-
-.csr-window__workspace {
-  margin-top: 20px;
-}
-
-.trlink_block{
-    width: 100%;
-    height: calc(100% - 48px);
-    position: relative;
-    overflow: auto;
-    border-top: 2px solid #ffffff;
     z-index: 2;
 }
 
@@ -2830,15 +2525,6 @@ a.help_paragraf {
     padding-right: 0px;
 }
 
-.desctoplic_text{
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    text-align: justify;
-    font-size: 13px;
-}
-
 a.waves-effect.waves-light.btn.licence-temporary-modal-btn.left {
     left: 10px;
 }
@@ -2926,17 +2612,11 @@ a.waves-effect.waves-light.btn.licence-temporary-modal-btn.left {
 
 .input-field label {
   color: #334294;
-  font-size: 0.9rem;
-}
-
-.input-field label.active {
-  font-size: 0.9rem;
 }
 
 [type="checkbox"]+label {
   height: 1.6rem;
   line-height: 1.2rem;
-  font-size: 0.9rem;
   padding-left: 25px;
   color: black;
   opacity: 0.87;
@@ -2945,14 +2625,6 @@ a.waves-effect.waves-light.btn.licence-temporary-modal-btn.left {
 .input-field-csr {
   height: 36px;
   line-height: 10px;
-}
-
-.input-field-csr input[type=text] {
-  font-size: 0.9rem;
-}
-
-.input-field-csr input[type=email] {
-  font-size: 0.9rem;
 }
 
 .noUi-handle {
@@ -3303,7 +2975,7 @@ svg:hover {
 
   .svg_icon_text {
     margin-bottom: 2px;
-    font-size: 12px;
+    font-size: 0.875rem;
     color: rgba(0,0,0,0.87);
     text-align: center;
   }

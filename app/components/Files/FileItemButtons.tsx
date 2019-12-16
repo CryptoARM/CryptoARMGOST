@@ -1,6 +1,9 @@
+import { List } from "immutable";
 import PropTypes from "prop-types";
 import React from "react";
+import { connect } from "react-redux";
 import { TMP_DIR } from "../../constants";
+import { filesInTransactionsSelector } from "../../selectors";
 import * as signs from "../../trusted/sign";
 import { fileExists } from "../../utils";
 
@@ -9,6 +12,7 @@ const dialog = window.electron.remote.dialog;
 
 interface IFileItemButtonsProps {
   file: any;
+  filesInTransactionList: List<any>;
   deleteFile: (id: number) => void;
   selectTempContentOfSignedFiles: (path: string) => void;
 }
@@ -20,13 +24,13 @@ class FileItemButtons extends React.Component<IFileItemButtonsProps, {}> {
   };
 
   render() {
-    const { file } = this.props;
+    const { file, filesInTransactionList } = this.props;
 
     if (!file) {
       return null;
     }
 
-    const classDisabled = file.socket ? "disabled" : "";
+    const classDisabled = file.socket || filesInTransactionList.includes(file.id) ? "disabled" : "";
 
     return (
       <div className="row nobottom" style={{ width: "120px" }}>
@@ -110,4 +114,8 @@ class FileItemButtons extends React.Component<IFileItemButtonsProps, {}> {
   }
 }
 
-export default FileItemButtons;
+export default connect((state) => {
+  return {
+    filesInTransactionList: filesInTransactionsSelector(state),
+  };
+})(FileItemButtons);

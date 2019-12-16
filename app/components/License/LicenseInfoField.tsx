@@ -9,8 +9,8 @@ interface ILicenseInfoField {
 export default function LicenseInfoField({ title, info, style }: ILicenseInfoField) {
     return (
       <React.Fragment>
-        <div className="desktoplic_text_item bottomitem">{title}</div>
-        <div className="desktoplic_text_item" style={style}>{info}</div>
+        <div className="caption-text">{title}</div>
+        <div className="primary-text" style={style}>{info}</div>
       </React.Fragment>
     );
 }

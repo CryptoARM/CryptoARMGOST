@@ -71,10 +71,18 @@
       var result = LICENSE_MNG.generateTrial();
       console.log("result", result);
     } catch (err) {
+      console.log("Error load trusted-crypto", err);
       window.tcerr = err;
     }
 
-    var { Curl } = require("trusted-curl");
+    var Curl;
+
+    try {
+      Curl  = require("trusted-curl").Curl;
+    } catch (err) {
+      console.log("Error load trusted-curl", err);
+      window.curlerr = err;
+    }
 
     path = require('path');
     fs = require('fs');
@@ -108,7 +116,9 @@
     window.CA_CERTREGUESTS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certrequests.json");
     window.CA_CSR_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "csr.json");
     window.DSS_TOKENS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "tokens.json");
-    window.DSS_CERTIFICATES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "DSSCertificate.json");
+    window.DSS_USERS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "users.json");
+    window.CERTIFICATES_DSS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "certificateDSS.json");
+    window.POLICY_DSS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "policyDSS.json");
     window.TRUSTED_CRYPTO_LOG = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost.log");
     window.APP_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_operations.log");
     window.APP_ERRORS_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_errors.log");

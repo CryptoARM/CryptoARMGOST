@@ -4,15 +4,18 @@ import Media from "react-media";
 import { connect } from "react-redux";
 import { AutoSizer, List } from "react-virtualized";
 import { loadAllCertificates, verifyCertificate } from "../../AC";
+import { REQUEST } from "../../constants";
 import accordion from "../../decorators/accordion";
 import { filteredCertificatesSelector } from "../../selectors";
 import { filteredCrlsSelector } from "../../selectors/crlsSelectors";
 import { filteredRequestCASelector } from "../../selectors/requestCASelector";
-import CRLListItem from "../CRL/CRLListItem";
+import { mapToArr } from "../../utils";
+import CrlTable from "../CRL/CrlTable";
 import ProgressBars from "../ProgressBars";
 import RequestCAListItem from "../Request/RequestCAListItem";
 import CertificateListItem from "./CertificateListItem";
 import CertificateListItemBigWidth from "./CertificateListItemBigWidth";
+import CertificateTable from "./CertificateTable";
 
 const HEIGHT_MODAL = 356;
 const HEIGHT_FULL = 432;
@@ -59,273 +62,136 @@ class CertificateList extends React.Component<ICertificateListProps, any> {
   }
 
   render() {
-    const { certificates, crls, isLoading, operation, certrequests } = this.props;
-    const { localize, locale } = this.context;
+    const { certificates, crls, isLoading, certrequests } = this.props;
 
     if (isLoading) {
       return <ProgressBars />;
     }
 
-    const my: object[] = [];
-    const root: object[] = [];
-    const intermediate: object[] = [];
-    const other: object[] = [];
-    const token: object[] = [];
-    const request: object[] = [];
+    const TYPE = this.props.location.state ? this.props.location.state.type : "CERTIFICATE";
 
-    certificates.forEach((cert: any) => {
-      switch (cert.category) {
-        case "MY":
-          return my.push(cert);
-        case "ROOT":
-          return root.push(cert);
-        case "CA":
-          return intermediate.push(cert);
-        case "AddressBook":
-          return other.push(cert);
-        case "TOKEN":
-          return token.push(cert);
-        case "Request":
-          return request.push(cert);
-      }
-    });
-
-    let count = -1;
-
-    if (my.length) {
-      count++;
+    if (TYPE === "REQUEST") {
+      return this.getRequestCAList(certrequests);
+    } else if (TYPE === "CRL") {
+      return this.getCrlsList(crls);
+    } else {
+      return this.getCertificatesList(certificates);
     }
-
-    if (root.length) {
-      count++;
-    }
-
-    if (other.length) {
-      count++;
-    }
-
-    if (token.length) {
-      count++;
-    }
-
-    if (request.length) {
-      count++;
-    }
-
-    if (crls.length && (operation === "certificate")) {
-      count++;
-      count++;
-    }
-
-    if (certrequests.length && (operation === "certificate")) {
-      count++;
-    }
-
-    return (
-      <React.Fragment>
-        <ul className="collapsible" data-collapsible="accordion">
-          {this.getCollapsibleElement(localize("Certificate.certs_my", locale), "my", my, count, true)}
-          {this.getCollapsibleElement(localize("Certificate.certs_other", locale), "other", other, count)}
-          {this.getCollapsibleElement(localize("Certificate.certs_intermediate", locale), "intermediate", intermediate, count)}
-          {this.getCollapsibleElement(localize("Certificate.certs_root", locale), "root", root, count)}
-          {this.getCollapsibleElement(localize("Certificate.certs_token", locale), "token", token, count)}
-          {this.getCollapsibleElement(localize("Certificate.certs_request", locale), "request", request, count)}
-          {(operation === "certificate") ? this.getCollapsibleElementRequestCA("Запросы отправленные в УЦ", "ca", certrequests, count) : null}
-          {(operation === "certificate") ? this.getCollapsibleElementCRL(localize("Certificate.crls", locale), "intermediate", crls, count) : null}
-        </ul>
-      </React.Fragment>
-    );
   }
 
-  getCollapsibleElement = (head: string, name: string, elements: object[], count: number, active: boolean = false) => {
+  getCertificatesList = (certificates: object[]) => {
     const { activeCert, operation, toggleOpenItem, isItemOpened } = this.props;
 
-    if (!elements || elements.length === 0) {
+    if (!certificates || certificates.length === 0) {
       return null;
     }
 
-    const activeSection = active ? "active" : "";
-
     return (
-      <li>
-        <div className={`collapsible-header color ${activeSection}`} onClick={() => this.setState({ activeSection: name })}>
-          <i className={`material-icons left ${name}`}>
-          </i>
-          {head}
-        </div>
-        <div className="collapsible-body">
-          <div style={{ display: "flex" }}>
-            <div style={{ flex: "1 1 auto", height: `calc(100vh - 170px - ${45 * count}px)` }}>
-              <AutoSizer>
-                {({ height, width }) => (
-                  <List
-                    height={height}
-                    overscanRowCount={1}
-                    rowCount={elements.length}
-                    rowHeight={ROW_HEIGHT}
-                    rowRenderer={({ index, key, style }) => {
-                      if (!elements.length || this.state.activeSection !== name) {
-                        return null;
-                      }
-
-                      const cert = elements[index];
-
-                      return (
-                        <ul
-                          key={key}
-                          style={style}
-                        >
-                          <Media query="(max-width: 1020px)">
-                            {(matches) =>
-                              matches ? (
-                                <CertificateListItem
-                                  key={cert.id}
-                                  cert={cert}
-                                  chooseCert={() => activeCert(cert)}
-                                  operation={operation}
-                                  isOpen={isItemOpened(cert.id.toString())}
-                                  toggleOpen={toggleOpenItem(cert.id.toString())}
-                                  style={style} />
-                              ) : <CertificateListItemBigWidth
-                                  key={cert.id}
-                                  cert={cert}
-                                  chooseCert={() => activeCert(cert)}
-                                  operation={operation}
-                                  isOpen={isItemOpened(cert.id.toString())}
-                                  toggleOpen={toggleOpenItem(cert.id.toString())}
-                                  style={style} />
-                            }
-                          </Media>
-                        </ul>
-                      );
-                    }}
-                    width={width}
-                  />
-                )}
-              </AutoSizer>
-            </div>
-          </div>
-        </div>
-      </li>
+      <CertificateTable
+        isItemOpened={isItemOpened}
+        toggleOpenItem={toggleOpenItem}
+        activeCert={activeCert}
+        selectedCert={this.props.selectedCert}
+        operation={this.props.operation}
+      />
     );
   }
 
-  getCollapsibleElementCRL = (head: string, name: string, elements: object[], count: number, active: boolean = false) => {
+  getCrlsList = (crls: object[]) => {
     const { activeCrl, operation, toggleOpenItem, isItemOpened } = this.props;
 
-    if (!elements || elements.length === 0) {
+    if (!crls || crls.length === 0) {
       return null;
     }
 
-    const activeSection = active ? "active" : "";
-
     return (
-      <li>
-        <div className={`collapsible-header color ${activeSection}`} onClick={() => this.setState({ activeSection: name })}>
-          <i className={`material-icons left ${name}`}>
-          </i>
-          {head}
-        </div>
-        <div className="collapsible-body">
-          <div style={{ display: "flex" }}>
-            <div style={{ flex: "1 1 auto", height: `calc(100vh - 170px - ${45 * count}px)` }}>
-              <AutoSizer>
-                {({ height, width }) => (
-                  <List
-                    height={height}
-                    overscanRowCount={1}
-                    rowCount={elements.length}
-                    rowHeight={ROW_HEIGHT}
-                    rowRenderer={({ index, key, style }) => {
-                      if (!elements.length || this.state.activeSection !== name) {
-                        return null;
-                      }
-
-                      const cert = elements[index];
-
-                      return (
-                        <ul
-                          key={key}
-                          style={style}
-                        >
-                          <CRLListItem
-                            key={cert.id}
-                            crl={cert}
-                            chooseCert={() => activeCrl(cert)}
-                            operation={operation}
-                            isOpen={isItemOpened(cert.id.toString())}
-                            toggleOpen={toggleOpenItem(cert.id.toString())} />
-                        </ul>
-                      );
-                    }}
-                    width={width}
-                  />
-                )}
-              </AutoSizer>
-            </div>
-          </div>
-        </div>
-      </li>
+      <CrlTable
+        isItemOpened={isItemOpened}
+        toggleOpenItem={toggleOpenItem}
+        activeCrl={activeCrl}
+        selectedCrl={this.props.selectedCrl}
+        operation={this.props.operation}
+      />
     );
   }
 
-  getCollapsibleElementRequestCA = (head: string, name: string, elements: object[], count: number, active: boolean = false) => {
-    const { activeRequestCA, operation, toggleOpenItem, isItemOpened } = this.props;
+  getRequestCAList = (elements: object[]) => {
+    const { activeRequestCA, activeCert, operation, toggleOpenItem, isItemOpened } = this.props;
 
     if (!elements || elements.length === 0) {
       return null;
     }
 
-    const activeSection = active ? "active" : "";
-
     return (
-      <li>
-        <div className={`collapsible-header color ${activeSection}`} onClick={() => this.setState({ activeSection: name })}>
-          <i className={`material-icons left ${name}`}>
-          </i>
-          {head}
-        </div>
-        <div className="collapsible-body">
-          <div style={{ display: "flex" }}>
-            <div style={{ flex: "1 1 auto", height: `calc(100vh - 170px - ${45 * count}px)` }}>
-              <AutoSizer>
-                {({ height, width }) => (
-                  <List
-                    height={height}
-                    overscanRowCount={1}
-                    rowCount={elements.length}
-                    rowHeight={ROW_HEIGHT}
-                    rowRenderer={({ index, key, style }) => {
-                      if (!elements.length || this.state.activeSection !== name) {
-                        return null;
-                      }
+      <AutoSizer>
+        {({ height, width }) => (
+          <List
+            height={height}
+            overscanRowCount={2}
+            rowCount={elements.length + 1}
+            rowHeight={ROW_HEIGHT}
+            rowRenderer={({ index, key, style }) => {
+              if (!elements.length) {
+                return null;
+              }
 
-                      const request = elements[index];
+              const request = elements[index];
 
-                      return (
-                        <ul
-                          key={key}
-                          style={style}
-                        >
-                          <RequestCAListItem
+              if (!request) {
+                return null;
+              }
+
+              if (request.category === REQUEST) {
+                return (
+                  <ul
+                    key={key}
+                    style={style}
+                  >
+                    <Media query="(max-width: 1020px)">
+                      {(matches) =>
+                        matches ? (
+                          <CertificateListItem
                             key={request.id}
-                            requestCA={request}
-                            service={this.props.services.getIn(["entities", request.serviceId])}
-                            chooseCert={() => activeRequestCA(request)}
+                            cert={request}
+                            chooseCert={() => activeCert(request)}
                             operation={operation}
                             isOpen={isItemOpened(request.id.toString())}
-                            toggleOpen={toggleOpenItem(request.id.toString())} />
-                        </ul>
-                      );
-                    }}
-                    width={width}
-                  />
-                )}
-              </AutoSizer>
-            </div>
-          </div>
-        </div>
-      </li>
+                            toggleOpen={toggleOpenItem(request.id.toString())}
+                            style={style} />
+                        ) : <CertificateListItemBigWidth
+                            key={request.id}
+                            cert={request}
+                            chooseCert={() => activeCert(request)}
+                            operation={operation}
+                            isOpen={isItemOpened(request.id.toString())}
+                            toggleOpen={toggleOpenItem(request.id.toString())}
+                            style={style} />
+                      }
+                    </Media>
+                  </ul>
+                );
+              } else {
+                return (
+                  <ul
+                    key={key}
+                    style={style}
+                  >
+                    <RequestCAListItem
+                      key={request.id}
+                      requestCA={request}
+                      service={this.props.services.getIn(["entities", request.serviceId])}
+                      chooseCert={() => activeRequestCA(request)}
+                      operation={operation}
+                      isOpen={isItemOpened(request.id.toString())}
+                      toggleOpen={toggleOpenItem(request.id.toString())} />
+                  </ul>
+                );
+              }
+            }}
+            width={width}
+          />
+        )}
+      </AutoSizer>
     );
   }
 }
@@ -336,11 +202,12 @@ interface IOwnProps {
 
 export default connect((state, ownProps: IOwnProps) => {
   return {
-    certificates: filteredCertificatesSelector(state, { operation: ownProps.operation }),
+    certificates: mapToArr(filteredCertificatesSelector(state, { operation: ownProps.operation })),
+    certrequests: filteredRequestCASelector(state).concat(mapToArr(filteredCertificatesSelector(state, { operation: ownProps.operation }))),
     crls: filteredCrlsSelector(state),
     isLoaded: state.certificates.loaded,
     isLoading: state.certificates.loading,
-    certrequests: filteredRequestCASelector(state),
+    location: state.router.location,
     services: state.services,
   };
 }, { loadAllCertificates, verifyCertificate }, null, { pure: false })(accordion(CertificateList));

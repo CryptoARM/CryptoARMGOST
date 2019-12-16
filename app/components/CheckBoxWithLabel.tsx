@@ -14,19 +14,16 @@ class CheckBoxWithLabel extends React.Component<ICheckBoxWithLabelProps, any> {
 
     const classDisabled = disabled ? "disabled" : "";
 
-    return <div className="row settings-item" >
-      <div className="col s1 settings-check">
-        <input
-          type="checkbox"
-          id={elementId}
-          className="filled-in"
-          onChange={onClickCheckBox}
-          disabled={disabled}
-          checked={isChecked} />
+    return <div className={`input-field ${classDisabled}`} >
+      <input
+        type="checkbox"
+        id={elementId}
+        className="filled-in"
+        onChange={onClickCheckBox}
+        disabled={disabled}
+        checked={isChecked} />
 
-        <label htmlFor={elementId}></label>
-      </div>
-      <div className={"col s11 settins-check-title " + classDisabled}>{title}</div>
+      <label htmlFor={elementId} className="truncate">{title}</label>
     </div>;
   }
 }

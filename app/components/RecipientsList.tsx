@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { verifyCertificate } from "../AC";
+import { CRYPTOPRO_DSS } from "../constants";
 
 const rectangleValidStyle = {
   background: "#4caf50",
@@ -48,17 +49,22 @@ class RecipientsList extends React.Component<IRecipientsListProps, any> {
             }
 
             if (recipient.status) {
-              curStatusStyle = "cert_status_ok";
+              curStatusStyle = recipient.dssUserID ? "cloud_cert_status_ok" : "cert_status_ok";
               rectangleStyle = rectangleValidStyle;
             } else {
-              curStatusStyle = "cert_status_error";
+              curStatusStyle = recipient.dssUserID  ? "cloud_cert_status_error" : "cert_status_error";
               rectangleStyle = rectangleUnvalidStyle;
             }
 
             if (recipient.key.length > 0) {
               curKeyStyle = "key ";
+
               if (curKeyStyle) {
-                curKeyStyle += "localkey";
+                if (recipient.dssUserID) {
+                  curKeyStyle += "dsskey";
+                } else {
+                  curKeyStyle += "localkey";
+                }
               }
             } else {
               curKeyStyle = "";
@@ -77,7 +83,7 @@ class RecipientsList extends React.Component<IRecipientsListProps, any> {
                       this.state.hoveredRowIndex === recipient.id ?
                         <div className="col s8">
                           <div className="collection-title">{recipient.subjectFriendlyName}</div>
-                          <div className="collection-info cert-info">{recipient.issuerFriendlyName}</div>
+                          <div className="collection-info">{recipient.issuerFriendlyName}</div>
 
                           <div className="col" style={{ width: "40px" }} onClick={(event) => {
                             event.stopPropagation();
@@ -88,7 +94,7 @@ class RecipientsList extends React.Component<IRecipientsListProps, any> {
                         </div> :
                         <div className="col s10">
                           <div className="collection-title">{recipient.subjectFriendlyName}</div>
-                          <div className="collection-info cert-info">{recipient.issuerFriendlyName}</div>
+                          <div className="collection-info">{recipient.issuerFriendlyName}</div>
                         </div>
                     }
                   </div>

@@ -218,7 +218,7 @@ app.on('ready', async () => {
         label: 'Help', submenu: [
           {
             role: 'help',
-            click() { require('electron').shell.openExternal('https://cryptoarm.ru/upload/docs/userguide-cryptoarm-gost-2-0.pdf') }
+            click() { require('electron').shell.openExternal('https://cryptoarm.ru/upload/docs/userguide-cryptoarm-gost-2-1.pdf') }
           }
         ],
       },
@@ -252,7 +252,10 @@ app.on('second-instance', (e, argv) => {
 });
 
 app.on('before-quit', function (evt) {
-  setTimeout(() => {
-    trayIcon.destroy()
-  }, 0)
+  global.sharedObject.isQuiting = true;
+
+  if (trayIcon != null) {
+    trayIcon.destroy();
+    trayIcon = null;
+  }
 });
