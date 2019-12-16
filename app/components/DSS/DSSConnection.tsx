@@ -115,6 +115,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
       disabled = " ";
     }
 
+
     return (
       <React.Fragment>
 
@@ -208,6 +209,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
                         placeholder={localize("DSS.enter_your_password", locale)}
                       />
                       <label htmlFor={password_dss}>{localize("DSS.password_dss", locale)}</label>
+                      <div id="password_img" className="password_visible" onClick={this.passwordVisibleHide}></div>
                     </div>
                   </div>
 
@@ -249,7 +251,25 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
       </React.Fragment>
     );
   }
+  passwordVisibleHide()
+  {
+    let pass = $('#password_dss');
+    pass.attr('type', pass.attr('type') === 'password' ? 'text' : 'password');
+    let elm = document.querySelector("#password_img");
+    if(elm.className == "password_hide")
+    {
+      $("#password_img").removeClass();
+      $("#password_img").addClass('password_visible');
+    }
+    else
+    {
+      $("#password_img").removeClass();
+      $("#password_img").addClass('password_hide');
+    }
 
+
+
+  }
   getDssResponseLabel = (dssResponse: any) => {
     return (
       <React.Fragment>
@@ -283,7 +303,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
     const target = ev.target;
     const name = target.name;
     const value = ev.target.value;
-
+console.log(value);
     const newSubject = {
       ...this.state.field_value,
       [name]: value,

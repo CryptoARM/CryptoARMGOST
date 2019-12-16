@@ -773,6 +773,24 @@ i.material-icons.sidevan.license{
   i.material-icons.sidevan.dss {
     background: url(./resources/image/sidemenu/dss.svg);
   }
+  .password_visible
+  {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    background: url(./resources/image/sidemenu/pass_on.svg);
+    top: 12px;
+    right: 25px;
+  }
+  .password_hide
+  {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    background: url(./resources/image/sidemenu/pass_hide.svg);
+    top: 12px;
+    right: 25px;
+  }
 
 /*-------------------------------Стили списка файлов------------------*/
 .add-file-item {
