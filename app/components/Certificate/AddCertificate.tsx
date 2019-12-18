@@ -60,7 +60,7 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
                   onMouseOver={() => this.handleOnRowMouseOver("cert_import_from_DSS")}>
                   <div className="col" style={{ width: "40px" }}>
                     <a data-position="bottom">
-                      <i className="material-icons certificate import" />
+                      <i className="material-icons certificate import_dss_cert" />
                     </a>
                   </div>
                   <div className="col s11">
@@ -80,7 +80,7 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
                   onMouseOver={() => this.handleOnRowMouseOver("create_request")}>
                   <div className="col" style={{ width: "40px" }}>
                     <a data-position="bottom">
-                      <i className="material-icons certificate import" />
+                      <i className="material-icons certificate add_question" />
                     </a>
                   </div>
                   <div className="col s11">
@@ -100,7 +100,7 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
                   onMouseOver={() => this.handleOnRowMouseOver("cert_get_through_ca")}>
                   <div className="col" style={{ width: "40px" }}>
                     <a data-position="bottom">
-                      <i className="material-icons certificate import" />
+                      <i className="material-icons certificate cloud_question" />
                     </a>
                   </div>
                   <div className="col s11">

@@ -39,6 +39,7 @@ import PinCodeForDssContainer from "../DSS/PinCodeForDssContainer";
 import ReAuth from "../DSS/ReAuth";
 import Modal from "../Modal";
 import RecipientsList from "../RecipientsList";
+import AllSettings from "../Settings/AllSettings";
 import SignerInfo from "../Signature/SignerInfo";
 
 const dialog = window.electron.remote.dialog;
@@ -65,6 +66,7 @@ interface ISignatureAndEncryptRightColumnSettingsProps {
 }
 
 interface ISignatureAndEncryptRightColumnSettingsState {
+  allSettingsMaunted: boolean;
   currentOperation: string;
   pinCode: string;
   searchValue: string;
@@ -83,6 +85,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     super(props);
 
     this.state = {
+      allSettingsMaunted: false,
       currentOperation: "",
       pinCode: "",
       searchValue: "",
@@ -90,6 +93,10 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       showModalDssResponse: false,
       showModalReAuth: false,
     };
+  }
+
+  componentWillMount() {
+    this.props.activeSetting(this.props.setting.id);
   }
 
   componentDidMount() {
@@ -107,6 +114,8 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       this.handleCloseModalReAuth();
       this.handleShowModalDssResponse();
     }
+
+    $(".collapsible").collapsible();
   }
 
   componentDidUpdate(prevProps: ISignatureAndEncryptRightColumnSettingsProps, prevState: ISignatureAndEncryptRightColumnSettingsState) {
@@ -134,120 +143,106 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
     return (
       <React.Fragment>
-        <div className="col s10">
-          <div className="primary-text">Настройки:</div>
-          <hr />
-        </div>
-        <div className="col s2">
-          <div className="right import-col">
-            <a className="btn-floated" data-activates="dropdown-btn-settings">
-              <i className="file-setting-item waves-effect material-icons secondary-content">more_vert</i>
-            </a>
-            <ul id="dropdown-btn-settings" className="dropdown-content">
-              <Link to={LOCATION_SETTINGS_CONFIG}>
-                <li><a onClick={() => {
-                  this.props.activeSetting(this.props.setting.id);
-                }}>Изменить</a></li>
-              </Link>
-              {
-                settings && settings.size > 1 ?
-                  <Link to={LOCATION_SETTINGS_SELECT}>
-                    <li>
-                      <a onClick={() => {
-                        this.props.activeSetting(this.props.setting.id);
-                      }}>Выбрать</a>
-                    </li>
-                  </Link> :
-                  null
-              }
-            </ul>
-          </div>
-        </div>
-        <div className="col s12 valign-wrapper">
-          <div className="col s2">
-            <div className="setting" />
-          </div>
-          <div className="col s10">
-            <div className="collection-title">{setting.name}</div>
-          </div>
-        </div>
-
-        <div className="row" />
-
-        <div className="col s10">
-          <div className="primary-text">{localize("Sign.signer_cert", locale)}</div>
-          <hr />
-        </div>
-        <div className="col s2">
-          <div className="right import-col">
-            <a className="btn-floated" data-activates="dropdown-btn-signer">
-              <i className="file-setting-item waves-effect material-icons secondary-content">more_vert</i>
-            </a>
-            <ul id="dropdown-btn-signer" className="dropdown-content">
-              <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE}>
-                <li><a onClick={() => {
-                  this.props.activeSetting(this.props.setting.id);
-                }}>Заменить</a></li>
-              </Link>
-              <li><a onClick={() => this.props.selectSignerCertificate(0)}>{localize("Common.clear", locale)}</a></li>
-            </ul>
-          </div>
-        </div>
-        {
-          (signer) ? <SignerInfo signer={signer} /> :
-            <div className="col s12">
-              <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE}>
-                <a className="btn btn-outlined waves-effect waves-light"
-                  onClick={() => {
-                    this.props.activeSetting(this.props.setting.id);
-                  }}
-                  style={{ width: "100%" }}>
-                  {localize("Settings.Choose", locale)}
-                </a>
-              </Link>
+        <div style={{ height: "calc(100vh - 150px)" }}>
+          <div className="add-certs">
+            <div className="col s10">
+              <div className="subtitle">{localize("Sign.signer_cert", locale)}</div>
+              <hr />
             </div>
-        }
-        <div className="row" />
-
-        <div className="col s10">
-          <div className="primary-text">Сертификаты шифрования:</div>
-          <hr />
-        </div>
-
-        <div className={`col s2 ${classDisabled}`}>
-          <div className="right import-col">
-            <a className="btn-floated" data-activates="dropdown-btn-encrypt">
-              <i className={`file-setting-item waves-effect material-icons secondary-content ${classDisabled}`}>more_vert</i>
-            </a>
-            <ul id="dropdown-btn-encrypt" className="dropdown-content">
-              <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT}>
-                <li><a onClick={() => {
-                  this.props.activeSetting(this.props.setting.id);
-                }}>{localize("Settings.add", locale)}</a></li>
-              </Link>
-              <li><a onClick={() => this.handleCleanRecipientsList()}>{localize("Common.clear", locale)}</a></li>
-            </ul>
-          </div>
-        </div>
-        {
-          (recipients && recipients.length) ?
-            <div style={{ height: "calc(100vh - 400px)" }}>
-              <div className={`add-certs ${classDisabled}`}>
-                <RecipientsList recipients={recipients} handleRemoveRecipient={(recipient) => this.props.deleteRecipient(recipient.id)} />
+            <div className="col s2">
+              <div className="right import-col">
+                <a className="btn-floated" data-activates="dropdown-btn-signer">
+                  <i className="file-setting-item waves-effect material-icons secondary-content">more_vert</i>
+                </a>
+                <ul id="dropdown-btn-signer" className="dropdown-content">
+                  <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE}>
+                    <li><a onClick={() => {
+                      this.props.activeSetting(this.props.setting.id);
+                    }}>Заменить</a></li>
+                  </Link>
+                  <li><a onClick={() => this.props.selectSignerCertificate(0)}>{localize("Common.clear", locale)}</a></li>
+                </ul>
               </div>
-            </div> :
-            <div className={`col s12 ${classDisabled}`}>
-              <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT}>
-                <a onClick={() => {
-                  this.props.activeSetting(this.props.setting.id);
-                }}
-                  className={`btn btn-outlined waves-effect waves-light ${classDisabled}`}
-                  style={{ width: "100%" }}>
-                  {localize("Settings.Choose", locale)}
-                </a>
-              </Link>
             </div>
-        }
+            {
+              (signer) ? <SignerInfo signer={signer} /> :
+                <div className="col s12">
+                  <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE}>
+                    <a className="btn btn-outlined waves-effect waves-light"
+                      onClick={() => {
+                        this.props.activeSetting(this.props.setting.id);
+                      }}
+                      style={{ width: "100%" }}>
+                      {localize("Settings.Choose", locale)}
+                    </a>
+                  </Link>
+                </div>
+            }
+            <div className="row" />
+
+            <div className="col s10">
+              <div className="subtitle">Сертификаты шифрования</div>
+              <hr />
+            </div>
+
+            <div className={`col s2 ${classDisabled}`}>
+              <div className="right import-col">
+                <a className="btn-floated" data-activates="dropdown-btn-encrypt">
+                  <i className={`file-setting-item waves-effect material-icons secondary-content ${classDisabled}`}>more_vert</i>
+                </a>
+                <ul id="dropdown-btn-encrypt" className="dropdown-content">
+                  <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT}>
+                    <li><a onClick={() => {
+                      this.props.activeSetting(this.props.setting.id);
+                    }}>{localize("Settings.add", locale)}</a></li>
+                  </Link>
+                  <li><a onClick={() => this.handleCleanRecipientsList()}>{localize("Common.clear", locale)}</a></li>
+                </ul>
+              </div>
+            </div>
+            {
+              (recipients && recipients.length) ?
+                <div className="col s12">
+                  <RecipientsList recipients={recipients} handleRemoveRecipient={(recipient) => this.props.deleteRecipient(recipient.id)} />
+                </div> :
+                <div className={`col s12 ${classDisabled}`}>
+                  <Link to={LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT}>
+                    <a onClick={() => {
+                      this.props.activeSetting(this.props.setting.id);
+                    }}
+                      className={`btn btn-outlined waves-effect waves-light ${classDisabled}`}
+                      style={{ width: "100%" }}>
+                      {localize("Settings.Choose", locale)}
+                    </a>
+                  </Link>
+                </div>
+            }
+
+            <div className="row" />
+
+            <div className="col s12">
+              <ul className="collapsible params" data-collapsible="accordion">
+                <li>
+                  <div className="collapsible-header params" onClick={() => {
+                    if (!this.state.allSettingsMaunted) {
+                      this.setState({ allSettingsMaunted: true });
+                    }
+                  }
+                  }>
+                    <i className="material-icons right">expand_more</i>
+                    Параметры
+                  </div>
+                  <div className="collapsible-body params">
+                    {
+                      this.state.allSettingsMaunted ? < AllSettings /> : null
+                    }
+
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
 
         <div className="row fixed-bottom-rightcolumn" >
           <div className="col s12">
@@ -266,7 +261,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                     checked={isDocumentsReviewed}
                     onClick={this.toggleDocumentsReviewed}
                   />
-                  <label htmlFor={"filesview"} className="truncate" style={{fontSize: "0.875rem"}}>
+                  <label htmlFor={"filesview"} className="truncate" style={{ fontSize: "0.875rem" }}>
                     {localize("Sign.documents_reviewed", locale)}
                   </label>
                 </div>

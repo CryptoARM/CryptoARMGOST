@@ -6,7 +6,7 @@ import {
   ADDRESS_BOOK, CA, LOCATION_ABOUT,
   LOCATION_ADDRESS_BOOK, LOCATION_CERTIFICATES, LOCATION_CONTAINERS,
   LOCATION_DOCUMENTS, LOCATION_EVENTS, LOCATION_MAIN,
-  LOCATION_SERVICES, LOCATION_SETTINGS, MY, REQUEST, ROOT,
+  LOCATION_SERVICES, MY, REQUEST, ROOT,
 } from "../constants";
 import { mapToArr } from "../utils";
 
@@ -81,13 +81,6 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
               <i className="material-icons sidevan dss"></i>
             </Link>
           </div>
-
-          <div className="row nobottom">
-            {LOCATION_SETTINGS === pathname ? < div className="side-nav-rectangle" /> : null}
-            <Link to={LOCATION_SETTINGS} style={{ padding: "0 10px" }}>
-              <i className="material-icons sidevan setting"></i>
-            </Link>
-          </div>
         </div>
         <div className="row">
           <div className="menu-elements">
@@ -95,7 +88,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
               <div className="row nobottom">
                 {LOCATION_ABOUT === pathname || LOCATION_EVENTS === pathname ? < div className="side-nav-rectangle" /> : null}
                 <Link id="dropdown-about" to={LOCATION_ABOUT} data-activates="dropdown-about-pages" data-hover="hover" style={{ padding: "0 10px" }}>
-                  <i className="material-icons sidevan license" style={{ padding: "0 10px" }}>about</i>
+                  <i className="material-icons sidevan about" style={{ padding: "0 10px" }}>about</i>
                 </Link>
               </div>
               <Link to="/" onClick={() => {
@@ -144,7 +137,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
 
     return (
       <div>
-        <ul id="dropdown-certificate-stores" className="dropdown-content" style={{ minHeight: "36px", height: "36px" }}>
+        <ul id="dropdown-certificate-stores" className="dropdown-content" style={{ minHeight: "85px" }}>
           <li>
             <div className="center-align">
               <a style={{ fontWeight: "bold", color: "#bf3817" }}>СЕРТИФИКАТЫ</a>
@@ -198,7 +191,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
 
     return (
       <div>
-        <ul id="dropdown-documents-stores" className="dropdown-content" style={{ minHeight: "36px", height: "36px" }}>
+        <ul id="dropdown-documents-stores" className="dropdown-content" style={{ minHeight: "120px" }}>
           <li>
             <div className="center-align">
               <a style={{ fontWeight: "bold", color: "#bf3817" }}>ДОКУМЕНТЫ</a>
@@ -208,7 +201,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
             <Link to={LOCATION_MAIN} style={{ height: "33px", padding: "0px" }}>
               <div className="row nobottom valign-wrapper">
                 <div className="col" style={{ width: "36px" }}>
-                  <i className="material-icons left container" />
+                  <i className="material-icons left sign_operation" />
                 </div>
                 <div className="col">
                   {localize("SignAndEncrypt.sign_and_encrypt", locale)}
@@ -220,7 +213,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
             <Link to={LOCATION_DOCUMENTS} style={{ height: "33px", padding: "0px" }}>
               <div className="row nobottom valign-wrapper">
                 <div className="col" style={{ width: "36px" }}>
-                  <i className="material-icons left container" />
+                  <i className="material-icons left folder" />
                 </div>
                 <div className="col">
                   {localize("Documents.documents", locale)}
@@ -238,7 +231,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
 
     return (
       <div>
-        <ul id="dropdown-about-pages" className="dropdown-content" style={{ minHeight: "36px", height: "36px" }}>
+        <ul id="dropdown-about-pages" className="dropdown-content" style={{ minHeight: "150px", height: "150px" }}>
           <li>
             <div className="center-align">
               <a style={{ fontWeight: "bold", color: "#bf3817" }}>О ПРОГРАММЕ</a>
@@ -249,7 +242,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
             <Link to={LOCATION_ABOUT} style={{ height: "33px", padding: "0px" }}>
               <div className="row nobottom valign-wrapper">
                 <div className="col" style={{ width: "36px" }}>
-                  <i className="material-icons left container" />
+                  <i className="material-icons left application" />
                 </div>
                 <div className="col">
                   {localize("About.about", locale)}
@@ -262,7 +255,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
             <Link to={LOCATION_EVENTS} style={{ height: "33px", padding: "0px" }}>
               <div className="row nobottom valign-wrapper">
                 <div className="col" style={{ width: "36px" }}>
-                  <i className="material-icons left container" />
+                  <i className="material-icons left journal" />
                 </div>
                 <div className="col">
                   {localize("Events.operations_log", locale)}
@@ -274,7 +267,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
             <a style={{ height: "33px", padding: "0px" }} onClick={() => window.electron.shell.openExternal(localize("Help.link_user_guide", locale))}>
               <div className="row nobottom valign-wrapper">
                 <div className="col" style={{ width: "36px" }}>
-                  <i className="material-icons left container" />
+                  <i className="material-icons left help" />
                 </div>
                 <div className="col">
                   Справка

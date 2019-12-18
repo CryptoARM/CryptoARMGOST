@@ -1,19 +1,20 @@
 import PropTypes from "prop-types";
 import React from "react";
+import { connect } from "react-redux";
+import {
+  changeTspProxyPort, changeTspProxyUrl, changeTspUrl, changeTspUseProxy,
+} from "../../AC/settingsActions";
 import CheckBoxWithLabel from "../CheckBoxWithLabel";
 
 interface ITspSettingsProps {
-  handleChange: (encoding: string) => void;
+  changeTspUrl: (url: string) => void;
+  changeTspProxyUrl: (url: string) => void;
+  changeTspProxyPort: (port: number) => void;
+  changeTspUseProxy: (use: boolean) => void;
+  settings: any;
 }
 
-interface ITspSettingsState {
-  port: number;
-  url_proxy: string;
-  url_tsp: string;
-  use_proxy: boolean;
-}
-
-class TspSettings extends React.Component<ITspSettingsProps, ITspSettingsState> {
+class TspSettings extends React.Component<ITspSettingsProps, {}> {
   static contextTypes = {
     locale: PropTypes.string,
     localize: PropTypes.func,
@@ -21,109 +22,117 @@ class TspSettings extends React.Component<ITspSettingsProps, ITspSettingsState> 
 
   constructor(props: any) {
     super(props);
-    this.state = {
-      port: 0,
-      url_proxy: "",
-      url_tsp: "",
-      use_proxy: false,
-    };
+  }
+
+  componentDidMount() {
+    Materialize.updateTextFields();
+  }
+
+  componentDidUpdate() {
+    Materialize.updateTextFields();
   }
 
   render() {
     const { localize, locale } = this.context;
+    const { tsp } = this.props.settings;
+    const { url, use_proxy, proxy_url, proxy_port } = tsp;
+
+    const disbledProxyInputs = use_proxy ? "" : "disabled";
 
     return (
       <div className="row">
-        <div className="col s12 m12 l6">
-          <div className="input-field col s12">
-            <input
-              id="url_tsp"
-              type="text"
-              className="validate"
-              name="url_tsp"
-              value={this.state.url_tsp}
-              onChange={this.handleInputChange}
-              placeholder="https://"
-            />
-            <label htmlFor="url_tsp">
-              {localize("Cades.url_tsp", locale)}
-            </label>
-          </div>
-
-          <div className="col s12">
-            <CheckBoxWithLabel
-              disabled={false}
-              isChecked={this.state.use_proxy}
-              elementId="use_proxy"
-              onClickCheckBox={this.handleUseProxyClick}
-              title={localize("Cades.use_proxy", locale)} />
-            <div className="row" />
-          </div>
+        <div className="input-field col s12">
+          <input
+            id="url_tsp"
+            type="text"
+            className="validate"
+            name="url_tsp"
+            value={url}
+            onChange={this.handleUrlChange}
+            placeholder="https://"
+          />
+          <label htmlFor="url_tsp">
+            {localize("Cades.url_tsp", locale)}
+          </label>
         </div>
 
-        <div className="col s12 m12 l6">
-          <div className="input-field col s12">
-            <input
-              id="url_proxy"
-              type="text"
-              className="validate"
-              name="url_proxy"
-              value={this.state.url_proxy}
-              onChange={this.handleInputChange}
-              placeholder="https://"
-            />
-            <label htmlFor="url_proxy">
-              {localize("Cades.url_proxy", locale)}
-            </label>
-          </div>
+        <div className="col s12">
+          <CheckBoxWithLabel
+            disabled={false}
+            isChecked={use_proxy}
+            elementId="use_proxy_tsp"
+            onClickCheckBox={this.handleUseProxyClick}
+            title={localize("Cades.use_proxy", locale)} />
+        </div>
 
-          <div className="input-field col s12">
-            <input
-              id="port"
-              type="number"
-              className="validate"
-              max={65536}
-              min={0}
-              name="port"
-              value={this.state.port}
-              onChange={this.handleInputPort}
-              placeholder="0 - 65536"
-            />
-            <label htmlFor="port">
-              {localize("Cades.port", locale)}
-            </label>
-          </div>
+        <div className={`input-field col s12 ${disbledProxyInputs}`}>
+          <input
+            id="url_proxy_tsp"
+            type="text"
+            className="validate"
+            name="url_proxy_tsp"
+            value={proxy_url}
+            onChange={this.handleUrlProxyChange}
+            placeholder="https://"
+          />
+          <label htmlFor="url_proxy_tsp" className={`${disbledProxyInputs}`}>
+            {localize("Cades.url_proxy", locale)}
+          </label>
+        </div>
+
+        <div className={`input-field col s12 ${disbledProxyInputs}`}>
+          <input
+            id="port_tsp"
+            type="number"
+            className="validate"
+            max={65536}
+            min={0}
+            name="port_tsp"
+            value={proxy_port}
+            onChange={this.handleInputPort}
+            placeholder="0 - 65536"
+          />
+          <label htmlFor="port_tsp" className={`${disbledProxyInputs}`}>
+            {localize("Cades.port", locale)}
+          </label>
         </div>
       </div>
     );
   }
 
-  handleInputChange = (ev: any) => {
-    const target = ev.target;
-    const name = target.name;
-    const value = ev.target.value;
+  handleUrlChange = (ev: any) => {
+    // tslint:disable-next-line: no-shadowed-variable
+    const { changeTspUrl } = this.props;
 
-    this.setState(({
-      ...this.state,
-      [name]: value,
-    }));
+    changeTspUrl(ev.target.value);
+  }
+
+  handleUrlProxyChange = (ev: any) => {
+    // tslint:disable-next-line: no-shadowed-variable
+    const { changeTspProxyUrl } = this.props;
+
+    changeTspProxyUrl(ev.target.value);
   }
 
   handleInputPort = (ev: any) => {
-    const target = ev.target;
-    const name = target.name;
-    const value = ev.target.value;
+    // tslint:disable-next-line: no-shadowed-variable
+    const { changeTspProxyPort } = this.props;
 
-    this.setState(({
-      port: parseInt(value, 10),
-    }));
+    changeTspProxyPort(parseInt(ev.target.value, 10));
   }
 
   handleUseProxyClick = () => {
-    this.setState({
-      use_proxy: !this.state.use_proxy,
-    });
+    // tslint:disable-next-line: no-shadowed-variable
+    const { changeTspUseProxy } = this.props;
+
+    changeTspUseProxy(!this.props.settings.tsp.use_proxy);
   }
 }
 
-export default TspSettings;
+export default connect((state) => {
+  return {
+    settings: state.settings.getIn(["entities", state.settings.active]),
+  };
+}, {
+  changeTspProxyPort, changeTspProxyUrl, changeTspUrl, changeTspUseProxy,
+})(TspSettings);

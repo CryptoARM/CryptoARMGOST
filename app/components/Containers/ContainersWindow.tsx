@@ -86,7 +86,7 @@ class ContainersWindow extends React.Component<any, any> {
 
             {
               container ?
-                <div className="row fixed-bottom-rightcolumn" style={{ position: "relative", bottom: "80px" }}>
+                <div className="row fixed-bottom-rightcolumn" style={{ bottom: "20px" }}>
                   <div className="col s12">
                     <hr />
                   </div>
@@ -96,7 +96,7 @@ class ContainersWindow extends React.Component<any, any> {
                       <div className="col s4 waves-effect waves-cryptoarm" onClick={this.handleInstallCertificate}>
                         <div className="col s12 svg_icon">
                           <a data-position="bottom">
-                            <i className="material-icons certificate import" />
+                            <i className="material-icons certificate key_add" />
                           </a>
                         </div>
                         <div className="col s12 svg_icon_text">{localize("Containers.installCertificate", locale)}</div>
@@ -107,7 +107,7 @@ class ContainersWindow extends React.Component<any, any> {
                   <div className="col s4 waves-effect waves-cryptoarm" onClick={this.handleShowModalDeleteContainer}>
                     <div className="col s12 svg_icon">
                       <a data-position="bottom">
-                        <i className="material-icons certificate remove" />
+                        <i className="material-icons certificate key_remove" />
                       </a>
                     </div>
                     <div className="col s12 svg_icon_text">{localize("Containers.remove_container", locale)}</div>

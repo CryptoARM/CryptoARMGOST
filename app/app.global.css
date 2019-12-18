@@ -57,6 +57,11 @@ nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
   letter-spacing: 0.00857142857rem; /* 0.15/(20*0.0625*14) */
 }
 
+.subtitle {
+  font-size: 1rem;
+  letter-spacing: 0.01071428571rem; /* 0.15/(16*0.0625*14) */
+}
+
 .primary-text {
   color: rgba(0,0,0,0.87);
   font-size: 1rem;
@@ -730,10 +735,6 @@ i.material-icons.left.logo-trusted {
   margin-left: -2px;
 }
 
-i.material-icons.sidevan.sign {
-  background: url(./resources/image/sidemenu/sign.svg);
-}
-
 i.material-icons.sidevan.cert {
   background: url(./resources/image/sidemenu/certificates.svg);
 }
@@ -746,24 +747,8 @@ i.material-icons.sidevan.address_book {
   background: url(./resources/image/sidemenu/address_book.svg);
 }
 
-i.material-icons.sidevan.keystore{
-  background: url(./resources/image/sidemenu/key_store.svg);
-}
-
-i.material-icons.sidevan.setting{
-  background: url(./resources/image/sidemenu/settings.svg);
-}
-
-i.material-icons.sidevan.license{
-    background: url(./resources/image/sidemenu/license.svg);
-  }
-
   i.material-icons.sidevan.exit{
     background: url(./resources/image/sidemenu/exit.svg);
-  }
-
-  i.material-icons.sidevan.journal {
-    background: url(./resources/image/sidemenu/journal.svg);
   }
 
   i.material-icons.sidevan.document {
@@ -868,13 +853,28 @@ i.material-icons.choosefolder {
   line-height: 30px;
 }
 
-.collapsible {
-  margin: 0;
+.collapsible.params {
+  border-left: 0 !important;
+  border-right: 0 !important;
+  box-shadow: none !important;
 }
 
-.collapsible-header.color{
-    background-color: ghostwhite;
+.collapsible-body.params {
+  border-bottom: 0 !important;
 }
+
+.collapsible-header.params{
+  border-left: 1px solid #ddd !important;
+  border-right: 1px solid #ddd !important;
+  border-bottom: 1px solid #ddd !important;
+}
+
+.collapsible-header.active i {
+  -ms-transform: rotate(180deg); /* IE 9 */
+  -webkit-transform: rotate(180deg); /* Chrome, Safari, Opera */
+  transform: rotate(180deg);
+  transition: transform 200ms;
+  }
 
 .cert-text {
     color: white;
@@ -1236,12 +1236,31 @@ i.material-icons.left.container {
 }
 
 i.material-icons.left.connect {
-  background: url(./resources/image/connect.png);
-  background-size: cover;
+  background: url(./resources/image/service_category_connect.svg);
 }
 
-i.material-icons.left.connect {
-  background: url(./resources/image/service_category_connect.svg);
+i.material-icons.left.application {
+  background: url(./resources/image/sidemenu/application.svg);
+}
+
+i.material-icons.left.folder {
+  background: url(./resources/image/sidemenu/folder.svg);
+}
+
+i.material-icons.left.help {
+  background: url(./resources/image/sidemenu/help.svg);
+}
+
+i.material-icons.left.journal {
+  background: url(./resources/image/sidemenu/journal.svg);
+}
+
+i.material-icons.left.license {
+  background: url(./resources/image/sidemenu/license.svg);
+}
+
+i.material-icons.left.sign_operation {
+  background: url(./resources/image/sidemenu/sign_operation.svg);
 }
 
 i.material-icons.left.ca {
@@ -2939,8 +2958,28 @@ svg:hover {
     background: url(./resources/image/operations/import_cert.svg);
   }
 
+  i.material-icons.certificate.import_dss_cert {
+    background: url(./resources/image/operations/import_dss_cert.svg);
+  }
+
+  i.material-icons.certificate.cloud_question {
+    background: url(./resources/image/operations/cloud_question.svg);
+  }
+
+  i.material-icons.certificate.add_question {
+    background: url(./resources/image/operations/add_question.svg);
+  }
+
   i.material-icons.certificate.remove {
-    background: url(./resources/image/operations/delete.svg);
+    background: url(./resources/image/operations/cert_delete.svg);
+  }
+
+  i.material-icons.certificate.key_remove {
+    background: url(./resources/image/operations/key_delete.svg);
+  }
+
+  i.material-icons.certificate.key_add {
+    background: url(./resources/image/operations/key_add.svg);
   }
 
   i.material-icons.certificate.csrfolder {
@@ -2965,10 +3004,6 @@ svg:hover {
     background-size: 36px 36px !important;
     width: 36px;
     height: 36px;
-  }
-
-  i.material-icons.settings.import {
-    background: url(./resources/image/operations/import_setting.svg);
   }
 
   i.material-icons.settings.export {
