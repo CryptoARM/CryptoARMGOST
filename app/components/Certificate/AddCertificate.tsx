@@ -68,7 +68,6 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
         return (
           <React.Fragment>
             {this.getImportFromFile()}
-            {this.getImportFromDss()}
             {this.getCreateRequest()}
             {this.getCreateRequestCA()}
           </React.Fragment>
@@ -101,7 +100,6 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
         return (
           <React.Fragment>
             {this.getImportFromFile()}
-            {this.getImportFromDss()}
             {this.getCreateRequest()}
             {this.getCreateRequestCA()}
           </React.Fragment>
