@@ -28,7 +28,6 @@ import CRLDelete from "../CRL/CRLDelete";
 import CRLExport from "../CRL/CRLExport";
 import CRLInfo from "../CRL/CRLInfo";
 import Dialog from "../Dialog";
-import DSSConnection from "../DSS/DSSConnection";
 import Modal from "../Modal";
 import PasswordDialog from "../PasswordDialog";
 import ProgressBars from "../ProgressBars";
@@ -71,7 +70,6 @@ class CertWindow extends React.Component<any, any> {
       showModalAddCertificate: false,
       showModalAddService: false,
       showModalBestStore: false,
-      showModalCertificateImportDSS: false,
       showModalCertificateRequest: false,
       showModalCertificateRequestCA: false,
       showModalCloudCSP: false,
@@ -114,9 +112,6 @@ class CertWindow extends React.Component<any, any> {
       case MODAL_DELETE_REQUEST_CA:
         this.setState({ showModalDeleteRequestCA: true });
         break;
-      case MODAL_CERTIFICATE_IMPORT_DSS:
-        this.setState({ showModalCertificateImportDSS: true });
-        break;
       case MODAL_CERTIFICATE_REQUEST:
         this.setState({ showModalCertificateRequest: true });
         break;
@@ -154,9 +149,6 @@ class CertWindow extends React.Component<any, any> {
       case MODAL_DELETE_CRL:
         this.setState({ showModalDeleteCRL: false });
         break;
-      case MODAL_CERTIFICATE_IMPORT_DSS:
-        this.setState({ showModalCertificateImportDSS: false });
-        break;
       case MODAL_CERTIFICATE_REQUEST:
         this.setState({ showModalCertificateRequest: false });
         break;
@@ -182,7 +174,6 @@ class CertWindow extends React.Component<any, any> {
 
   handleCloseModals = () => {
     this.setState({
-      showModalCertificateImportDSS: false,
       showModalCertificateRequest: false,
       showModalCertificateRequestCA: false,
       showModalCloudCSP: false,
@@ -1217,28 +1208,6 @@ class CertWindow extends React.Component<any, any> {
     );
   }
 
-  showModalCertificateImportDSS = () => {
-    const { localize, locale } = this.context;
-    const { certificate, showModalCertificateImportDSS } = this.state;
-
-    if (!showModalCertificateImportDSS) {
-      return;
-    }
-
-    return (
-      <Modal
-        isOpen={showModalCertificateImportDSS}
-        header={localize("DSS.DSS_connection", locale)}
-        onClose={() => this.handleCloseModalByType(MODAL_CERTIFICATE_IMPORT_DSS)}
-        style={{ width: "500px" }}>
-        <DSSConnection
-          onCancel={() => this.handleCloseModalByType(MODAL_CERTIFICATE_IMPORT_DSS)}
-          handleReloadCertificates={this.handleReloadCertificates}
-        />
-      </Modal>
-    );
-  }
-
   showModalCloudCSP = () => {
     const { localize, locale } = this.context;
     const { showModalCloudCSP } = this.state;
@@ -1475,7 +1444,6 @@ class CertWindow extends React.Component<any, any> {
           {this.showModalDeleteCrl()}
           {this.showModalExportRequestCA()}
           {this.showModalDeleteRequestCA()}
-          {this.showModalCertificateImportDSS()}
           {this.showModalCertificateRequest()}
           {this.showModalCertificateRequestCA()}
           {this.showModalCloudCSP()}
