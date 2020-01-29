@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
 import { verifySignature } from "../../AC";
-import { filesInTransactionsSelector } from "../../selectors";
 import { mapToArr } from "../../utils";
 
 interface IFileRedux {
@@ -66,25 +65,7 @@ class FileIcon extends React.Component<IFileIconProps, {}> {
   }
 
   render() {
-    const { file, filesInTransactionList } = this.props;
-
-    if (filesInTransactionList.includes(file.id)) {
-      return (
-        <div className="preloader-wrapper small active icon_file_type">
-          <div className="spinner-layer spinner-blue-only">
-            <div className="circle-clipper left">
-              <div className="circle"></div>
-            </div>
-            <div className="gap-patch">
-              <div className="circle" />
-            </div>
-            <div className="circle-clipper right">
-              <div className="circle" />
-            </div>
-          </div>
-        </div>
-      );
-    }
+    const { file } = this.props;
 
     return (
       <div>
@@ -121,7 +102,6 @@ class FileIcon extends React.Component<IFileIconProps, {}> {
 
 export default connect((state) => {
   return {
-    filesInTransactionList: filesInTransactionsSelector(state),
     signatures: state.signatures,
   };
 }, { verifySignature })(FileIcon);

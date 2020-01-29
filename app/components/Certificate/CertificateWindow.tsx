@@ -58,7 +58,6 @@ class CertWindow extends React.Component<any, any> {
       importingCertificate: null,
       importingCertificatePath: null,
       password: "",
-      requestCA: null,
       showDialogInstallRootCertificate: false,
       showModalAddCertificate: false,
       showModalBestStore: false,
@@ -68,7 +67,6 @@ class CertWindow extends React.Component<any, any> {
       showModalDeleteCertifiacte: false,
       showModalExportCRL: false,
       showModalExportCertifiacte: false,
-      showModalExportRequestCA: false,
     });
   }
 
@@ -173,22 +171,18 @@ class CertWindow extends React.Component<any, any> {
   }
 
   handleActiveCert = (certificate: any) => {
-    this.setState({ certificate, crl: null, requestCA: null });
+    this.setState({ certificate, crl: null });
   }
 
   handleActiveCRL = (crl: any) => {
-    this.setState({ certificate: null, requestCA: null, crl });
-  }
-
-  handleActiveRequestCA = (requestCA: any) => {
-    this.setState({ certificate: null, crl: null, requestCA });
+    this.setState({ certificate: null, crl });
   }
 
   handleReloadCertificates = () => {
     // tslint:disable-next-line:no-shadowed-variable
     const { isLoading, loadAllCertificates, removeAllCertificates } = this.props;
 
-    this.setState({ certificate: null, crl: null, requestCA: null });
+    this.setState({ certificate: null, crl: null});
 
     removeAllCertificates();
 
@@ -1100,7 +1094,7 @@ class CertWindow extends React.Component<any, any> {
     }
 
     if (prevProps.location !== location) {
-      this.setState({ certificate: null, crl: null, requestCA: null });
+      this.setState({ certificate: null, crl: null });
     }
 
     if (prevProps.cloudCSPState !== this.props.cloudCSPState) {
@@ -1170,7 +1164,7 @@ class CertWindow extends React.Component<any, any> {
 
   render() {
     const { certificates, crls, isLoading, isLoadingFromDSS, searchValue } = this.props;
-    const { certificate, crl, requestCA } = this.state;
+    const { certificate, crl } = this.state;
     const { localize, locale } = this.context;
 
     if (isLoading || isLoadingFromDSS) {
@@ -1213,7 +1207,6 @@ class CertWindow extends React.Component<any, any> {
                       selectedCrl={this.state.crl}
                       activeCert={this.handleActiveCert}
                       activeCrl={this.handleActiveCRL}
-                      activeRequestCA={this.handleActiveRequestCA}
                       operation="certificate" />
                 }
               </div>
@@ -1290,11 +1283,6 @@ class CertWindow extends React.Component<any, any> {
         </div>
       </div>
     );
-  }
-
-  handleDeleteRequestCA = (requestId: string) => {
-    this.setState({ requestCA: null });
-    this.props.deleteRequestCA(requestId);
   }
 
   handleSearchValueChange = (ev: any) => {

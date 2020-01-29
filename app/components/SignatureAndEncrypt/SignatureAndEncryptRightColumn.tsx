@@ -24,7 +24,7 @@ import {
   LOCATION_SETTINGS_SELECT, REMOVE, SIGN, UNSIGN, USER_NAME, VERIFY,
 } from "../../constants";
 import { DEFAULT_ID, ISignParams } from "../../reducer/settings";
-import { activeFilesSelector, connectedSelector, filesInTransactionsSelector, loadingRemoteFilesSelector } from "../../selectors";
+import { activeFilesSelector, connectedSelector, loadingRemoteFilesSelector } from "../../selectors";
 import { DECRYPTED, ENCRYPTED, ERROR, SIGNED, UPLOADED } from "../../server/constants";
 import * as trustedEncrypts from "../../trusted/encrypt";
 import * as jwt from "../../trusted/jwt";
@@ -1121,16 +1121,10 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   checkEnableOperationButton = (operation: string) => {
-    const { activeFilesArr, isDocumentsReviewed, filesInTransactionList, signer, recipients } = this.props;
+    const { activeFilesArr, isDocumentsReviewed, signer, recipients } = this.props;
 
     if (!activeFilesArr.length) {
       return false;
-    }
-
-    for (const document of activeFilesArr) {
-      if (filesInTransactionList.includes(document.id)) {
-        return false;
-      }
     }
 
     switch (operation) {
@@ -1248,7 +1242,6 @@ export default connect((state) => {
     connectedList: connectedSelector(state, { connected: true }),
     connections: state.connections,
     files: mapToArr(state.files.entities),
-    filesInTransactionList: filesInTransactionsSelector(state),
     isDocumentsReviewed: state.files.documentsReviewed,
     licenseStatus: state.license.status,
     lic_error: state.license.lic_error,

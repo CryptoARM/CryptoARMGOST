@@ -787,31 +787,3 @@ export function deleteRecipient(recipient: number) {
     type: DELETE_RECIPIENT_CERTIFICATE,
   };
 }
-
-export function addCertificateRequestCA(certificateRequestCA: ICertificateRequestCA) {
-  return {
-    payload: {
-      certificateRequestCA,
-    },
-    type: ADD_CERTIFICATE_REQUEST_CA,
-  };
-}
-
-export function rememberPasswordDSS(id: string, password: string) {
-  return {
-    payload: {
-      id,
-      password,
-    },
-    type: REMEMBER_PASSWORD_DSS,
-  };
-}
-
-export function deletePasswordDSS(id: string) {
-  return {
-    payload: {
-      id,
-    },
-    type: DELETE_PASSWORD_DSS,
-  };
-}

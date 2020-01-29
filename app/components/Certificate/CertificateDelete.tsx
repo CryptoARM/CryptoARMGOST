@@ -1,14 +1,12 @@
 import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
-import { deleteDssCertificate } from "../../AC/dssActions";
 import { USER_NAME } from "../../constants";
 import logger from "../../winstonLogger";
 
 interface ICertificateDeleteProps {
   certificate: any;
   certificates: any[];
-  deleteDssCertificate: (id: string, dssUserID: string) => void;
   onCancel?: () => void;
   reloadCertificates: () => void;
   reloadContainers: () => void;
@@ -115,7 +113,7 @@ class CertificateDelete extends React.Component<ICertificateDeleteProps, ICertif
 
   handleDeleteCertificateAndContainer = () => {
     // tslint:disable-next-line:no-shadowed-variable
-    const { certificate, certificates, deleteDssCertificate, reloadCertificates, reloadContainers } = this.props;
+    const { certificate, certificates, reloadCertificates, reloadContainers } = this.props;
     const { container, deleteContainer } = this.state;
     const { localize, locale } = this.context;
 
@@ -161,21 +159,7 @@ class CertificateDelete extends React.Component<ICertificateDeleteProps, ICertif
       }
     }
 
-    if (certificate.dssUserID) {
-      deleteDssCertificate(certificate.id, certificate.dssUserID);
-
-      logger.log({
-        certificate: certificate.subjectName,
-        level: "info",
-        message: "",
-        operation: "Удаление сертификата",
-        operationObject: {
-          in: "CN=" + certificate.subjectFriendlyName,
-          out: "Null",
-        },
-        userName: USER_NAME,
-      });
-    } else if (!window.PKISTORE.deleteCertificate(certificate)) {
+    if (!window.PKISTORE.deleteCertificate(certificate)) {
       $(".toast-cert_delete_failed").remove();
       Materialize.toast(localize("Certificate.cert_delete_failed", locale), 2000, "toast-cert_delete_failed");
 
@@ -206,4 +190,4 @@ class CertificateDelete extends React.Component<ICertificateDeleteProps, ICertif
 
 export default connect((state) => ({
   certificates: state.certificates.entities,
-}), { deleteDssCertificate })(CertificateDelete);
+}), {})(CertificateDelete);

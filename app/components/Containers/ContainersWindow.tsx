@@ -223,7 +223,7 @@ class ContainersWindow extends React.Component<any, any> {
     // tslint:disable-next-line:no-shadowed-variable
     const { isLoading, loadAllCertificates, removeAllCertificates } = this.props;
 
-    this.setState({ certificate: null, crl: null, requestCA: null });
+    this.setState({ certificate: null, crl: null });
 
     removeAllCertificates();
 

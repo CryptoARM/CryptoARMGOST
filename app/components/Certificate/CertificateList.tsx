@@ -8,7 +8,6 @@ import { REQUEST } from "../../constants";
 import accordion from "../../decorators/accordion";
 import { filteredCertificatesSelector } from "../../selectors";
 import { filteredCrlsSelector } from "../../selectors/crlsSelectors";
-import { filteredRequestCASelector } from "../../selectors/requestCASelector";
 import { mapToArr } from "../../utils";
 import CrlTable from "../CRL/CrlTable";
 import ProgressBars from "../ProgressBars";
@@ -23,7 +22,6 @@ const ROW_HEIGHT = 45;
 interface ICertificateListProps {
   activeCert: (certificate: any) => void;
   activeCrl: (crl: any) => void;
-  activeRequestCA: (requestCA: any) => void;
   certificates: any;
   crls: any;
   isLoaded: boolean;
@@ -69,9 +67,7 @@ class CertificateList extends React.Component<ICertificateListProps, any> {
 
     const TYPE = this.props.location.state ? this.props.location.state.type : "CERTIFICATE";
 
-    if (TYPE === "REQUEST") {
-      return this.getRequestCAList(certrequests);
-    } else if (TYPE === "CRL") {
+    if (TYPE === "CRL") {
       return this.getCrlsList(crls);
     } else {
       return this.getCertificatesList(certificates);
@@ -113,70 +109,6 @@ class CertificateList extends React.Component<ICertificateListProps, any> {
       />
     );
   }
-
-  getRequestCAList = (elements: object[]) => {
-    const { activeRequestCA, activeCert, operation, toggleOpenItem, isItemOpened } = this.props;
-
-    if (!elements || elements.length === 0) {
-      return null;
-    }
-
-    return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <List
-            height={height}
-            overscanRowCount={2}
-            rowCount={elements.length + 1}
-            rowHeight={ROW_HEIGHT}
-            rowRenderer={({ index, key, style }) => {
-              if (!elements.length) {
-                return null;
-              }
-
-              const request = elements[index];
-
-              if (!request) {
-                return null;
-              }
-
-              if (request.category === REQUEST) {
-                return (
-                  <ul
-                    key={key}
-                    style={style}
-                  >
-                    <Media query="(max-width: 1020px)">
-                      {(matches) =>
-                        matches ? (
-                          <CertificateListItem
-                            key={request.id}
-                            cert={request}
-                            chooseCert={() => activeCert(request)}
-                            operation={operation}
-                            isOpen={isItemOpened(request.id.toString())}
-                            toggleOpen={toggleOpenItem(request.id.toString())}
-                            style={style} />
-                        ) : <CertificateListItemBigWidth
-                            key={request.id}
-                            cert={request}
-                            chooseCert={() => activeCert(request)}
-                            operation={operation}
-                            isOpen={isItemOpened(request.id.toString())}
-                            toggleOpen={toggleOpenItem(request.id.toString())}
-                            style={style} />
-                      }
-                    </Media>
-                  </ul>
-                );
-              }
-            }}
-            width={width}
-          />
-        )}
-      </AutoSizer>
-    );
-  }
 }
 
 interface IOwnProps {
@@ -186,7 +118,7 @@ interface IOwnProps {
 export default connect((state, ownProps: IOwnProps) => {
   return {
     certificates: mapToArr(filteredCertificatesSelector(state, { operation: ownProps.operation })),
-    certrequests: filteredRequestCASelector(state).concat(mapToArr(filteredCertificatesSelector(state, { operation: ownProps.operation }))),
+    certrequests: mapToArr(filteredCertificatesSelector(state, { operation: ownProps.operation })),
     crls: filteredCrlsSelector(state),
     isLoaded: state.certificates.loaded,
     isLoading: state.certificates.loading,
