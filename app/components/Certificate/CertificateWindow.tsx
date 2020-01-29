@@ -6,20 +6,18 @@ import React from "react";
 import Media from "react-media";
 import { connect } from "react-redux";
 import { loadAllCertificates, loadAllContainers, removeAllCertificates, removeAllContainers } from "../../AC";
-import { deleteRequestCA } from "../../AC/caActions";
 import { resetCloudCSP } from "../../AC/cloudCspActions";
 import { changeSearchValue } from "../../AC/searchActions";
 import {
   ADDRESS_BOOK, CA, CERTIFICATE, CRL,
   DEFAULT_CSR_PATH, MODAL_ADD_CERTIFICATE, MODAL_ADD_SERVICE_CA, MODAL_BEST_STORE,
   MODAL_CERTIFICATE_IMPORT_DSS, MODAL_CERTIFICATE_REQUEST, MODAL_CERTIFICATE_REQUEST_CA, MODAL_CLOUD_CSP,
-  MODAL_DELETE_CERTIFICATE, MODAL_DELETE_CRL, MODAL_DELETE_REQUEST_CA, MODAL_EXPORT_CERTIFICATE,
-  MODAL_EXPORT_CRL, MODAL_EXPORT_REQUEST_CA, MY, PFX, PROVIDER_CRYPTOPRO, REQUEST, ROOT,
+  MODAL_DELETE_CERTIFICATE, MODAL_DELETE_CRL, MODAL_EXPORT_CERTIFICATE,
+  MODAL_EXPORT_CRL, MY, PFX, PROVIDER_CRYPTOPRO, REQUEST, ROOT,
   USER_NAME,
 } from "../../constants";
 import { filteredCertificatesSelector } from "../../selectors";
 import { filteredCrlsSelector } from "../../selectors/crlsSelectors";
-import { filteredRequestCASelector } from "../../selectors/requestCASelector";
 import { fileCoding, fileExists } from "../../utils";
 import logger from "../../winstonLogger";
 import BlockNotElements from "../BlockNotElements";
@@ -32,11 +30,6 @@ import Modal from "../Modal";
 import PasswordDialog from "../PasswordDialog";
 import ProgressBars from "../ProgressBars";
 import CertificateRequest from "../Request/CertificateRequest";
-import CertificateRequestCA from "../Request/CertificateRequestCA";
-import RequestCADelete from "../Request/RequestCADelete";
-import RequestCAExport from "../Request/RequestCAExport";
-import RequestCAInfo from "../Request/RequestCAInfo";
-import AddService from "../Services/AddService";
 import AddCertificate from "./AddCertificate";
 import BestStore from "./BestStore";
 import CertificateChainInfo from "./CertificateChainInfo";
@@ -68,14 +61,11 @@ class CertWindow extends React.Component<any, any> {
       requestCA: null,
       showDialogInstallRootCertificate: false,
       showModalAddCertificate: false,
-      showModalAddService: false,
       showModalBestStore: false,
       showModalCertificateRequest: false,
-      showModalCertificateRequestCA: false,
       showModalCloudCSP: false,
       showModalDeleteCRL: false,
       showModalDeleteCertifiacte: false,
-      showModalDeleteRequestCA: false,
       showModalExportCRL: false,
       showModalExportCertifiacte: false,
       showModalExportRequestCA: false,
@@ -91,9 +81,6 @@ class CertWindow extends React.Component<any, any> {
       case MODAL_ADD_CERTIFICATE:
         this.setState({ showModalAddCertificate: true });
         break;
-      case MODAL_ADD_SERVICE_CA:
-        this.setState({ showModalAddService: true });
-        break;
       case MODAL_DELETE_CERTIFICATE:
         this.setState({ showModalDeleteCertifiacte: true });
         break;
@@ -106,17 +93,8 @@ class CertWindow extends React.Component<any, any> {
       case MODAL_DELETE_CRL:
         this.setState({ showModalDeleteCRL: true });
         break;
-      case MODAL_EXPORT_REQUEST_CA:
-        this.setState({ showModalExportRequestCA: true });
-        break;
-      case MODAL_DELETE_REQUEST_CA:
-        this.setState({ showModalDeleteRequestCA: true });
-        break;
       case MODAL_CERTIFICATE_REQUEST:
         this.setState({ showModalCertificateRequest: true });
-        break;
-      case MODAL_CERTIFICATE_REQUEST_CA:
-        this.setState({ showModalCertificateRequestCA: true });
         break;
       case MODAL_CLOUD_CSP:
         this.setState({ showModalCloudCSP: true });
@@ -134,9 +112,6 @@ class CertWindow extends React.Component<any, any> {
       case MODAL_ADD_CERTIFICATE:
         this.setState({ showModalAddCertificate: false });
         break;
-      case MODAL_ADD_SERVICE_CA:
-        this.setState({ showModalAddService: false });
-        break;
       case MODAL_DELETE_CERTIFICATE:
         this.setState({ showModalDeleteCertifiacte: false });
         break;
@@ -152,15 +127,6 @@ class CertWindow extends React.Component<any, any> {
       case MODAL_CERTIFICATE_REQUEST:
         this.setState({ showModalCertificateRequest: false });
         break;
-      case MODAL_EXPORT_REQUEST_CA:
-        this.setState({ showModalExportRequestCA: false });
-        break;
-      case MODAL_DELETE_REQUEST_CA:
-        this.setState({ showModalDeleteRequestCA: false });
-        break;
-      case MODAL_CERTIFICATE_REQUEST_CA:
-        this.setState({ showModalCertificateRequestCA: false });
-        break;
       case MODAL_CLOUD_CSP:
         this.setState({ showModalCloudCSP: false });
         break;
@@ -175,14 +141,12 @@ class CertWindow extends React.Component<any, any> {
   handleCloseModals = () => {
     this.setState({
       showModalCertificateRequest: false,
-      showModalCertificateRequestCA: false,
       showModalCloudCSP: false,
       showModalDeleteCRL: false,
       showModalDeleteCertifiacte: false,
       showModalExportCRL: false,
       showModalExportCertifiacte: false,
       showModalBestStore: false,
-      showModalAddService: false,
     });
   }
 
@@ -829,15 +793,13 @@ class CertWindow extends React.Component<any, any> {
   }
 
   getCertificateOrCRLInfo() {
-    const { certificate, crl, requestCA } = this.state;
+    const { certificate, crl } = this.state;
     const { localize, locale } = this.context;
 
     if (certificate) {
       return this.getCertificateInfoBody();
     } else if (crl) {
       return this.getCRLInfoBody();
-    } else if (requestCA) {
-      return this.getRequestCAInfoBody();
     } else {
       return <BlockNotElements name={"active"} title={localize("Certificate.cert_not_select", locale)} />;
     }
@@ -903,16 +865,6 @@ class CertWindow extends React.Component<any, any> {
     return (
       <div className="add-certs">
         <CRLInfo crl={crl} />
-      </div>
-    );
-  }
-
-  getRequestCAInfoBody() {
-    const { requestCA } = this.state;
-
-    return (
-      <div className="add-certs">
-        <RequestCAInfo requestCA={requestCA} handleReloadCertificates={this.handleReloadCertificates} />
       </div>
     );
   }
@@ -1061,73 +1013,6 @@ class CertWindow extends React.Component<any, any> {
     );
   }
 
-  showModalAddService = () => {
-    const { localize, locale } = this.context;
-    const { showModalAddService } = this.state;
-
-    if (!showModalAddService) {
-      return;
-    }
-
-    return (
-      <Modal
-        isOpen={showModalAddService}
-        header={localize("Services.add_new_service", locale)}
-        onClose={() => this.handleCloseModalByType(MODAL_ADD_SERVICE_CA)}
-        style={{ width: "600px" }}>
-
-        <AddService onCancel={() => this.handleCloseModalByType(MODAL_ADD_SERVICE_CA)} />
-      </Modal>
-    );
-  }
-
-  showModalExportRequestCA = () => {
-    const { localize, locale } = this.context;
-    const { requestCA, showModalExportRequestCA } = this.state;
-
-    if (!requestCA || !showModalExportRequestCA) {
-      return;
-    }
-
-    return (
-      <Modal
-        isOpen={showModalExportRequestCA}
-        header={localize("Request.export_request", locale)}
-        onClose={() => this.handleCloseModalByType(MODAL_EXPORT_REQUEST_CA)}
-        style={{ width: "600px" }}>
-
-        <RequestCAExport
-          requestCA={requestCA}
-          onSuccess={() => this.handleCloseModalByType(MODAL_EXPORT_REQUEST_CA)}
-          onCancel={() => this.handleCloseModalByType(MODAL_EXPORT_REQUEST_CA)}
-          onFail={() => this.handleCloseModalByType(MODAL_EXPORT_REQUEST_CA)} />
-      </Modal>
-    );
-  }
-
-  showModalDeleteRequestCA = () => {
-    const { localize, locale } = this.context;
-    const { requestCA, showModalDeleteRequestCA } = this.state;
-
-    if (!requestCA || !showModalDeleteRequestCA) {
-      return;
-    }
-
-    return (
-      <Modal
-        isOpen={showModalDeleteRequestCA}
-        header={localize("Request.delete_request", locale)}
-        onClose={() => this.handleCloseModalByType(MODAL_DELETE_REQUEST_CA)}
-        style={{ width: "600px" }}>
-
-        <RequestCADelete
-          deleteRequestCA={this.handleDeleteRequestCA}
-          requestCA={requestCA}
-          onCancel={() => this.handleCloseModalByType(MODAL_DELETE_REQUEST_CA)} />
-      </Modal>
-    );
-  }
-
   showModalCertificateRequest = () => {
     const { localize, locale } = this.context;
     const { certificate, showModalCertificateRequest } = this.state;
@@ -1147,32 +1032,6 @@ class CertWindow extends React.Component<any, any> {
         <CertificateRequest
           certificateTemplate={certificateTemplate}
           onCancel={() => this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST)}
-          selfSigned={false}
-        />
-      </Modal>
-    );
-  }
-
-  showModalCertificateRequestCA = () => {
-    const { localize, locale } = this.context;
-    const { certificate, showModalCertificateRequestCA } = this.state;
-
-    if (!showModalCertificateRequestCA) {
-      return;
-    }
-
-    const certificateTemplate = certificate && certificate.category === REQUEST ? certificate : undefined;
-
-    return (
-      <Modal
-        isOpen={showModalCertificateRequestCA}
-        header={localize("CSR.create_request", locale)}
-        onClose={() => this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST_CA)}>
-
-        <CertificateRequestCA
-          certificateTemplate={certificateTemplate}
-          handleShowModalByType={this.handleShowModalByType}
-          onCancel={() => this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST_CA)}
           selfSigned={false}
         />
       </Modal>
@@ -1408,44 +1267,13 @@ class CertWindow extends React.Component<any, any> {
                 : null
             }
 
-            {
-              requestCA ?
-                <div className="row fixed-bottom-rightcolumn" style={{ bottom: "20px" }}>
-                  <div className="col s12">
-                    <hr />
-                  </div>
-                  <div className="col s4 waves-effect waves-cryptoarm" onClick={() => this.handleShowModalByType(MODAL_EXPORT_REQUEST_CA)}>
-                    <div className="col s12 svg_icon">
-                      <a data-position="bottom">
-                        <i className="material-icons ca export_request" />
-                      </a>
-                    </div>
-                    <div className="col s12 svg_icon_text">{localize("Certificate.cert_export", locale)}</div>
-                  </div>
-
-                  <div className="col s4 waves-effect waves-cryptoarm" onClick={() => this.handleShowModalByType(MODAL_DELETE_REQUEST_CA)}>
-                    <div className="col s12 svg_icon">
-                      <a data-position="bottom">
-                        <i className="material-icons certificate remove" />
-                      </a>
-                    </div>
-                    <div className="col s12 svg_icon_text">{localize("Documents.docmenu_remove", locale)}</div>
-                  </div>
-                </div>
-                : null
-            }
-
           </div>
           {this.showModalAddCertificate()}
-          {this.showModalAddService()}
           {this.showModalDeleteCertificate()}
           {this.showModalExportCertificate()}
           {this.showModalExportCRL()}
           {this.showModalDeleteCrl()}
-          {this.showModalExportRequestCA()}
-          {this.showModalDeleteRequestCA()}
           {this.showModalCertificateRequest()}
-          {this.showModalCertificateRequestCA()}
           {this.showModalCloudCSP()}
           {this.showModalBestStore()}
 
@@ -1621,7 +1449,6 @@ class CertWindow extends React.Component<any, any> {
 export default connect((state) => {
   return {
     certificates: filteredCertificatesSelector(state, { operation: "certificate" }),
-    certrequests: filteredRequestCASelector(state),
     regrequests: state.regrequests.entities,
     cloudCSPSettings: state.settings.getIn(["entities", state.settings.default]).cloudCSP,
     cloudCSPState: state.cloudCSP,
@@ -1634,6 +1461,6 @@ export default connect((state) => {
     servicesMap: state.services.entities,
   };
 }, {
-  changeSearchValue, deleteRequestCA, loadAllCertificates, loadAllContainers,
+  changeSearchValue, loadAllCertificates, loadAllContainers,
   removeAllCertificates, removeAllContainers, resetCloudCSP,
 })(CertWindow);

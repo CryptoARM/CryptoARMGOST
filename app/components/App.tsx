@@ -23,7 +23,6 @@ import DocumentsWindow from "./Documents/DocumentsWindow";
 import EventsWindow from "./Events/EventsWindow";
 import * as fileManager from "./Files/fileManager";
 import MenuBar from "./MenuBar";
-import ServiceWindow from "./Services/ServiceWindow";
 import SettingsConfig from "./Settings/SettingsConfig";
 import SettingsSelect from "./Settings/SettingsSelect";
 import SettingsWindow from "./Settings/SettingsWindow";
@@ -68,7 +67,6 @@ class App extends React.Component<IAppProps, {}> {
           <Route path={LOCATION_SETTINGS} component={SettingsWindow} />
           <Route path={LOCATION_SETTINGS_SELECT} component={SettingsSelect} />
           <Route path={LOCATION_SETTINGS_CONFIG} component={SettingsConfig} />
-          <Route path={LOCATION_SERVICES} component={ServiceWindow} />
         </React.Fragment>
       </Router>
     );

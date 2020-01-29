@@ -12,7 +12,6 @@ import { filteredRequestCASelector } from "../../selectors/requestCASelector";
 import { mapToArr } from "../../utils";
 import CrlTable from "../CRL/CrlTable";
 import ProgressBars from "../ProgressBars";
-import RequestCAListItem from "../Request/RequestCAListItem";
 import CertificateListItem from "./CertificateListItem";
 import CertificateListItemBigWidth from "./CertificateListItemBigWidth";
 import CertificateTable from "./CertificateTable";
@@ -168,22 +167,6 @@ class CertificateList extends React.Component<ICertificateListProps, any> {
                             style={style} />
                       }
                     </Media>
-                  </ul>
-                );
-              } else {
-                return (
-                  <ul
-                    key={key}
-                    style={style}
-                  >
-                    <RequestCAListItem
-                      key={request.id}
-                      requestCA={request}
-                      service={this.props.services.getIn(["entities", request.serviceId])}
-                      chooseCert={() => activeRequestCA(request)}
-                      operation={operation}
-                      isOpen={isItemOpened(request.id.toString())}
-                      toggleOpen={toggleOpenItem(request.id.toString())} />
                   </ul>
                 );
               }

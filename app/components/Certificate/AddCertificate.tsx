@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import {
   ADDRESS_BOOK, CA, CRL, MODAL_CERTIFICATE_IMPORT_DSS,
-  MODAL_CERTIFICATE_REQUEST, MODAL_CERTIFICATE_REQUEST_CA, MY, REQUEST, ROOT, MODAL_ADD_SERVICE_CA,
+  MODAL_CERTIFICATE_REQUEST, MY, REQUEST, ROOT
 } from "../../constants";
 
 interface IAddCertificateProps {
@@ -69,7 +69,6 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
           <React.Fragment>
             {this.getImportFromFile()}
             {this.getCreateRequest()}
-            {this.getCreateRequestCA()}
           </React.Fragment>
         );
 
@@ -85,7 +84,6 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
         return (
           <React.Fragment>
             {this.getImportFromFile()}
-            {this.addServiceCA()}
           </React.Fragment>
         );
 
@@ -93,7 +91,6 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
         return (
           <React.Fragment>
             {this.getCreateRequest()}
-            {this.getCreateRequestCA()}
           </React.Fragment>
         );
       default:
@@ -101,7 +98,6 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
           <React.Fragment>
             {this.getImportFromFile()}
             {this.getCreateRequest()}
-            {this.getCreateRequestCA()}
           </React.Fragment>
         );
     }
@@ -184,58 +180,6 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
             }, 100);
           }}>
             {localize("CSR.create_request", locale)}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  getCreateRequestCA = () => {
-    const { localize, locale } = this.context;
-
-    return (
-      <div
-        className="collection-item avatar certs-collection col s12 valign-wrapper"
-        onMouseOver={() => this.handleOnRowMouseOver("cert_get_through_ca")}>
-        <div className="col" style={{ width: "40px" }}>
-          <a data-position="bottom">
-            <i className="material-icons certificate cloud_question" />
-          </a>
-        </div>
-        <div className="col s11">
-          <div className="collection-title" onClick={() => {
-            this.props.onCancel();
-            setTimeout(() => {
-              this.props.handleShowModalByType(MODAL_CERTIFICATE_REQUEST_CA);
-            }, 100);
-          }}>
-            {localize("Certificate.cert_get_through_ca", locale)}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  addServiceCA = () => {
-    const { localize, locale } = this.context;
-
-    return (
-      <div
-        className="collection-item avatar certs-collection col s12 valign-wrapper"
-        onMouseOver={() => this.handleOnRowMouseOver("cert_get_through_ca")}>
-        <div className="col" style={{ width: "40px" }}>
-          <a data-position="bottom">
-            <i className="material-icons certificate cloud_question" />
-          </a>
-        </div>
-        <div className="col s11">
-          <div className="collection-title" onClick={() => {
-            this.props.onCancel();
-            setTimeout(() => {
-              this.props.handleShowModalByType(MODAL_ADD_SERVICE_CA);
-            }, 100);
-          }}>
-            {localize("Services.connect_ca", locale)}
           </div>
         </div>
       </div>
