@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
 import { push } from "react-router-redux";
-import { ICertificateRequestCA } from "../components/Services/types";
 import {
   ACTIVE_CONTAINER, ACTIVE_FILE, ADD_CERTIFICATE_REQUEST_CA,
   ADD_RECIPIENT_CERTIFICATE,

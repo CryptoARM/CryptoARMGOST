@@ -19,11 +19,8 @@ import CheckBoxWithLabel from "../CheckBoxWithLabel";
 import EncodingTypeSelector from "../EncodingTypeSelector";
 import RecipientsList from "../RecipientsList";
 import SelectFolder from "../SelectFolder";
-import SignatureStandardSelector from "../Signature/SignatureStandardSelector";
 import SignatureTypeSelector from "../Signature/SignatureTypeSelector";
 import SignerInfo from "../Signature/SignerInfo";
-import OcspSettings from "./OcspSettings";
-import TspSettings from "./TspSettings";
 
 const dialog = window.electron.remote.dialog;
 
@@ -66,7 +63,6 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
     const classDisabled = disabled ? "disabled" : "";
 
     let encoding = settings.sign.encoding;
-    const signatureStandard = settings.sign.standard;
     const isDetached = settings.sign.detached;
 
     if (signer && signer.service && encoding !== "BASE-64") {
@@ -122,11 +118,6 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
                 <div className="col s12">
                   <div className="row settings-content">
                     <div className="col s12 m12 l6">
-                      <SignatureStandardSelector
-                        value={signatureStandard}
-                        handleChange={this.handleSignatureStandardChange}
-                        disabled={signer && signer.service} />
-
                       <SignatureTypeSelector
                         detached={isDetached}
                         handleChange={this.handleDetachedChange}
@@ -257,28 +248,6 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
                       </div>
                   }
                 </div>
-              </div>
-
-              <div className="row">
-                <div className="col s12">
-                  <div className="headline6">
-                    {localize("Cades.service_tsp", locale)}
-                  </div>
-                  <hr />
-                </div>
-
-                <TspSettings />
-              </div>
-
-              <div className="row">
-                <div className="col s12">
-                  <div className="headline6">
-                    {localize("Cades.service_ocsp", locale)}
-                  </div>
-                  <hr />
-                </div>
-
-                <OcspSettings />
               </div>
             </div>
           </div>
@@ -412,15 +381,6 @@ class SettingsWindow extends React.Component<any, ISettingsWindowState> {
     this.setState({
       settings: settings
         .setIn(["sign", "encoding"], encoding),
-    });
-  }
-
-  handleSignatureStandardChange = (value: string) => {
-    const { settings } = this.state;
-
-    this.setState({
-      settings: settings
-        .setIn(["sign", "standard"], value),
     });
   }
 

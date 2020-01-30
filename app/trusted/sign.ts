@@ -1,12 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
 import {
-  DEFAULT_DOCUMENTS_PATH, DEFAULT_PATH, SIGNATURE_STANDARD, TSP_OCSP_ENABLED,
-  USER_NAME,
+  DEFAULT_DOCUMENTS_PATH, DEFAULT_PATH, USER_NAME,
 } from "../constants";
 import localize from "../i18n/localize";
 import { ISignParams } from "../reducer/settings";
-import { IOcsp } from "../reducer/signatures";
 import { fileCoding, fileExists } from "../utils";
 import logger from "../winstonLogger";
 
@@ -101,99 +99,6 @@ export function signFile(
 
   try {
     const sd: trusted.cms.SignedData = new trusted.cms.SignedData();
-
-    if (TSP_OCSP_ENABLED && params) {
-      if (params && params.signModel && params.signModel.standard === SIGNATURE_STANDARD.CADES) {
-        const connSettings = new trusted.utils.ConnectionSettings();
-
-        if (params.tspModel && params.tspModel.use_proxy) {
-          connSettings.ProxyAddress = params.tspModel.proxy_url;
-
-          if (params.tspModel.proxy_login) {
-            connSettings.ProxyUserName = params.tspModel.proxy_url;
-          }
-
-          if (params.tspModel.proxy_password) {
-            connSettings.ProxyPassword = params.tspModel.proxy_password;
-          }
-
-          if (params.tspModel.proxy_login && params.tspModel.proxy_password) {
-            connSettings.AuthType = 1;
-          }
-        } else if (params.tspModel && params.tspModel.url) {
-          connSettings.Address = params.tspModel.url;
-        }
-
-        const ocspSettings = new trusted.utils.ConnectionSettings();
-
-        if (params.ocspModel && params.ocspModel.use_proxy) {
-          ocspSettings.ProxyAddress = params.ocspModel.proxy_url;
-
-          if (params.ocspModel.proxy_login) {
-            ocspSettings.ProxyUserName = params.ocspModel.proxy_url;
-          }
-
-          if (params.ocspModel.proxy_password) {
-            ocspSettings.ProxyPassword = params.ocspModel.proxy_password;
-          }
-
-          if (params.ocspModel.proxy_login && params.ocspModel.proxy_password) {
-            ocspSettings.AuthType = 1;
-          }
-        } else if (params.ocspModel && params.ocspModel.url) {
-          ocspSettings.Address = params.ocspModel.url;
-        }
-
-        const cadesParams = new trusted.cms.CadesParams();
-        cadesParams.cadesType = trusted.cms.CadesType.ctCadesXLT1;
-        cadesParams.connSettings = connSettings;
-
-        if (ocspSettings.ProxyAddress || ocspSettings.Address) {
-          cadesParams.ocspSettings = ocspSettings;
-        }
-
-        sd.signParams = cadesParams;
-      } else if (params.tspModel && params.signModel && (params.signModel.timestamp_on_data || params.signModel.timestamp_on_sign)) {
-        const connSettings = new trusted.utils.ConnectionSettings();
-
-        if (params.tspModel.use_proxy) {
-          connSettings.ProxyAddress = params.tspModel.proxy_url;
-
-          if (params.tspModel.proxy_login) {
-            connSettings.ProxyUserName = params.tspModel.proxy_url;
-          }
-
-          if (params.tspModel.proxy_password) {
-            connSettings.ProxyPassword = params.tspModel.proxy_password;
-          }
-
-          if (params.tspModel.proxy_login && params.tspModel.proxy_password) {
-            connSettings.AuthType = 1;
-          }
-        } else {
-          connSettings.Address = params.tspModel.url;
-        }
-
-        const tspParams = new trusted.cms.TimestampParams();
-        tspParams.connSettings = connSettings;
-
-        let stampType;
-
-        if (params.signModel.timestamp_on_data && !params.signModel.timestamp_on_sign) {
-          stampType = trusted.cms.StampType.stContent;
-        } else if (!params.signModel.timestamp_on_data && params.signModel.timestamp_on_sign) {
-          stampType = trusted.cms.StampType.stSignature;
-        } else if (params.signModel.timestamp_on_data && params.signModel.timestamp_on_sign) {
-          // tslint:disable-next-line: no-bitwise
-          stampType = trusted.cms.StampType.stContent | trusted.cms.StampType.stSignature;
-        }
-
-        if (stampType) {
-          tspParams.stampType = stampType;
-          sd.signParams = tspParams;
-        }
-      }
-    }
 
     sd.policies = policies;
     sd.content = {
@@ -292,99 +197,6 @@ export function resignFile(
 
       if (!(verifySign(sd))) {
         return;
-      }
-    }
-
-    if (TSP_OCSP_ENABLED && params) {
-      if (params && params.signModel && params.signModel.standard === SIGNATURE_STANDARD.CADES) {
-        const connSettings = new trusted.utils.ConnectionSettings();
-
-        if (params.tspModel && params.tspModel.use_proxy) {
-          connSettings.ProxyAddress = params.tspModel.proxy_url;
-
-          if (params.tspModel.proxy_login) {
-            connSettings.ProxyUserName = params.tspModel.proxy_url;
-          }
-
-          if (params.tspModel.proxy_password) {
-            connSettings.ProxyPassword = params.tspModel.proxy_password;
-          }
-
-          if (params.tspModel.proxy_login && params.tspModel.proxy_password) {
-            connSettings.AuthType = 1;
-          }
-        } else if (params.tspModel && params.tspModel.url) {
-          connSettings.Address = params.tspModel.url;
-        }
-
-        const ocspSettings = new trusted.utils.ConnectionSettings();
-
-        if (params.ocspModel && params.ocspModel.use_proxy) {
-          ocspSettings.ProxyAddress = params.ocspModel.proxy_url;
-
-          if (params.ocspModel.proxy_login) {
-            ocspSettings.ProxyUserName = params.ocspModel.proxy_url;
-          }
-
-          if (params.ocspModel.proxy_password) {
-            ocspSettings.ProxyPassword = params.ocspModel.proxy_password;
-          }
-
-          if (params.ocspModel.proxy_login && params.ocspModel.proxy_password) {
-            ocspSettings.AuthType = 1;
-          }
-        } else if (params.ocspModel && params.ocspModel.url) {
-          ocspSettings.Address = params.ocspModel.url;
-        }
-
-        const cadesParams = new trusted.cms.CadesParams();
-        cadesParams.cadesType = trusted.cms.CadesType.ctCadesXLT1;
-        cadesParams.connSettings = connSettings;
-
-        if (ocspSettings.ProxyAddress || ocspSettings.Address) {
-          cadesParams.ocspSettings = ocspSettings;
-        }
-
-        sd.signParams = cadesParams;
-      } else if (params.tspModel && params.signModel && (params.signModel.timestamp_on_data || params.signModel.timestamp_on_sign)) {
-        const connSettings = new trusted.utils.ConnectionSettings();
-
-        if (params.tspModel.use_proxy) {
-          connSettings.ProxyAddress = params.tspModel.proxy_url;
-
-          if (params.tspModel.proxy_login) {
-            connSettings.ProxyUserName = params.tspModel.proxy_url;
-          }
-
-          if (params.tspModel.proxy_password) {
-            connSettings.ProxyPassword = params.tspModel.proxy_password;
-          }
-
-          if (params.tspModel.proxy_login && params.tspModel.proxy_password) {
-            connSettings.AuthType = 1;
-          }
-        } else {
-          connSettings.Address = params.tspModel.url;
-        }
-
-        const tspParams = new trusted.cms.TimestampParams();
-        tspParams.connSettings = connSettings;
-
-        let stampType;
-
-        if (params.signModel.timestamp_on_data && !params.signModel.timestamp_on_sign) {
-          stampType = trusted.cms.StampType.stContent;
-        } else if (!params.signModel.timestamp_on_data && params.signModel.timestamp_on_sign) {
-          stampType = trusted.cms.StampType.stSignature;
-        } else if (params.signModel.timestamp_on_data && params.signModel.timestamp_on_sign) {
-          // tslint:disable-next-line: no-bitwise
-          stampType = trusted.cms.StampType.stContent | trusted.cms.StampType.stSignature;
-        }
-
-        if (stampType) {
-          tspParams.stampType = stampType;
-          sd.signParams = tspParams;
-        }
       }
     }
 
@@ -621,9 +433,6 @@ export function getSignPropertys(cms: trusted.cms.SignedData) {
       signer = signers.items(i);
       cert = signer.certificate;
 
-      const timestamps = [];
-      let ocsp: IOcsp = {};
-
       try {
         ch = trusted.utils.Csp.buildChain(cert);
       } catch (e) {
@@ -636,61 +445,7 @@ export function getSignPropertys(cms: trusted.cms.SignedData) {
         digestAlgorithm: undefined,
         status_verify: undefined,
         subject: undefined,
-        timestamps: [],
       };
-
-      try {
-        if (TSP_OCSP_ENABLED && signer.isCades) {
-          const ocspResp = signer.ocspResp;
-
-          ocsp.Certificates = ocspResp.Certificates;
-          ocsp.NextUpdate = ocspResp.NextUpdate();
-          ocsp.OCSP = ocspResp;
-          ocsp.OcspCert = ocspResp.OcspCert;
-          ocsp.ProducedAt = ocspResp.ProducedAt;
-          ocsp.RespNumber = ocspResp.RespNumber;
-          ocsp.RespStatus = ocspResp.RespStatus;
-          ocsp.RespStatus = ocspResp.RespStatus;
-          ocsp.RevReason = ocspResp.RevReason();
-          ocsp.RevTime = ocspResp.RevTime();
-          ocsp.SignatureAlgorithmOid = ocspResp.SignatureAlgorithmOid;
-          ocsp.Status = ocspResp.Status();
-          ocsp.ThisUpdate = ocspResp.ThisUpdate();
-        }
-      } catch (e) {
-        console.log("------ ERRROR GET OCSP PROPS ------");
-        console.log(e);
-      }
-
-      try {
-        if (TSP_OCSP_ENABLED) {
-          for (const stType in trusted.cms.StampType) {
-            if (Number(stType)) {
-              const timestamp = signer.timestamp(parseInt(stType, 10));
-              if (timestamp) {
-                timestamps.push({
-                  Accuracy: timestamp.Accuracy,
-                  Certificates: timestamp.Certificates,
-                  DataHash: timestamp.DataHash,
-                  DataHashAlgOID: timestamp.DataHashAlgOID,
-                  HasNonce: timestamp.HasNonce,
-                  Ordering: timestamp.Ordering,
-                  PolicyID: timestamp.PolicyID,
-                  SerialNumber: timestamp.SerialNumber,
-                  TSACertificate: timestamp.TSACertificate,
-                  TSP: timestamp,
-                  Time: timestamp.Time,
-                  TsaName: timestamp.TsaName,
-                  Type: stType,
-                });
-              }
-            }
-          }
-        }
-      } catch (e) {
-        console.log("------ ERRROR GET TSP PROPS ------");
-        console.log(e);
-      }
 
       if (!ch || !ch.length || ch.length === 0) {
         certificatesSignStatus = false;
@@ -745,11 +500,9 @@ export function getSignPropertys(cms: trusted.cms.SignedData) {
         alg: cert.signatureAlgorithm,
         certs: certSign,
         digestAlgorithm: cert.signatureDigestAlgorithm,
-        ocsp,
         signingTime: signer.signingTime,
         status_verify: false,
         subject: cert.subjectFriendlyName,
-        timestamps,
       };
       certSign = [];
 
@@ -760,11 +513,7 @@ export function getSignPropertys(cms: trusted.cms.SignedData) {
         Materialize.toast(localize("Sign.verify_signercontent_founds_errors", window.locale), 2000, "toast-verify_signercontent_founds_errors");
       }
 
-      if (TSP_OCSP_ENABLED && signer.isCades) {
-        curRes.status_verify = signerStatus;
-      } else {
-        curRes.status_verify = certificatesSignStatus && signerStatus;
-      }
+      curRes.status_verify = certificatesSignStatus && signerStatus;
 
       result.push(curRes);
     }

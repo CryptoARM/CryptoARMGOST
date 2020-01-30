@@ -20,10 +20,8 @@ import CheckBoxWithLabel from "../CheckBoxWithLabel";
 import EncodingTypeSelector from "../EncodingTypeSelector";
 import EncryptionAlgorithmSelector from "../Encryption/EncryptionAlgorithmSelector";
 import SelectFolder from "../SelectFolder";
-import SignatureStandardSelector, { SignatureStandard } from "../Signature/SignatureStandardSelector";
 import SignatureTypeSelector from "../Signature/SignatureTypeSelector";
-import OcspSettings from "./OcspSettings";
-import TspSettings from "./TspSettings";
+import { SignatureStandard } from "../Signature/SignatureStandardSelector";
 
 const dialog = window.electron.remote.dialog;
 const isCsp5R2orHigh = isCsp5R2();
@@ -54,18 +52,7 @@ class AllSettings extends React.Component<any, {}> {
     Materialize.updateTextFields();
 
     const signatureStandard = settings.sign.standard;
-
-    if (signatureStandard === SignatureStandard.CADES) {
-      changeSignatureTime(true);
-      changeSignatureTimestamp(false);
-      changeSignatureTimestampOnSign(true);
-    }
-
-    if (!(TSP_OCSP_ENABLED)) {
-      changeSignatureStandard(SignatureStandard.CMS);
-      changeSignatureTimestamp(false);
-      changeSignatureTimestampOnSign(false);
-    }
+    changeSignatureStandard(SignatureStandard.CMS);
 
     if (signer && (signer.service || signer.dssUserID)) {
       changeSignatureStandard(SignatureStandard.CMS);
@@ -87,7 +74,6 @@ class AllSettings extends React.Component<any, {}> {
 
     let encoding = settings.sign.encoding;
     const signatureStandard = settings.sign.standard;
-    const classDisabledTspAndOcsp = signatureStandard === SignatureStandard.CADES ? "" : "disabled";
     const isDetached = settings.sign.detached;
 
     if (signer && (signer.service || signer.dssUserID) && encoding !== "BASE-64") {
@@ -130,11 +116,6 @@ class AllSettings extends React.Component<any, {}> {
           </div>
 
           <div className="col s12">
-            <SignatureStandardSelector
-              value={signatureStandard}
-              handleChange={this.handleSignatureStandardChange}
-              disabled={signer && (signer.service || signer.dssUserID) || !(TSP_OCSP_ENABLED)} />
-
             <SignatureTypeSelector
               detached={isDetached}
               handleChange={this.handleDetachedChange}
@@ -147,24 +128,11 @@ class AllSettings extends React.Component<any, {}> {
 
           <div className="col s12">
             <CheckBoxWithLabel
-              disabled={disabled || signatureStandard === SignatureStandard.CADES}
+              disabled={disabled}
               onClickCheckBox={this.handleTimeClick}
-              isChecked={signatureStandard === SignatureStandard.CADES ? true : settings.sign.time}
+              isChecked={settings.sign.time}
               elementId="sign_time"
               title={localize("Sign.sign_time", locale)} />
-
-            <CheckBoxWithLabel
-              disabled={!(TSP_OCSP_ENABLED) || signatureStandard === SignatureStandard.CADES || signer && (signer.service || signer.dssUserID)}
-              onClickCheckBox={this.handleTimestampOnSignClick}
-              isChecked={signatureStandard === SignatureStandard.CADES ? true : settings.sign.timestamp_on_sign}
-              elementId="set_timestamp_on_sign"
-              title={localize("Cades.set_timestamp_on_sign", locale)} />
-
-            <CheckBoxWithLabel onClickCheckBox={this.handleTimestampClick}
-              disabled={!(TSP_OCSP_ENABLED) || signatureStandard === SignatureStandard.CADES || signer && (signer.service || signer.dssUserID)}
-              isChecked={signatureStandard === SignatureStandard.CADES ? false : settings.sign.timestamp_on_data}
-              elementId="set_timestamp_on_data"
-              title={localize("Cades.set_timestamp_on_data", locale)} />
           </div>
         </div>
 
@@ -203,24 +171,6 @@ class AllSettings extends React.Component<any, {}> {
             elementId="archive_files"
             title={localize("Encrypt.archive_files_before", locale)} />
 
-        </div>
-
-        <div className="row" />
-
-        <div className="subtitle">
-          {localize("Cades.service_tsp", locale)}
-        </div>
-        <hr />
-
-        <TspSettings />
-
-        <div className="subtitle">
-          {localize("Cades.service_ocsp", locale)}
-        </div>
-        <hr />
-
-        <div className={classDisabledTspAndOcsp}>
-          <OcspSettings isCades={signatureStandard === SignatureStandard.CADES} />
         </div>
       </div>
     );
@@ -314,12 +264,6 @@ class AllSettings extends React.Component<any, {}> {
     const { changeSignatureTime, changeSignatureTimestamp, changeSignatureTimestampOnSign, changeSignatureStandard } = this.props;
 
     changeSignatureStandard(value);
-
-    if (value === SignatureStandard.CADES) {
-      changeSignatureTime(true);
-      changeSignatureTimestamp(false);
-      changeSignatureTimestampOnSign(true);
-    }
   }
 
   handleEncryptEncodingChange = (encoding: string) => {
