@@ -418,13 +418,14 @@ export const getCPCSPVersionPKZI = () => {
 };
 
 export const isCsp5R2 = () => {
-  const cspVersion = getCPCSPVersion();
-  const versionPKZI = getCPCSPVersionPKZI();
+  //const cspVersion = getCPCSPVersion();
+  //const versionPKZI = getCPCSPVersionPKZI();
 
-  if (cspVersion && versionPKZI
-    && parseInt((cspVersion.charAt(0)), 10) === 5 && parseInt((versionPKZI), 10) >= 11635) {
-    return true;
-  } else {
-    return false;
-  }
+  //if (cspVersion && versionPKZI
+  //  && parseInt((cspVersion.charAt(0)), 10) === 5 && parseInt((versionPKZI), 10) >= 11635) {
+  //  return true;
+  //} else {
+  //  return false;
+  //}
+  return false;
 };
