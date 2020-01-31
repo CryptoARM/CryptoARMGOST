@@ -60,6 +60,51 @@ class SignatureStatus extends React.Component<ISignatureStatusProps, null> {
             }) : "-"}</div>
           </div>
         </div>
+
+        <div className="row" />
+
+        <div className="row">
+          <div className="col s12 primary-text">Сертификат подписчика:</div>
+          <div className="col s12">
+            <div className="collection">
+              <div className="collection-item certs-collection certificate-info">
+                <div className="collection-title">{signerCert.subjectFriendlyName}</div>
+                <div className="collection-info">{localize("Certificate.subject", locale)}</div>
+              </div>
+
+              <div className="collection-item certs-collection certificate-info">
+                <div className="collection-title">{signerCert.issuerFriendlyName}</div>
+                <div className="collection-info">{localize("Certificate.issuer", locale)}</div>
+              </div>
+
+              <div className="collection-item certs-collection certificate-info">
+                <div className="collection-title">{(new Date(signerCert.notAfter)).toLocaleDateString(locale, {
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}</div>
+                <div className="collection-info">{localize("Certificate.cert_valid", locale)}</div>
+              </div>
+
+              <div className="collection-item certs-collection certificate-info">
+                <div className="collection-title">{localizeAlgorithm(signature.alg, locale)}</div>
+                <div className="collection-info">{localize("Sign.alg", locale)}</div>
+              </div>
+
+            </div>
+          </div>
+
+          <div className="row" />
+
+          <div className="col s12">
+            <a className="primary-text">{localize("Certificate.cert_chain_info", locale)}</a>
+            <CertificateChainInfo certificate={signerCert} style="" onClick={() => { return; }} />
+          </div>
+
+          <div className="row" />
+        </div>
       </div>
     );
   }
