@@ -590,8 +590,8 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       }
 
       try {
-        trusted.utils.Csp.installCertificateToContainer(cert, containerName, 75);
-        trusted.utils.Csp.installCertificateFromContainer(containerName, 75, "Crypto-Pro GOST R 34.10-2001 Cryptographic Service Provider");
+        trusted.utils.Csp.installCertificateToContainer(cert, containerName, 77);
+        trusted.utils.Csp.installCertificateFromContainer(containerName, 77, "Infotecs GOST 2012/512 Cryptographic Service Provider");
 
         this.handleReloadCertificates();
 

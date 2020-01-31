@@ -530,7 +530,7 @@ export function loadAllContainers() {
       let enumedContainers: any[] = [];
 
       try {
-        enumedContainers = trusted.utils.Csp.enumContainers(75);
+        enumedContainers = trusted.utils.Csp.enumContainers(77);
       } catch (e) {
         dispatch({
           type: LOAD_ALL_CONTAINERS + FAIL,
@@ -575,7 +575,7 @@ export function getCertificateFromContainer(container: number) {
       let certificate;
 
       try {
-        certificate = trusted.utils.Csp.getCertificateFromContainer(cont.name, 75);
+        certificate = trusted.utils.Csp.getCertificateFromContainer(cont.name, 77);
         const certificateItem = {
           hash: certificate.thumbprint,
           issuerFriendlyName: certificate.issuerFriendlyName,
