@@ -51,18 +51,6 @@ class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
                 <hr />
                 <LicenseInfo />
               </div>
-              <div className="col s12">
-                <div className="headline6">{localize("License.About_License_CSP", locale)}</div>
-                <hr />
-                <div className="col s6">
-                  <div className="caption-text">{localize("License.serial_number", locale)}</div>
-                  <div className="primary-text">{licenseCsp.substring(0, licenseCsp.length - 5)}</div>
-                </div>
-                <div className="col s6">
-                  <div className="caption-text">{localize("License.lic_status", locale)}</div>
-                  <div className="primary-text">{this.getLicenseStatus() ? localize("License.license_correct", locale) : localize("License.license_incorrect", locale)}</div>
-                </div>
-              </div>
 
               <div className="row" />
 
@@ -89,9 +77,6 @@ class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
                 </div>
                 <div className="row" />
                 <div className="col s6">
-                  <div className="caption-text">{localize("About.CspVersion", locale)}</div>
-                  <div className="primary-text">{localize("Csp.cpcspPKZIVersion", locale)} {this.getCPCSPVersionPKZI()}</div>
-                  <div className="primary-text">{localize("Csp.cpcspSKZIVersion", locale)} {this.getCPCSPVersionSKZI()}</div>
                 </div>
                 <div className="col s6">
                   <div className="caption-text">{localize("About.support", locale)}</div>
@@ -101,23 +86,6 @@ class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
                   </div>
                 </div>
               </div>
-
-              {!(TSP_OCSP_ENABLED) ?
-                <React.Fragment>
-                  <div className="row" />
-
-                  <div className="col s12">
-                    <div className="headline6">Ограничения</div>
-                    <hr />
-                    <div className="row">
-                      <div className="col s12">
-                        <div className="primary-text">{localize("Problems.resolve_8_1", locale)}</div>
-                      </div>
-                    </div>
-                  </div>
-                </ React.Fragment>
-                : null
-              }
             </div>
           </div>
           <div className="col s4 rightcol">
@@ -144,79 +112,8 @@ class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
                 </div>
               </div>
             </div>
-            <div className="col s12">
-              <div className="primary-text">Управление лицензией КриптоПро CSP</div>
-              <hr />
-              <div className="row" >
-                <div className="col s6 waves-effect waves-cryptoarm hover_outline" onClick={this.showModalLicenseCSPSetup}>
-                  <div className="col s12 svg_icon">
-                    <a data-position="bottom">
-                      <i className="material-icons license install" />
-                    </a>
-                  </div>
-                  <div className="col s12 svg_icon_text">{localize("License.enter_key", locale)}</div>
-                </div>
-                <div className="col s6 waves-effect waves-cryptoarm hover_outline" onClick={() => this.gotoLink(localize("License.link_buy_license_csp", locale))}>
-                  <div className="col s12 svg_icon">
-                    <a data-position="bottom">
-                      <i className="material-icons license buy" />
-                    </a>
-                  </div>
-                  <div className="col s12 svg_icon_text">{localize("License.buy_license", locale)}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="col s12">
-              <div className="primary-text">Управление лицензией КриптоПро TSP</div>
-              <hr />
-              <div className="row" >
-                <div className={`col s6 waves-effect waves-cryptoarm hover_outline ${TSP_OCSP_ENABLED ? "" : "disabled"}`} onClick={this.showModalLicenseTSPSetup}>
-                  <div className="col s12 svg_icon">
-                    <a data-position="bottom">
-                      <i className="material-icons license install" />
-                    </a>
-                  </div>
-                  <div className="col s12 svg_icon_text">{localize("License.enter_key", locale)}</div>
-                </div>
-                <div className="col s6 waves-effect waves-cryptoarm hover_outline" onClick={() => this.gotoLink(localize("License.link_buy_license_tsp", locale))}>
-                  <div className="col s12 svg_icon">
-                    <a data-position="bottom">
-                      <i className="material-icons license buy" />
-                    </a>
-                  </div>
-                  <div className="col s12 svg_icon_text">{localize("License.buy_license", locale)}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="col s12">
-              <div className="primary-text">Управление лицензией КриптоПро OCSP</div>
-              <hr />
-              <div className="row" >
-                <div className={`col s6 waves-effect waves-cryptoarm hover_outline ${TSP_OCSP_ENABLED ? "" : "disabled"}`} onClick={this.showModalLicenseOCSPSetup}>
-                  <div className="col s12 svg_icon">
-                    <a data-position="bottom">
-                      <i className="material-icons license install" />
-                    </a>
-                  </div>
-                  <div className="col s12 svg_icon_text">{localize("License.enter_key", locale)}</div>
-                </div>
-                <div className="col s6 waves-effect waves-cryptoarm hover_outline" onClick={() => this.gotoLink(localize("License.link_buy_license_ocsp", locale))}>
-                  <div className="col s12 svg_icon">
-                    <a data-position="bottom">
-                      <i className="material-icons license buy" />
-                    </a>
-                  </div>
-                  <div className="col s12 svg_icon_text">{localize("License.buy_license", locale)}</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
-        {this.getModalLicenseCSPSetup()}
-        {this.getModalLicenseTSPSetup()}
-        {this.getModalLicenseOCSPSetup()}
         {this.getModalLicenseSetup()}
       </div>
     );
