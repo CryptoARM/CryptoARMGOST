@@ -68,23 +68,12 @@ class Resolve extends React.Component<IResolveProps, {}> {
             <p className="help_paragraf">{localize("Problems.resolve_1_1", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_1_2", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_1_3", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://www.cryptopro.ru/")}> www.cryptopro.ru</a>
+              <a className="hlink" onClick={(event) => this.gotoLink("https://infotecs.ru/")}> infotecs.ru</a>
             </p>
             <p className="help_paragraf">{localize("Problems.resolve_1_4", locale)}
               <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/upload/docs/userguide-cryptoarm-gost.pdf")}>
                 {localize("Help.link_user_guide_name", locale)}
               </a>
-            </p>
-          </div>
-        );
-
-      case NO_TSP_OCSP_ENABLED:
-        return (
-          <div className="resolve-content">
-            <p className="help_paragraf">{localize("Problems.resolve_8_1", locale)}</p>
-            <p className="help_paragraf">{localize("Problems.resolve_8_2", locale)}</p>
-            <p className="help_paragraf">{localize("Problems.resolve_8_3", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://www.cryptopro.ru/")}> www.cryptopro.ru</a>
             </p>
           </div>
         );
@@ -106,13 +95,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
             <p className="help_paragraf">{localize("Problems.resolve_1_1", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_1_2", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_1_3", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://www.cryptopro.ru/")}> www.cryptopro.ru</a>
-            </p>
-            <p className="help_paragraf">
-              {localize("Problems.resolve_1_4", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/upload/docs/userguide-cryptoarm-gost.pdf")}>
-                {localize("Help.link_user_guide_name", locale)}
-              </a>
+              <a className="hlink" onClick={(event) => this.gotoLink("https://infotecs.ru/")}> infotecs.ru</a>
             </p>
           </div>
         );

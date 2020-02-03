@@ -64,20 +64,6 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
         this.setState({ criticalError: false });
         return false;
       }
-
-      if (!trusted.utils.Csp.checkCPCSPLicense()) {
-        $(".toast-noCPLicense").remove();
-        Materialize.toast(localize("Csp.noCPLicense", locale), 5000, "toast-noCPLicense");
-
-        this.setState({
-          errors: [...this.state.errors, {
-            important: WARNING,
-            type: ERROR_CHECK_CSP_LICENSE,
-          }],
-        });
-
-        return false;
-      }
     } catch (e) {
       $(".toast-cspErr").remove();
       Materialize.toast(localize("Csp.cspErr", locale), 2000, "toast-cspErr");
@@ -94,17 +80,6 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
     }
 
     return true;
-  }
-
-  checkTspAndOcsp = () => {
-    if (!(TSP_OCSP_ENABLED)) {
-      this.setState({
-        errors: [...this.state.errors, {
-          important: WARNING,
-          type: NO_TSP_OCSP_ENABLED,
-        }],
-      });
-    }
   }
 
   checkTrustedCryptoLoadedErr = () => {
@@ -207,8 +182,6 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
 
     if (this.checkTrustedCryptoLoadedErr()) {
       this.checkCPCSP();
-
-      this.checkTspAndOcsp();
     }
 
     loadLicense();
