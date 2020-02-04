@@ -50,9 +50,9 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
     const { localize, locale } = this.context;
 
     try {
-      if (!trusted.utils.Csp.isGost2001CSPAvailable()) {
-        $(".toast-noProvider2001").remove();
-        Materialize.toast(localize("Csp.noProvider2001", locale), 5000, "toast-noProvider2001");
+      if (!trusted.utils.Csp.isGost2012_256CSPAvailable()) {
+        $(".toast-noProvider2012").remove();
+        Materialize.toast(localize("Csp.noProvider2012", locale), 5000, "toast-noProvider2012");
 
         this.setState({
           errors: [...this.state.errors, {

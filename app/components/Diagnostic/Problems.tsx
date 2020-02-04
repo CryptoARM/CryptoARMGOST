@@ -39,7 +39,7 @@ class Problems extends React.Component<IProblemsProps, {}> {
       case ERROR_CHECK_CSP_LICENSE:
         return "Problems.problem_2";
       case NO_GOST_2001:
-        return "Csp.noProvider2001";
+        return "Csp.noProvider2012";
       case ERROR_CHECK_CSP_PARAMS:
         return "Csp.cspErr";
       case NO_CRYPTOARM_LICENSE:
