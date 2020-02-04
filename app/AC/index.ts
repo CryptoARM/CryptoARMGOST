@@ -540,11 +540,16 @@ export function loadAllContainers() {
       const filteredContainers = [];
 
       for (const cont of enumedContainers) {
+        var resultContainerName = cont.fqcnA;
+        if( resultContainerName.length === 0 ) {
+          resultContainerName = cont.container;
+        }
+        const readerNameLastPos = resultContainerName.lastIndexOf(resultContainerName.includes("|") ? "|" : "\\");
         filteredContainers.push({
           friendlyName: cont.container,
           id: Math.random(),
           name: cont.unique,
-          reader: cont.fqcnA.substring(4, cont.fqcnA.lastIndexOf("\\")),
+          reader: resultContainerName.substring(0, readerNameLastPos),
         });
       }
 
