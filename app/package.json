@@ -1,8 +1,8 @@
 {
   "author": "Cifrovye tekhnologii LLC",
-  "description": "CryptoARM GOST",
-  "name": "cryptoarm-gost",
-  "version": "2.2.1",
+  "description": "CryptoARM for ViPNet",
+  "name": "cryptoarm-vipnet",
+  "version": "1.0.0",
   "main": "./main.js",
   "license": "Apache-2.0",
   "dependencies": {
