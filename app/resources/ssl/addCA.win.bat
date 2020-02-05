@@ -1,6 +1,6 @@
 @echo off
 
-if not exist "%UserProfile%\AppData\Local\Trusted\CryptoARM GOST" mkdir "%UserProfile%\AppData\Local\Trusted\CryptoARM GOST"
+if not exist "%UserProfile%\AppData\Local\Trusted\CryptoARM ViPNet" mkdir "%UserProfile%\AppData\Local\Trusted\CryptoARM ViPNet"
 
 
 setlocal
