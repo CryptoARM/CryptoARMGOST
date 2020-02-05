@@ -91,7 +91,7 @@ class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
           <div className="col s4 rightcol">
             <div className="row halfbottom" />
             <div className="col s12">
-              <div className="primary-text">Управление лицензией КриптоАРМ ГОСТ</div>
+              <div className="primary-text">Управление лицензией КриптоАРМ для ViPNet</div>
               <hr />
               <div className="row" >
                 <div className="col s6 waves-effect waves-cryptoarm hover_outline" onClick={this.showModalLicenseSetup}>
@@ -101,14 +101,6 @@ class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
                     </a>
                   </div>
                   <div className="col s12 svg_icon_text">{localize("License.enter_key", locale)}</div>
-                </div>
-                <div className="col s6 waves-effect waves-cryptoarm hover_outline" onClick={() => this.gotoLink(localize("License.link_buy_license", locale))}>
-                  <div className="col s12 svg_icon">
-                    <a data-position="bottom">
-                      <i className="material-icons license buy" />
-                    </a>
-                  </div>
-                  <div className="col s12 svg_icon_text">{localize("License.buy_license", locale)}</div>
                 </div>
               </div>
             </div>
