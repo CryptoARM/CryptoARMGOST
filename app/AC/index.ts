@@ -544,7 +544,10 @@ export function loadAllContainers() {
         if( resultContainerName.length === 0 ) {
           resultContainerName = cont.container;
         }
-        const readerNameLastPos = resultContainerName.lastIndexOf(resultContainerName.includes("|") ? "|" : "\\");
+        var readerNameLastPos = resultContainerName.lastIndexOf(resultContainerName.includes("|") ? "|" : "\\");
+        if( -1 === readerNameLastPos ) {
+          readerNameLastPos = resultContainerName.lastIndexOf("/");
+        }
         filteredContainers.push({
           friendlyName: cont.container,
           id: Math.random(),
