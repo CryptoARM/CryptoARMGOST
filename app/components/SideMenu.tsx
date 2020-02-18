@@ -130,7 +130,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
           <ul id="dropdown-sign_and_encrypt" className="dropdown-content" style={{ display: "none" }}>
             <li>
               <div className="center-align">
-                <a style={{ fontWeight: "bold", color: "#bf3817" }}>ПОДПИСЬ И ШИФРОВАНИЕ</a>
+                <a style={{ fontWeight: "bold", color: "#1D587f" }}>ПОДПИСЬ И ШИФРОВАНИЕ</a>
               </div>
             </li>
           </ul>
@@ -146,7 +146,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
           <ul id="dropdown-documents-stores" className="dropdown-content" style={{ display: "none" }}>
             <li>
               <div className="center-align">
-                <a style={{ fontWeight: "bold", color: "#bf3817" }}>ДОКУМЕНТЫ</a>
+                <a style={{ fontWeight: "bold", color: "#1D587f" }}>ДОКУМЕНТЫ</a>
               </div>
             </li>
           </ul>
@@ -165,7 +165,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
           <ul id="dropdown-address-book" className="dropdown-content" style={{ display: "none" }}>
             <li>
               <div className="center-align">
-                <a style={{ fontWeight: "bold", color: "#bf3817" }}>КОНТАКТЫ</a>
+                <a style={{ fontWeight: "bold", color: "#1D587f" }}>КОНТАКТЫ</a>
               </div>
             </li>
           </ul>
@@ -210,7 +210,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
           >
             <li>
               <div className="center-align">
-                <a style={{ fontWeight: "bold", color: "#bf3817" }}>СЕРТИФИКАТЫ</a>
+                <a style={{ fontWeight: "bold", color: "#1D587f" }}>СЕРТИФИКАТЫ</a>
               </div>
             </li>
           </Link>
@@ -270,7 +270,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
           >
             <li>
               <div className="center-align">
-                <a style={{ fontWeight: "bold", color: "#bf3817" }}>О ПРОГРАММЕ</a>
+                <a style={{ fontWeight: "bold", color: "#1D587f" }}>О ПРОГРАММЕ</a>
               </div>
             </li>
           </Link>
@@ -325,7 +325,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
           <ul id="dropdown-menu-exit" className="dropdown-content" style={{ top: "34px !impotant", display: "none" }}>
             <li>
               <div className="center-align">
-                <a style={{ fontWeight: "bold", color: "#bf3817" }}>ВЫХОД</a>
+                <a style={{ fontWeight: "bold", color: "#1D587f" }}>ВЫХОД</a>
               </div>
             </li>
           </ul>

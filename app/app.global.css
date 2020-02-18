@@ -49,7 +49,7 @@ nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
 }
 
 .cryptoarm-red {
-  background-color: #bf3817 !important;
+  background-color: #1D587f !important;
 }
 
 .headline6 {
@@ -85,7 +85,7 @@ nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
 }
 
 .unvalid {
-  color: #bf3817 !important;
+  color: #1D587f !important;
 }
 
 .unknown {
@@ -128,7 +128,7 @@ nav i, nav [class^="mdi-"], nav [class*="mdi-"], nav i.material-icons {
     font-size: 100%;
 }
 .app-bar, .menu-logo{
-    background-color: #bf3817;
+    background-color: #1D587f;
 }
 .menu-elements {
     position: absolute;
@@ -154,14 +154,14 @@ nav .input-field input {
 
 .content {
     display:flex;
-    border: 2px solid #bf3817;
+    border: 2px solid #1D587f;
     border-top: none;
     width: 100%;
     height: calc(100% - 35px);
     position: absolute;
 }
 .content-noflex {
-  border: 2px solid #bf3817;
+  border: 2px solid #1D587f;
   width: 100%;
   height: calc(100% - 35px);
   position: absolute;
@@ -355,7 +355,7 @@ body {
 }
 
 .btn:hover, .add-cert-btn:hover, .operation-btn:hover {
-    background-color: #bf3817;
+    background-color: #1D587f;
 }
 /*--- file list---*/
 .collection {
@@ -588,7 +588,7 @@ div::-webkit-scrollbar-thumb {
 /*-------------------------------Стили кнопок------------------*/
 
 .btn, .add-cert-btn, .operation-btn, .choose-btn {
-    background-color: #bf3817;
+    background-color: #1D587f;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -607,7 +607,7 @@ div::-webkit-scrollbar-thumb {
   overflow: hidden;
   vertical-align: middle;
   border-radius: 4px;
-  color: #bf3817;
+  color: #1D587f;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -625,7 +625,7 @@ div::-webkit-scrollbar-thumb {
   overflow: hidden;
   vertical-align: middle;
   border-radius: 4px;
-  color: #bf3817;
+  color: #1D587f;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -649,17 +649,17 @@ div::-webkit-scrollbar-thumb {
 }
 
 .choose-btn:hover{
-    background-color: #bf3817;
+    background-color: #1D587f;
 }
 
 
 
 .add-file-but {
-    background-color: #bf3817;
+    background-color: #1D587f;
     font-size:60%;
 }
 .add-file-but:hover {
-    background-color: #bf3817;
+    background-color: #1D587f;
 }
 
 .btn-large {
@@ -711,7 +711,7 @@ div::-webkit-scrollbar-thumb {
 .side-nav-rectangle {
 	width: 3px;
 	height: 44px;
-  background: #bf3817;
+  background: #1D587f;
   float: left;
   margin-top: 2px;
 }
@@ -863,7 +863,7 @@ i.material-icons.choosefolder {
 }
 
 .collapsible-header.params{
-  border-color: #bf3817;
+  border-color: #1D587f;
   border-style: solid;
   border-width: 1px;
   border-radius: 4px;
@@ -1340,7 +1340,7 @@ i.material-icons.left.ca {
 }
 
 span.card-title {
-  color: #bf3817;
+  color: #1D587f;
 }
 
 .card .card-title {
@@ -1356,7 +1356,7 @@ span.card-title {
 }
 
 .card .card-action a:not(.btn):not(.btn-large):not(.btn-floating) {
-  color: #bf3817;
+  color: #1D587f;
   margin-right: 20px;
   transition: color .3s ease;
   text-transform: uppercase;
@@ -1635,7 +1635,7 @@ textarea#message {
 
 a {
   cursor: pointer;
-  color: #b64729;
+  color: #1d587f;
 }
 
 .add-cert-collection.collection {
@@ -1648,11 +1648,11 @@ a {
 }
 
 a.menuheaderlink {
-    background-color:  #bf3817;
+    background-color:  #1D587f;
 }
 
 a.menuheaderlink:hover {
-    background-color: #bf3817;
+    background-color: #1D587f;
 }
 
 .logo-text {
@@ -1720,21 +1720,21 @@ a.menuheaderlink:hover {
   text-indent: -9999px;
   width: 16px;
   height: 16px;
-  background: #bf3817;
+  background: #1D587f;
   border-radius: 100%;
   background-size: 16px 16px;
 }
 
 .desktoplic_area{
     height: 300px;
-    border-left: 1px solid #bf3817;
-    border-right: 1px solid #bf3817;
+    border-left: 1px solid #1D587f;
+    border-right: 1px solid #1D587f;
 }
 
 .bmark_desktoplic {
     text-align: center;
     padding: 10px 0;
-    color: #bf3817;
+    color: #1D587f;
     font-family: "Roboto", sans-serif;
     font-size: 20px;
     font-weight: 300;
@@ -1982,17 +1982,17 @@ a.cert-back-btn.waves-effect.waves-light {
 }
 .slider-red .indicators .indicator-item {
   background-color: #ffffff;
-  border: 2px solid #bf3817;
+  border: 2px solid #1D587f;
 }
 .slider-white .indicators .indicator-item {
-  background-color: #bf3817;
+  background-color: #1D587f;
   border: 2px solid #ffffff;
 }
 .slider.fullscreen ul.indicators {
     bottom: 0;
 }
 .slider-red .indicators .indicator-item.active {
-  background-color: #bf3817;
+  background-color: #1D587f;
 }
 .slider-white .indicators .indicator-item.active {
   background-color: #ffffff;
@@ -2015,7 +2015,7 @@ a.cert-back-btn.waves-effect.waves-light {
 }
 .material-icons.slider-btn-red {
     font-size: 44px;
-    color: #bf3817;
+    color: #1D587f;
 }
 .material-icons.slider-btn-white {
     font-size: 44px;
@@ -2245,7 +2245,7 @@ a.cert-back-btn.waves-effect.waves-light {
 .dialog-bar {
     height: 35px;
     line-height: 35px;
-    background-color: #bf3817;
+    background-color: #1D587f;
 }
 .dialog-bar .app-bar-item {
     color: #ffffff;
@@ -2400,7 +2400,7 @@ i.material-icons.left.chain_10 {
 
 /*----------------------------*/
 .modal-bar {
-    background-color: #bf3817;
+    background-color: #1D587f;
     height: 40px;
     line-height: 40px;
 }
@@ -2414,7 +2414,7 @@ i.material-icons.left.chain_10 {
 .rectangle {
 	width: 3px;
 	height: 45px;
-  background: #bf3817;
+  background: #1D587f;
   float: left;
 }
 
@@ -2723,20 +2723,20 @@ a.waves-effect.waves-light.btn.licence-temporary-modal-btn.left {
 }
 
 .picker__date-display, .picker__weekday-display {
-  background-color: #bf3817;
+  background-color: #1D587f;
 }
 
 .picker__day--selected, .picker__day--selected:hover,
 .picker--focused .picker__day--selected {
-  background-color: #bf3817;
+  background-color: #1D587f;
 }
 
 .picker__close, .picker__today {
-  color: #bf3817;
+  color: #1D587f;
 }
 
 .picker__day.picker__day--today {
-  color: #bf3817;
+  color: #1D587f;
 }
 
 .picker__date-display {
@@ -3088,7 +3088,7 @@ svg:hover {
   }
 
   .hover_outline:hover {
-    outline: 1px solid #bf3817;
+    outline: 1px solid #1D587f;
   }
 
   .disabled_docs{

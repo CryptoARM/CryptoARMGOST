@@ -6,7 +6,7 @@ const rectangleValidStyle = {
 };
 
 const rectangleUnvalidStyle = {
-  background: "#bf3817",
+  background: "#1D587f",
 };
 
 interface ICertificateListItemProps {
