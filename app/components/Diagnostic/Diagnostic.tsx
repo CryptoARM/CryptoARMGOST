@@ -112,19 +112,6 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
       return false;
     }
 
-    if (window.curlerr) {
-      this.setState({
-        errors: [...this.state.errors, {
-          important: WARNING,
-          type: ERROR_LOAD_TRUSTED_CURL,
-        }],
-      });
-
-      this.setState({ criticalError: false });
-
-      return false;
-    }
-
     return true;
   }
 
