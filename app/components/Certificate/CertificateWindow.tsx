@@ -156,7 +156,7 @@ class CertWindow extends React.Component<any, any> {
     this.setState({
       importingCertificate: certificate,
       importingCertificatePath: path,
-      showDialogInstallRootCertificate: true,
+      showDialogInstallRootCertificate: false,
     });
   }
 
@@ -360,7 +360,7 @@ class CertWindow extends React.Component<any, any> {
       }
 
       if (selfSigned || bCA) {
-        this.handleShowDialogInstallRootCertificate(path, certificate);
+        this.handleInstallTrustedCertificate(path, certificate);
       } else {
         removeAllCertificates();
 
@@ -491,118 +491,60 @@ class CertWindow extends React.Component<any, any> {
         loadAllCertificates();
       }
     } else {
-      this.handleShowDialogInstallRootCertificate(path, certificate);
+      this.handleInstallTrustedCertificate(path, certificate);
     }
   }
 
-  handleInstallTrustedCertificate = () => {
+  handleInstallTrustedCertificate = (path: string, certificate: trusted.pki.Certificate) => {
     const { localize, locale } = this.context;
     // tslint:disable-next-line:no-shadowed-variable
     const { isLoading, loadAllCertificates, removeAllCertificates } = this.props;
-    const { importingCertificate, importingCertificatePath } = this.state;
+    //const { importingCertificate, importingCertificatePath } = this.state;
 
     this.handleCloseDialogInstallRootCertificate();
 
-    const isSelfSigned = importingCertificate.isSelfSigned;
+    const isSelfSigned = certificate.isSelfSigned;
 
-    if (OS_TYPE === "Windows_NT") {
-      const storeName = isSelfSigned ? ROOT : CA;
+    const storeName = isSelfSigned ? ROOT : CA;
 
-      window.PKISTORE.importCertificate(importingCertificate, PROVIDER_CRYPTOPRO, (err: Error) => {
-        if (err) {
+    window.PKISTORE.importCertificate(certificate, PROVIDER_CRYPTOPRO, (err: Error) => {
+      if (err) {
 
-          logger.log({
-            certificate: importingCertificate.subjectName,
-            level: "error",
-            message: err.message ? err.message : "",
-            operation: "Импорт сертификата",
-            operationObject: {
-              in: "CN=" + importingCertificate.subjectFriendlyName,
-              out: "Null",
-            },
-            userName: USER_NAME,
-          });
+        logger.log({
+          certificate: certificate.subjectName,
+          level: "error",
+          message: err.message ? err.message : "",
+          operation: "Импорт сертификата",
+          operationObject: {
+            in: "CN=" + certificate.subjectFriendlyName,
+            out: "Null",
+          },
+          userName: USER_NAME,
+        });
 
-          Materialize.toast(localize("Certificate.cert_import_failed", locale), 2000, "toast-cert_import_error");
-        } else {
-          removeAllCertificates();
-
-          if (!isLoading) {
-            loadAllCertificates();
-          }
-
-          logger.log({
-            certificate: importingCertificate.subjectName,
-            level: "info",
-            message: "",
-            operation: "Импорт сертификата",
-            operationObject: {
-              in: "CN=" + importingCertificate.subjectFriendlyName,
-              out: "Null",
-            },
-            userName: USER_NAME,
-          });
-
-          Materialize.toast(localize("Certificate.cert_trusted_import_ok", locale), 2000, "toast-cert_trusted_import_ok");
-        }
-      }, storeName);
-    } else if (importingCertificatePath) {
-      let certmgrPath = "";
-
-      if (OS_TYPE === "Darwin") {
-        certmgrPath = "/opt/cprocsp/bin/certmgr";
+        Materialize.toast(localize("Certificate.cert_import_failed", locale), 2000, "toast-cert_import_error");
       } else {
-        certmgrPath = os.arch() === "ia32" ? "/opt/cprocsp/bin/ia32/certmgr" : "/opt/cprocsp/bin/amd64/certmgr";
-      }
+        removeAllCertificates();
 
-      const storeName = isSelfSigned ? "mROOT" : "mCA";
-
-      // tslint:disable-next-line:quotemark
-      const cmd = "sh -c " + "\"" + certmgrPath + ' -install -store ' + "'" + storeName + "'" + ' -file ' + "'" + importingCertificatePath + "'" + "\"";
-
-      const options = {
-        name: "CryptoARM GOST",
-      };
-
-      window.sudo.exec(cmd, options, function (err: Error) {
-        if (err) {
-
-          logger.log({
-            certificate: importingCertificate.subjectName,
-            level: "error",
-            message: err.message ? err.message : "",
-            operation: "Импорт сертификата",
-            operationObject: {
-              in: "CN=" + importingCertificate.subjectFriendlyName,
-              out: "Null",
-            },
-            userName: USER_NAME,
-          });
-
-          Materialize.toast(localize("Certificate.cert_trusted_import_failed", locale), 2000, "toast-cert_trusted_import_failed");
-        } else {
-          removeAllCertificates();
-
-          if (!isLoading) {
-            loadAllCertificates();
-          }
-
-          logger.log({
-            certificate: importingCertificate.subjectName,
-            level: "info",
-            message: "",
-            operation: "Импорт сертификата",
-            operationObject: {
-              in: "CN=" + importingCertificate.subjectFriendlyName,
-              out: "Null",
-            },
-            userName: USER_NAME,
-          });
-
-          Materialize.toast(localize("Certificate.cert_trusted_import_ok", locale), 2000, "toast-cert_trusted_import_ok");
+        if (!isLoading) {
+          loadAllCertificates();
         }
-      });
-    }
+
+        logger.log({
+          certificate: certificate.subjectName,
+          level: "info",
+          message: "",
+          operation: "Импорт сертификата",
+          operationObject: {
+            in: "CN=" + certificate.subjectFriendlyName,
+            out: "Null",
+          },
+          userName: USER_NAME,
+        });
+
+        Materialize.toast(localize("Certificate.cert_trusted_import_ok", locale), 2000, "toast-cert_trusted_import_ok");
+      }
+    }, storeName);
   }
 
   crlImport = (crl: trusted.pki.CRL, crlFilePath?: string) => {
@@ -617,101 +559,43 @@ class CertWindow extends React.Component<any, any> {
       return;
     }
 
-    if (OS_TYPE === "Windows_NT") {
-      window.PKISTORE.importCrl(crl, PROVIDER_CRYPTOPRO, (err: Error) => {
-        if (err) {
-          logger.log({
-            certificate: crl.issuerFriendlyName,
-            level: "error",
-            message: err.message ? err.message : "",
-            operation: "Импорт CRL",
-            operationObject: {
-              in: "CN=" + crl.issuerFriendlyName,
-              out: "Null",
-            },
-            userName: USER_NAME,
-          });
+    window.PKISTORE.importCrl(crl, PROVIDER_CRYPTOPRO, (err: Error) => {
+      if (err) {
+        logger.log({
+          certificate: crl.issuerFriendlyName,
+          level: "error",
+          message: err.message ? err.message : "",
+          operation: "Импорт CRL",
+          operationObject: {
+            in: "CN=" + crl.issuerFriendlyName,
+            out: "Null",
+          },
+          userName: USER_NAME,
+        });
 
-          Materialize.toast(localize("CRL.crl_import_failed", locale), 2000, "toast-crl_import_failed");
-        } else {
-          removeAllCertificates();
-
-          if (!isLoading) {
-            loadAllCertificates();
-          }
-
-          logger.log({
-            certificate: crl.issuerFriendlyName,
-            level: "info",
-            message: "",
-            operation: "Импорт CRL",
-            operationObject: {
-              in: "CN=" + crl.issuerFriendlyName,
-              out: "Null",
-            },
-            userName: USER_NAME,
-          });
-
-          Materialize.toast(localize("CRL.crl_import_ok", locale), 2000, "toast-crl_import_ok");
-        }
-      }, CA);
-    } else if (crlFilePath) {
-      let certmgrPath = "";
-
-      if (OS_TYPE === "Darwin") {
-        certmgrPath = "/opt/cprocsp/bin/certmgr";
+        Materialize.toast(localize("CRL.crl_import_failed", locale), 2000, "toast-crl_import_failed");
       } else {
-        certmgrPath = os.arch() === "ia32" ? "/opt/cprocsp/bin/ia32/certmgr" : "/opt/cprocsp/bin/amd64/certmgr";
-      }
+        removeAllCertificates();
 
-      const storeName = "mCA";
-
-      // tslint:disable-next-line:quotemark
-      const cmd = "sh -c " + "\"" + certmgrPath + ' -install -store ' + "'" + storeName + "'" + ' -crl -file ' + "'" + crlFilePath + "'" + "\"";
-
-      const options = {
-        name: "CryptoARM GOST",
-      };
-
-      window.sudo.exec(cmd, options, function (err: Error) {
-        if (err) {
-
-          logger.log({
-            certificate: crl.issuerFriendlyName,
-            level: "error",
-            message: err.message ? err.message : "",
-            operation: "Импорт CRL",
-            operationObject: {
-              in: "CN=" + crl.issuerFriendlyName,
-              out: "Null",
-            },
-            userName: USER_NAME,
-          });
-
-          Materialize.toast(localize("CRL.crl_import_failed", locale), 2000, "toast-crl_import_failed");
-        } else {
-          removeAllCertificates();
-
-          if (!isLoading) {
-            loadAllCertificates();
-          }
-
-          logger.log({
-            certificate: crl.issuerFriendlyName,
-            level: "info",
-            message: "",
-            operation: "Импорт CRL",
-            operationObject: {
-              in: "CN=" + crl.issuerFriendlyName,
-              out: "Null",
-            },
-            userName: USER_NAME,
-          });
-
-          Materialize.toast(localize("CRL.crl_import_ok", locale), 2000, "toast-crl_import_ok");
+        if (!isLoading) {
+          loadAllCertificates();
         }
-      });
-    }
+
+        logger.log({
+          certificate: crl.issuerFriendlyName,
+          level: "info",
+          message: "",
+          operation: "Импорт CRL",
+          operationObject: {
+            in: "CN=" + crl.issuerFriendlyName,
+            out: "Null",
+          },
+          userName: USER_NAME,
+        });
+
+        Materialize.toast(localize("CRL.crl_import_ok", locale), 2000, "toast-crl_import_ok");
+      }
+    }, CA);
   }
 
   p12Import = (fpath: string) => {
@@ -1270,9 +1154,6 @@ class CertWindow extends React.Component<any, any> {
           {this.showModalCloudCSP()}
           {this.showModalBestStore()}
 
-          <Dialog isOpen={this.state.showDialogInstallRootCertificate}
-            header="Внимание!" body="Для установки корневых сертификатов требуются права администратора. Продолжить?"
-            onYes={this.handleInstallTrustedCertificate} onNo={this.handleCloseDialogInstallRootCertificate} />
           <PasswordDialog value={this.state.password} onChange={this.handlePasswordChange} />
         </div>
 

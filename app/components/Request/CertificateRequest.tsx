@@ -556,25 +556,23 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       });
 
       try {
-        if (OS_TYPE === "Windows_NT") {
-          window.PKISTORE.importCertificate(cert, PROVIDER_CRYPTOPRO, (err: Error) => {
-            if (err) {
-              Materialize.toast(localize("Certificate.cert_import_failed", locale), 2000, "toast-cert_import_error");
-            }
-          }, ROOT);
+        window.PKISTORE.importCertificate(cert, PROVIDER_CRYPTOPRO, (err: Error) => {
+          if (err) {
+            Materialize.toast(localize("Certificate.cert_import_failed", locale), 2000, "toast-cert_import_error");
+          }
+        }, ROOT);
 
-          logger.log({
-            certificate: cert.subjectName,
-            level: "info",
-            message: "",
-            operation: "Импорт сертификата",
-            operationObject: {
-              in: "CN=" + cert.subjectFriendlyName,
-              out: "Null",
-            },
-            userName: USER_NAME,
-          });
-        }
+        logger.log({
+          certificate: cert.subjectName,
+          level: "info",
+          message: "",
+          operation: "Импорт сертификата",
+          operationObject: {
+            in: "CN=" + cert.subjectFriendlyName,
+            out: "Null",
+          },
+          userName: USER_NAME,
+        });
       } catch (err) {
         logger.log({
           certificate: cert.subjectName,
