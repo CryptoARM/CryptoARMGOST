@@ -2,7 +2,7 @@
   "author": "Cifrovye tekhnologii LLC",
   "description": "CryptoARM for ViPNet",
   "name": "cryptoarm-vipnet",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./main.js",
   "license": "Apache-2.0",
   "dependencies": {
