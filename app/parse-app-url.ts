@@ -202,9 +202,9 @@ export function parseUrlCommandApiV7(urlWithCommand: string): IUrlCommandApiV4Ty
   const parsedPath = pathName.substr(1);
 
   // enable only https
-  if (URL.parse(parsedPath, true).protocol !== "https:") {
-    return result;
-  }
+  // if (URL.parse(parsedPath, true).protocol !== "https:") {
+  //   return result;
+  // }
 
   result.command = recievedCommand;
   result.id = getQueryStringValue(query, "id");

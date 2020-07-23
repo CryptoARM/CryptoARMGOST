@@ -14,6 +14,7 @@ import ProgressBars from "../ProgressBars";
 import SortDirection from "../Sort/SortDirection";
 import SortIndicator from "../Sort/SortIndicator";
 import CertificateStatusIcon from "./CertificateStatusIcon";
+import { trace } from "console";
 
 type TSortDirection = "ASC" | "DESC" | undefined;
 
@@ -303,12 +304,13 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
   }
 
   handleOnRowClick = ({ rowData }: { rowData: any }) => {
-    const { activeCert, certificatesMap, toggleOpenItem } = this.props;
+    const { activeCert, certificatesMap, toggleOpenItem, isCertInfoMode } = this.props;
+    if (!isCertInfoMode) {
+      const cert = certificatesMap.get(rowData.id);
 
-    const cert = certificatesMap.get(rowData.id);
-
-    activeCert(cert ? cert : rowData);
-    toggleOpenItem(rowData.id.toString());
+      activeCert(cert ? cert : rowData);
+      toggleOpenItem(rowData.id.toString());
+    }
   }
 
   handleScrollToBefore = () => {
