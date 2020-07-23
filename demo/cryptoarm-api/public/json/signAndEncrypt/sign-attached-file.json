@@ -1,0 +1,27 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "operation": [
+      "SIGN"
+    ],
+    "props": {
+      "license": "",
+      "files": [
+        {
+          "name": "file1.txt",
+          "url": "http://localhost:8080/public/files/file1.txt",
+          "id": 1,
+          "urlDetached": ""
+        }
+      ],
+      "extra": {
+        "token": "9c7101f7-9c47-4481-b4da-a6a497abde08",
+        "signType": 0,
+        "signStandart": 0,
+        "signEncoding": 0
+      },
+      "uploader": "http://localhost:8080/upload"
+    }
+  },
+  "id": "71407d37-ae12-4a60-9c38-a77664c31f27"
+}
