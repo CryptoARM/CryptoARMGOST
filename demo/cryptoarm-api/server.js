@@ -26,9 +26,13 @@ app.post('/json', function (req, res) {
     console.log("Error! Wrong jsonrpc version! (" + req.body.jsonrpc + " but MUST be 2.0)");
   }
 
+
+  console.log("req.body", req.body);
+
   if (req.body.method === "certificates.parameters"
     || req.body.method === "certificateInfo.parameters"
     || req.body.method === "diagnostics.parameters"
+    || req.body.method === "signAndEncrypt.parameters"
   ) {
     if (id !== req.body.id) {
       console.log("Error! Id from URL and ID from request is not match! (" + id + " and " + req.body.id + ")");

@@ -37,7 +37,7 @@ export interface IUrlCommandApiV4Type {
 const __WIN32__ = process.platform === "win32";
 const protocolLauncherArg = "--protocol-launcher";
 
-function getQueryStringValue(query: any,  key: any) {
+function getQueryStringValue(query: any, key: any) {
   const value = query[key];
   if (value == null) {
     return null;
@@ -183,6 +183,7 @@ export function parseUrlCommandApiV7(urlWithCommand: string): IUrlCommandApiV4Ty
   switch (recievedCommand.toLowerCase()) {
     case "certificates":
     case "diagnostics":
+    case "signandencrypt":
       break;
     default:
       // tslint:disable-next-line: no-console
@@ -201,10 +202,10 @@ export function parseUrlCommandApiV7(urlWithCommand: string): IUrlCommandApiV4Ty
   // Trim the trailing / from the URL
   const parsedPath = pathName.substr(1);
 
-  // enable only https
-  if (URL.parse(parsedPath, true).protocol !== "https:") {
-    return result;
-  }
+  // // enable only https
+  // if (URL.parse(parsedPath, true).protocol !== "https:") {
+  //   return result;
+  // }
 
   result.command = recievedCommand;
   result.id = getQueryStringValue(query, "id");

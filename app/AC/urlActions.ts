@@ -19,6 +19,7 @@ import { extFile, fileExists, md5 } from "../utils";
 import { toggleReverseOperations, toggleSigningOperation } from "./settingsActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
+import { handleUrlCommandSignAmdEncrypt } from "./urlCmdSignAndEncrypt";
 
 const remote = window.electron.remote;
 
@@ -64,6 +65,10 @@ export function dispatchURLCommand(
 
     case "diagnostics":
       handleUrlCommandDiagnostics(command);
+      break;
+
+    case "signandencrypt":
+      handleUrlCommandSignAmdEncrypt(command);
       break;
 
     default:
@@ -121,6 +126,7 @@ export async function cancelUrlAction(data: ISignRequest | IEncryptRequest) {
 }
 
 function signDocumentsFromURL(action: URLActionType) {
+  console.log("action", action);
   store.dispatch({
     type: SIGN_DOCUMENTS_FROM_URL + START,
   });
@@ -128,8 +134,8 @@ function signDocumentsFromURL(action: URLActionType) {
   cleanFileLists();
   openWindow(SIGN);
 
-  store.dispatch (toggleReverseOperations(false));
-  store.dispatch (toggleSigningOperation(true));
+  store.dispatch(toggleReverseOperations(false));
+  store.dispatch(toggleSigningOperation(true));
 
   store.dispatch({
     type: SIGN_DOCUMENTS_FROM_URL + START,
@@ -148,16 +154,17 @@ function signDocumentsFromURL(action: URLActionType) {
         urlObj.searchParams.append("command", action.command);
       }
 
-      data = await getJsonFromURL(urlObj.toString());
+      data = action.props;
+      console.log("data", data);
 
-      if (data && data.params && data.params.files) {
+      if (data && data.files) {
         await downloadFiles(data);
       } else {
         throw new Error("Error get JSON or json incorrect");
       }
 
-      if (data && data.params && data.params.license && data.params.extra) {
-        addLicenseToStore(data.params.extra.token, data.params.license);
+      if (data && data.license && data.extra) {
+        addLicenseToStore(data.extra.token, data.license);
       }
 
       store.dispatch({
@@ -227,7 +234,7 @@ const getJsonFromURL = async (url: string): Promise<void> => {
 };
 
 const downloadFiles = async (data: ISignRequest | IEncryptRequest) => {
-  const { params } = data;
+  const params = data;
 
   if (!params) {
     return;
