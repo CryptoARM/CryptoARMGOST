@@ -137,6 +137,9 @@ app.post('/json', function (req, res) {
   } else if (req.body.method === "diagnostics.information") {
     printDiagnosticInformation(req.body.params);
     res.status(200).send("");
+  } else if (req.body.method === "signAndEncrypt.outDirectResults") {
+    console.log("outDirectResults", req.body.params.directResults);
+    res.status(200).send("");
   } else {
     console.log("Unsupported method: " + req.body.method);
     res.status(400).send('Incorrect token');

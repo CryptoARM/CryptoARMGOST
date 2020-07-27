@@ -20,7 +20,7 @@
         "signStandart": 0,
         "signEncoding": 0
       },
-      "uploader": "http://localhost:8080/upload"
+      "uploader": "http://localhost:8080/json"
     }
   },
   "id": "3a2fca10-fb2c-45eb-a61e-2e0da2a92bf0"
