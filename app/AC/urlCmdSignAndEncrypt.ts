@@ -45,9 +45,6 @@ export function handleUrlCommandSignAmdEncrypt( command: IUrlCommandApiV4Type ) 
       const operation = data.result.operation;
       const props = data.result.props;
 
-      console.log("operation", operation);
-      console.log("operation.includes ", operation.includes("SIGN"));
-
       if (operation && operation.includes("SIGN")) {
         return dispatchURLAction({
           name: "sign-documents-from-url",

@@ -126,7 +126,6 @@ export async function cancelUrlAction(data: ISignRequest | IEncryptRequest) {
 }
 
 function signDocumentsFromURL(action: URLActionType) {
-  console.log("action", action);
   store.dispatch({
     type: SIGN_DOCUMENTS_FROM_URL + START,
   });
@@ -155,7 +154,7 @@ function signDocumentsFromURL(action: URLActionType) {
       }
 
       data = action.props;
-      console.log("data", data);
+      data.method = "sign";
 
       if (data && data.files) {
         await downloadFiles(data);
@@ -201,9 +200,10 @@ function verifyDocumentsFromURL(action: URLActionType) {
         urlObj.searchParams.append("command", action.command);
       }
 
-      data = await getJsonFromURL(urlObj.toString());
+      data = action.props;
+      data.method = "verify";
 
-      if (data && data.params && data.params.files) {
+      if (data && data.files) {
         await downloadFiles(data);
       } else {
         throw new Error("Error get JSON or json incorrect");
