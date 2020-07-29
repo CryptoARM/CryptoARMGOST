@@ -14,7 +14,6 @@ import ProgressBars from "../ProgressBars";
 import SortDirection from "../Sort/SortDirection";
 import SortIndicator from "../Sort/SortIndicator";
 import CertificateStatusIcon from "./CertificateStatusIcon";
-import { trace } from "console";
 
 type TSortDirection = "ASC" | "DESC" | undefined;
 
