@@ -111,7 +111,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
             <input
               id="containerName"
               type="text"
-              className={!this.props.formVerified ? "validate" : containerName.length > 0 ? "valid" : "invalid"}
+              className={containerName.trim().length > 0 ? "valid" : "invalid"}
               name="containerName"
               value={containerName}
               onChange={handleInputChange}
