@@ -203,7 +203,7 @@ export function parseUrlCommandApiV7(urlWithCommand: string): IUrlCommandApiV4Ty
 
   // enable only https
   if (URL.parse(parsedPath, true).protocol !== "https:") {
-    return result;
+     return result;
   }
 
   result.command = recievedCommand;
