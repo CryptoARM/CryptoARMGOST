@@ -95,7 +95,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
             <p className="help_paragraf">{localize("Problems.resolve_2_1", locale)}</p>
             <p className="help_paragraf">
               {localize("Problems.resolve_2_2", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/")}> cryptoarm.ru</a>
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/shop/skzi-cryptopro-csp-5-0")}> cryptoarm.ru</a>
             </p>
             <p className="help_paragraf">{localize("Problems.resolve_2_3", locale)} </p>
           </div>
