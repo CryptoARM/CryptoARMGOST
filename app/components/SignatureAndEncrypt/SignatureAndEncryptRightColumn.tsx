@@ -15,7 +15,7 @@ import {
 import { IFile } from "../../AC";
 import { documentsReviewed } from "../../AC/documentsActions";
 import { createTransactionDSS, dssOperationConfirmation, dssPerformOperation } from "../../AC/dssActions";
-import { multiDirectOperation, multiOperationStart, multiReverseOperation  } from "../../AC/multiOperations";
+import { multiDirectOperation, multiOperationStart, multiReverseOperation } from "../../AC/multiOperations";
 import {
   activeSetting, changeDefaultSettings, deleteSetting, saveSettings,
 } from "../../AC/settingsActions";
@@ -175,7 +175,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       this.handleCloseModalDssResponse();
     }
 
-    if(prevProps.signingPackage && !this.props.signingPackage && !this.props.packageSignResult) {
+    if (prevProps.signingPackage && !this.props.signingPackage && !this.props.packageSignResult) {
       $(".toast-files_signed_failed").remove();
       Materialize.toast(localize("Sign.files_signed_failed", locale), 7000, "toast-files_signed_failed");
     }
@@ -829,7 +829,18 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (setting.operations.reverse_operations) {
+
+      if (activeFilesArr.length === 1 && activeFilesArr[0].extension === "sig") {
+        let cms = signs.loadSign(activeFilesArr[0].fullpath);
+
+        if (cms.isDetached()) {
+          $(".toast-files_unsigned_detached").remove();
+          Materialize.toast(localize("Sign.files_unsigned_detached", window.locale), 2000, "toast-files_unsigned_detached");
+          return;
+         }
+      }
       for (const activeFileItem of activeFilesArr) {
+
         if (activeFileItem.extension === "enc") {
           if (licenseStatus !== true) {
             $(".toast-jwtErrorLicense").remove();
@@ -911,7 +922,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if ((setting.sign.timestamp_on_data || setting.sign.timestamp_on_sign)
-    && setting.tsp.url === "") {
+      && setting.tsp.url === "") {
       $(".toast-Sign_failed_TSP_misconfigured").remove();
       Materialize.toast(localize("Tsp.failed_tsp_url", locale), 3000, "toast-Sign_failed-TSP_misconfigured");
       return;
@@ -1001,14 +1012,14 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       setting = setting.setIn(["sign", "time"], true);
     }
     if (files.length > 0) {
-      const policies: string [] = [] ;
+      const policies: string[] = [];
       const folderOut = setting.operations.save_result_to_folder ? setting.outfolder : "";
 
       let format = trusted.DataFormat.PEM;
       if (setting.sign.encoding !== localize("Settings.BASE", locale)) {
         format = trusted.DataFormat.DER;
       }
-      if (setting.sign.detached) {policies.push ("detached"); }
+      if (setting.sign.detached) { policies.push("detached"); }
       if (folderOut.length > 0) {
         if (!dirExists(folderOut)) {
           $(".toast-failed_find_directory").remove();
@@ -1310,7 +1321,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   resignDss = (filesAtt: IFilePackage, filesDet: IFilePackage, setting: any, cert: any,
-               multipackage: boolean = false) => {
+    multipackage: boolean = false) => {
     const { signer, tokensAuth, users, policyDSS, uploader,
       createTransactionDSS, packageReSign } = this.props;
     const { pinCode } = this.state;
@@ -1325,7 +1336,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     const policy = policyDSS.getIn([signer.dssUserID, "policy"]).filter(
       (item: any) => item.Action === (isSignPackage ? "SignDocuments" : "SignDocument"));
     const mfaRequired = policy[0].MfaRequired;
-    const policies: string [] = [];
+    const policies: string[] = [];
     const folderOut = setting.outfolder;
     let format = trusted.DataFormat.PEM;
     if (setting.sign.encoding !== localize("Settings.BASE", locale)) {
@@ -1333,7 +1344,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (mfaRequired) {
-      const originalDocument = (signsIsDetached &&  !isSignPackage) ? documents[0].OriginalContent : "";
+      const originalDocument = (signsIsDetached && !isSignPackage) ? documents[0].OriginalContent : "";
       createTransactionDSS(user.dssUrl,
         tokenAuth.access_token,
         buildTransaction(
@@ -1407,7 +1418,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                         packageReSign(files, cert, policies, format, folderOut, outURIList,
                           directResult, isNeedToSignSecondPackage || multipackage,
                           isNeedToSignSecondPackage);
-                        if(isNeedToSignSecondPackage) {
+                        if (isNeedToSignSecondPackage) {
                           this.resignDss(null, filesDet, setting, cert, true);
                         } else {
                           this.setState({ pinCode: "" });
@@ -1470,7 +1481,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           },
         );
     } else {
-      const originalData = (signsIsDetached &&  !isSignPackage) ? documents[0].OriginalContent : "";
+      const originalData = (signsIsDetached && !isSignPackage) ? documents[0].OriginalContent : "";
       this.props.dssPerformOperation(
         user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
         tokenAuth.access_token,
@@ -1570,7 +1581,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (files.length > 0) {
-      const policies: string [] = [];
+      const policies: string[] = [];
       const folderOut = setting.outfolder;
       let format = trusted.DataFormat.PEM;
       if (setting.sign.encoding !== localize("Settings.BASE", locale)) {
@@ -2264,7 +2275,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (filesSign.length > 0) {
-      const policies: string [] = [];
+      const policies: string[] = [];
 
       const folderOut = setting.outfolder;
       let format = trusted.DataFormat.PEM;
