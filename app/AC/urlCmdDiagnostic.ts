@@ -8,6 +8,7 @@ import {
   DIAGNOSTIC_FROM_URL,
   START,
   LOCATION_MAIN,
+  SHOW_MODAL_ADD_TRUSTED_SERVICE,
 } from "../constants";
 import localize from "../i18n/localize";
 import { IUrlCommandApiV4Type } from "../parse-app-url";
@@ -16,7 +17,7 @@ import { Store } from "../trusted/store";
 import { fileExists } from "../utils";
 import { PkiCertToCertInfo } from "./urlCmdCertInfo";
 import { paramsRequest, postRequest } from "./urlCmdUtils";
-import { addTrustedService } from "./trustedServicesActions";
+import { addTrustedService, showModalAddTrustedService } from "./trustedServicesActions";
 import { push } from "react-router-redux";
 
 interface IDiagnosticsInformation {
@@ -82,7 +83,7 @@ export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
   if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
     //
   } else {
-    window.SHOW_MODAL = true;
+    store.dispatch(showModalAddTrustedService());
 
     const remote = window.electron.remote;
     const curWindow = remote.getCurrentWindow();
@@ -95,8 +96,6 @@ export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
     curWindow.focus();
 
     store.dispatch(push(LOCATION_MAIN));
-
-
   }
 
   store.dispatch(addTrustedService(command.url));

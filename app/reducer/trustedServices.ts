@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { OrderedMap, Record } from "immutable";
 import {
-  ADD_TRUSTED_SERVICE, TRUSTED_SERVICES_JSON,
+  ADD_TRUSTED_SERVICE, SHOW_MODAL_ADD_TRUSTED_SERVICE, TRUSTED_SERVICES_JSON,
 } from "../constants";
 
 export const TrustedServiceModel = Record({
@@ -11,6 +11,7 @@ export const TrustedServiceModel = Record({
 
 export const DefaultReducerState = Record({
   entities: OrderedMap({}),
+  showModal: false,
 });
 
 export default (trustedServices = new DefaultReducerState(), action) => {
@@ -22,6 +23,9 @@ export default (trustedServices = new DefaultReducerState(), action) => {
         url: payload.service,
       }));
       break;
+
+    case SHOW_MODAL_ADD_TRUSTED_SERVICE:
+      return trustedServices.set("showModal", true);
   }
 
   if (type === ADD_TRUSTED_SERVICE) {

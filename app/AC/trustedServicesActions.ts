@@ -1,4 +1,4 @@
-import { ADD_TRUSTED_SERVICE } from "../constants";
+import { ADD_TRUSTED_SERVICE, SHOW_MODAL_ADD_TRUSTED_SERVICE } from "../constants";
 import { uuid } from "../utils";
 
 export function addTrustedService(service: string) {
@@ -8,5 +8,11 @@ export function addTrustedService(service: string) {
       service,
     },
     type: ADD_TRUSTED_SERVICE,
+  };
+}
+
+export function showModalAddTrustedService() {
+  return {
+    type: SHOW_MODAL_ADD_TRUSTED_SERVICE,
   };
 }
