@@ -389,6 +389,7 @@ export default {
     documents_deleted1: "Удалены документы ( файлов: ",
     documents_deleted2: " )",
     encrypted_files: "Зашифрованные файлы",
+    archived_files: "Архивированные файлы",
     filename: "Имя файла",
     filesize: "Размер",
     filesize_from: "Размер файла больше чем",

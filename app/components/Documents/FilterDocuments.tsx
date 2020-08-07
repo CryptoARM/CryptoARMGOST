@@ -2,13 +2,13 @@ import PropTypes from "prop-types";
 import React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
+import { unselectAllFiles } from "../../AC";
+import { unselectAllDocuments } from "../../AC/documentsActions";
 import { applyDocumentsFilters, resetDocumentsFilters } from "../../AC/documentsFiltersActions";
 import {
-  ALL, ENCRYPTED, SIGNED,
+  ALL, ARCHIVED, ENCRYPTED, SIGNED,
 } from "../../constants";
 import DatePicker from "../DatePicker";
-import {unselectAllFiles} from "../../AC";
-import {unselectAllDocuments} from "../../AC/documentsActions";
 
 interface IFilterDocumentsProps {
   applyDocumentsFilters: (filters: IDocumentsFilters) => void;
@@ -33,6 +33,7 @@ interface IDocumentsFilters {
   types: {
     ENCRYPTED: boolean;
     SIGNED: boolean;
+    ARCHIVED: boolean;
     [key: string]: boolean;
   };
 }
@@ -50,6 +51,7 @@ const initialState = {
   sizeFrom: "",
   sizeTo: "",
   types: {
+    ARCHIVED: false,
     ENCRYPTED: false,
     SIGNED: false,
   },
@@ -275,6 +277,19 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
                             {localize("Documents.signed_files", locale)}
                           </label>
                         </div>
+                        <div className="input-checkbox">
+                          <input
+                            name={ARCHIVED}
+                            type="checkbox"
+                            id={ARCHIVED}
+                            className="filled-in"
+                            checked={types.ARCHIVED}
+                            onChange={this.handleFileTypesChange}
+                          />
+                          <label htmlFor={ARCHIVED} className="truncate">
+                            {localize("Documents.archived_files", locale)}
+                          </label>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -310,7 +325,7 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
     const { filters } = this.state;
     const { types } = filters;
 
-    return !types.ENCRYPTED && !types.SIGNED;
+    return !types.ENCRYPTED && !types.SIGNED && !types.ARCHIVED;
   }
 
   handleFileTypesChange = (ev: any) => {
@@ -335,6 +350,7 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
       filters: {
         ...this.state.filters,
         types: {
+          ARCHIVED: !value,
           ENCRYPTED: !value,
           SIGNED: !value,
         },
