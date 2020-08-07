@@ -372,6 +372,7 @@ export default {
     resolve_header: "Solutions",
   },
   Documents: {
+    archived_files: "Archived files",
     Documents: "DOCUMENTS",
     atime: "Last access",
     birthtime: "Creation time",
