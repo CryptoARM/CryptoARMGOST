@@ -15,7 +15,7 @@ import {
 import { IFile } from "../../AC";
 import { documentsReviewed } from "../../AC/documentsActions";
 import { createTransactionDSS, dssOperationConfirmation, dssPerformOperation } from "../../AC/dssActions";
-import { multiDirectOperation, multiOperationStart, multiReverseOperation  } from "../../AC/multiOperations";
+import { multiDirectOperation, multiOperationStart, multiReverseOperation } from "../../AC/multiOperations";
 import {
   activeSetting, changeDefaultSettings, deleteSetting, saveSettings,
 } from "../../AC/settingsActions";
@@ -57,6 +57,7 @@ import WrongCertificate from "../Settings/WrongCertificate";
 import SignerInfo from "../Signature/SignerInfo";
 import store from "../../store";
 import { push } from "react-router-redux";
+import { postRequest } from "../../AC/urlCmdUtils";
 
 const dialog = window.electron.remote.dialog;
 
@@ -175,7 +176,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       this.handleCloseModalDssResponse();
     }
 
-    if(prevProps.signingPackage && !this.props.signingPackage && !this.props.packageSignResult) {
+    if (prevProps.signingPackage && !this.props.signingPackage && !this.props.packageSignResult) {
       $(".toast-files_signed_failed").remove();
       Materialize.toast(localize("Sign.files_signed_failed", locale), 7000, "toast-files_signed_failed");
     }
@@ -190,7 +191,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   render() {
     const { localize, locale } = this.context;
     const { activeFiles, activeFilesArr, isDocumentsReviewed, recipients, setting, settings, signer,
-      operationIsRemote } = this.props;
+      operationIsRemote, operationRemoteAction } = this.props;
     const { file, saveSettingsWithNewName } = this.state;
 
     const disabledNavigate = this.isFilesFromSocket();
@@ -453,8 +454,9 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
                   <div className="col s4 waves-effect waves-cryptoarm" onClick={() => {
                     this.props.removeAllFiles();
-                    if (this.props.operationRemoteAction) {
-                      cancelUrlAction(this.props.operationRemoteAction.json);
+                    if (operationRemoteAction) {
+                      console.log("operationRemoteAction", operationRemoteAction);
+                      cancelUrlAction("signAndEncrypt.outDirectResults", operationRemoteAction.url, operationRemoteAction.id);
                     }
 
                     removeUrlAction();
@@ -483,8 +485,8 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
                   <div className="col s4 waves-effect waves-cryptoarm" onClick={() => {
                     this.props.removeAllFiles();
-                    if (this.props.operationRemoteAction) {
-                      cancelUrlAction(this.props.operationRemoteAction.json);
+                    if (operationRemoteAction) {
+                      cancelUrlAction("signAndEncrypt.outDirectResults", operationRemoteAction.url, operationRemoteAction.id);
                     }
                     removeUrlAction();
                   }}>
@@ -911,7 +913,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if ((setting.sign.timestamp_on_data || setting.sign.timestamp_on_sign)
-    && setting.tsp.url === "") {
+      && setting.tsp.url === "") {
       $(".toast-Sign_failed_TSP_misconfigured").remove();
       Materialize.toast(localize("Tsp.failed_tsp_url", locale), 3000, "toast-Sign_failed-TSP_misconfigured");
       return;
@@ -1001,14 +1003,14 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       setting = setting.setIn(["sign", "time"], true);
     }
     if (files.length > 0) {
-      const policies: string [] = [] ;
+      const policies: string[] = [];
       const folderOut = setting.operations.save_result_to_folder ? setting.outfolder : "";
 
       let format = trusted.DataFormat.PEM;
       if (setting.sign.encoding !== localize("Settings.BASE", locale)) {
         format = trusted.DataFormat.DER;
       }
-      if (setting.sign.detached) {policies.push ("detached"); }
+      if (setting.sign.detached) { policies.push("detached"); }
       if (folderOut.length > 0) {
         if (!dirExists(folderOut)) {
           $(".toast-failed_find_directory").remove();
@@ -1310,7 +1312,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   resignDss = (filesAtt: IFilePackage, filesDet: IFilePackage, setting: any, cert: any,
-               multipackage: boolean = false) => {
+    multipackage: boolean = false) => {
     const { signer, tokensAuth, users, policyDSS, uploader,
       createTransactionDSS, packageReSign } = this.props;
     const { pinCode } = this.state;
@@ -1325,7 +1327,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     const policy = policyDSS.getIn([signer.dssUserID, "policy"]).filter(
       (item: any) => item.Action === (isSignPackage ? "SignDocuments" : "SignDocument"));
     const mfaRequired = policy[0].MfaRequired;
-    const policies: string [] = [];
+    const policies: string[] = [];
     const folderOut = setting.outfolder;
     let format = trusted.DataFormat.PEM;
     if (setting.sign.encoding !== localize("Settings.BASE", locale)) {
@@ -1333,7 +1335,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (mfaRequired) {
-      const originalDocument = (signsIsDetached &&  !isSignPackage) ? documents[0].OriginalContent : "";
+      const originalDocument = (signsIsDetached && !isSignPackage) ? documents[0].OriginalContent : "";
       createTransactionDSS(user.dssUrl,
         tokenAuth.access_token,
         buildTransaction(
@@ -1342,6 +1344,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         documentsId)
         .then(
           (data1: any) => {
+            resign
             $(".toast-transaction_created_successful").remove();
             Materialize.toast(localize("DSS.transaction_created_successful", locale), 3000, "toast-transaction_created_successful");
 
@@ -1407,7 +1410,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                         packageReSign(files, cert, policies, format, folderOut, outURIList,
                           directResult, isNeedToSignSecondPackage || multipackage,
                           isNeedToSignSecondPackage);
-                        if(isNeedToSignSecondPackage) {
+                        if (isNeedToSignSecondPackage) {
                           this.resignDss(null, filesDet, setting, cert, true);
                         } else {
                           this.setState({ pinCode: "" });
@@ -1470,7 +1473,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           },
         );
     } else {
-      const originalData = (signsIsDetached &&  !isSignPackage) ? documents[0].OriginalContent : "";
+      const originalData = (signsIsDetached && !isSignPackage) ? documents[0].OriginalContent : "";
       this.props.dssPerformOperation(
         user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
         tokenAuth.access_token,
@@ -1570,7 +1573,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (files.length > 0) {
-      const policies: string [] = [];
+      const policies: string[] = [];
       const folderOut = setting.outfolder;
       let format = trusted.DataFormat.PEM;
       if (setting.sign.encoding !== localize("Settings.BASE", locale)) {
@@ -1758,26 +1761,36 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
             return;
           } else {
+            const infoRequest = {
+              jsonrpc: "2.0",
+              method: "signAndEncrypt.outDirectResults",
+              params: {
+                directResults: [],
+                id: operationRemoteAction.id,
+              },
+            };
+
             remoteFilesToUpload.forEach((uploadData: any) => {
-              const formData = {
-                extra: JSON.stringify(uploadData.file.extra),
-                file: fs.createReadStream(uploadData.newPath),
+              infoRequest.params.directResults.push({
                 id: uploadData.file.remoteId,
-                signers: JSON.stringify(uploadData.normalyzeSignatureInfo),
-              };
+                out: fs.readFileSync(uploadData.newPath, "base64"),
+                signers: uploadData.normalyzeSignatureInfo,
+              });
 
-              window.request.post({
-                formData,
-                url: uploader,
-              }, (err) => {
-                if (err) {
-                  console.log("err", err);
-                }
-
-                deleteFile(uploadData.file.id);
-              }
-              );
+              deleteFile(uploadData.file.id);
             });
+
+            postRequest(uploader, JSON.stringify(infoRequest)).then(
+              (respData: any) => {
+                const remote = window.electron.remote;
+                remote.getCurrentWindow().minimize();
+              },
+              (error) => {
+                // tslint:disable-next-line: no-console
+                console.log("Error sending of diagnostics info with id " + operationRemoteAction.id
+                  + ". Error description: " + error);
+              },
+            );
           }
         }
 
@@ -2264,7 +2277,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (filesSign.length > 0) {
-      const policies: string [] = [];
+      const policies: string[] = [];
 
       const folderOut = setting.outfolder;
       let format = trusted.DataFormat.PEM;

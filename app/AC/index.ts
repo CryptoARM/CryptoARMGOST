@@ -31,6 +31,7 @@ import { ERROR, SIGNED, UPLOADED, VERIFIED } from "../server/constants";
 import * as signs from "../trusted/sign";
 import { Store } from "../trusted/store";
 import { extFile, fileCoding, fileExists, md5 } from "../utils";
+import { postRequest } from "./urlCmdUtils";
 
 export function changeLocation(location: string) {
   return (dispatch: (action: {}) => void) => {
@@ -153,42 +154,45 @@ function uploadFiles(
   uploader: any,
   urlActions: any
 ) {
-  remoteFilesToUpload.forEach((uploadData: any) => {
-    const formData = {
-      extra: JSON.stringify(uploadData.file.extra),
-      file: fs.createReadStream(uploadData.newPath),
-      id: uploadData.file.remoteId,
-      signers: JSON.stringify(uploadData.normalyzeSignatureInfo),
-    };
-
-    window.request.post({
-      formData,
-      url: uploader,
-    }, (err: Error) => {
-      if (err) {
-        //
-      } else {
-        //
-
-        dispatch({
-          payload: { id: uploadData.file.id },
-          type: DELETE_FILE,
-        });
-      }
-
-      try {
-        fs.unlinkSync(uploadData.newPath);
-
-        if (urlActions && urlActions.action && urlActions.action.isDetachedSign) {
-          fs.unlinkSync(uploadData.file.fullpath);
-          fs.unlinkSync(uploadData.newPath.substring(0, uploadData.newPath.lastIndexOf(".")));
-        }
-      } catch (e) {
-        //
-      }
+  const infoRequest = {
+    jsonrpc: "2.0",
+    method: "signAndEncrypt.outDirectResults",
+    params: {
+      directResults: [],
+      id: urlActions.action.id,
     },
-    );
+  };
+
+  remoteFilesToUpload.forEach((uploadData: any) => {
+    infoRequest.params.directResults.push({
+      id: uploadData.file.remoteId,
+      out: fs.readFileSync(uploadData.newPath, "base64"),
+      signers: uploadData.normalyzeSignatureInfo,
+    });
+
+    try {
+      fs.unlinkSync(uploadData.newPath);
+
+      if (urlActions && urlActions.action && urlActions.action.isDetachedSign) {
+        fs.unlinkSync(uploadData.file.fullpath);
+        fs.unlinkSync(uploadData.newPath.substring(0, uploadData.newPath.lastIndexOf(".")));
+      }
+    } catch (e) {
+      //
+    }
   });
+
+  postRequest(uploader, JSON.stringify(infoRequest)).then(
+    (respData: any) => {
+      const remote = window.electron.remote;
+      remote.getCurrentWindow().minimize();
+    },
+    (error) => {
+      // tslint:disable-next-line: no-console
+      console.log("Error sending of diagnostics info with id " + urlActions.id
+        + ". Error description: " + error);
+    },
+  );
 }
 
 export function packageSign(

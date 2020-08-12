@@ -1,0 +1,23 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "operation": [
+      "VERIFYSIGN"
+    ],
+    "props": {
+      "license": "",
+      "files": [
+        {
+          "name": "file1.txt.sig",
+          "url": "http://localhost:8080/public/files/file1.txt.sig",
+          "id": 2,
+          "urlDetached": ""
+        }
+      ],
+      "extra": {
+        "token": "9c7101f7-9c47-4481-b4da-a6a497abde08"
+      }
+    }
+  },
+  "id": "1b9e26e0-0524-402c-b255-b17dd49ef49b"
+}
