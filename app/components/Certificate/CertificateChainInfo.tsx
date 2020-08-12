@@ -135,18 +135,18 @@ class CertificateChainInfo extends React.Component<any, any> {
   }
 
   buildChain = (certItem: any) => {
-    let tcert: trusted.pki.Certificate | undefined;
-
-    if (certItem.x509 && certItem.dssUserID) {
-      try {
-        tcert = new trusted.pki.Certificate();
-        tcert.import(Buffer.from(certItem.x509), trusted.DataFormat.PEM);
-      } catch (e) {
-        //
+    let certificate = certItem.object ? certItem.object : null;
+    if (certificate === null) {
+      if (certItem.x509 && certItem.dssUserID) {
+        try {
+          certificate = trusted.pki.Certificate.import(Buffer.from(certItem.x509), trusted.DataFormat.PEM);
+        } catch (e) {
+          return null;
+        }
+      } else {
+        certificate = window.PKISTORE.getPkiObject(certItem);
       }
     }
-
-    const certificate = certItem.object ? certItem.object : certItem.x509 ? tcert : window.PKISTORE.getPkiObject(certItem);
 
     try {
       return trusted.utils.Csp.buildChain(certificate);
