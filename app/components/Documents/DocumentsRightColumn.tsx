@@ -10,7 +10,7 @@ import {
 import {
   LOCATION_MAIN, REMOVE, SIGN,
 } from "../../constants";
-import { selectedDocumentsSelector, selectedFiltredDocumentsSelector } from "../../selectors/documentsSelector";
+import { filteredDocumentsSelector, selectedDocumentsSelector, selectedFiltredDocumentsSelector } from "../../selectors/documentsSelector";
 import { bytesToSize, mapToArr } from "../../utils";
 import FileIcon from "../Files/FileIcon";
 import SignatureInfoBlock from "../Signature/SignatureInfoBlock";
@@ -56,12 +56,12 @@ class DocumentsRightColumn extends React.Component<IDocumentsWindowProps, {}> {
 
   render() {
     const { localize, locale } = this.context;
-    const { documents, documentsMap, fileSignatures, selectedDocs, showSignatureInfo } = this.props;
+    const { fileSignatures, selectedDocs, showSignatureInfo, filteredDocSelector } = this.props;
 
     let lastSelectDocument;
 
     if (selectedDocs && selectedDocs.size) {
-      lastSelectDocument = documentsMap.get(selectedDocs.last());
+      lastSelectDocument = filteredDocSelector.get(selectedDocs.last());
     }
 
     return (
@@ -249,7 +249,7 @@ export default connect((state) => {
   });
 
   return {
-
+    filteredDocSelector: filteredDocumentsSelector (state),
     activeDocumentsArr: selectedDocumentsSelector(state),
     documents: selectedDocumentsSelector(state),
     documentsMap: state.documents.entities,

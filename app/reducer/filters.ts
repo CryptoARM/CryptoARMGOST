@@ -16,6 +16,7 @@ const defaultFilters = {
     sizeFrom: undefined,
     sizeTo: undefined,
     types: {
+      ARCHIVED: false,
       ENCRYPTED: false,
       SIGNED: false,
     },
@@ -180,6 +181,7 @@ export default (filters = defaultFilters, action) => {
           sizeFrom: undefined,
           sizeTo: undefined,
           types: {
+            ARCHIVED: false,
             ENCRYPTED: false,
             SIGNED: false,
           },
@@ -198,7 +200,8 @@ const checkDefaultDocumentsFilters = (filters: any) => {
     defaultFilters.documents.sizeFrom === filters.sizeFrom &&
     defaultFilters.documents.sizeTo === filters.sizeTo &&
     defaultFilters.documents.types.ENCRYPTED === filters.types.ENCRYPTED &&
-    defaultFilters.documents.types.SIGNED === filters.types.SIGNED
+    defaultFilters.documents.types.SIGNED === filters.types.SIGNED &&
+    defaultFilters.documents.types.ARCHIVED === filters.types.ARCHIVED
   ) {
     return true;
   }

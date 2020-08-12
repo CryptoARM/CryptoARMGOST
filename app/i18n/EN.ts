@@ -41,9 +41,9 @@ export default {
     send: "Send",
     support: "Support",
     username: "Name",
-    version: "2.5.3",
+    version: "2.5.4",
     version_app: "Application version",
-    version_full: "Version: 2.5.3",
+    version_full: "Version: 2.5.4",
   },
   AddressBook: {
     address_book: "Address book",
@@ -372,6 +372,7 @@ export default {
     resolve_header: "Solutions",
   },
   Documents: {
+    archived_files: "Archived files",
     Documents: "DOCUMENTS",
     atime: "Last access",
     birthtime: "Creation time",
