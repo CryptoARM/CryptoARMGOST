@@ -157,7 +157,18 @@ export default class CertificateInfo extends React.Component<ICertificateInfoPro
   }
 
   buildChain = (certItem: any) => {
-    const certificate = certItem.object ? certItem.object : certItem.x509 ? certItem.x509 : window.PKISTORE.getPkiObject(certItem);
+    let certificate = certItem.object ? certItem.object : null;
+    if (certificate === null) {
+      if (certItem.x509) {
+        try {
+          certificate = trusted.pki.Certificate.import(Buffer.from(certItem.x509), trusted.DataFormat.PEM);
+        } catch (e) {
+          return null;
+        }
+      } else {
+        certificate = window.PKISTORE.getPkiObject(certItem);
+      }
+    }
 
     try {
       return trusted.utils.Csp.buildChain(certificate);
