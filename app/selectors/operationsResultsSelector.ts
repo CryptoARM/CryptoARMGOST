@@ -1,6 +1,6 @@
 import { createSelector } from "reselect";
 import {
-  ALL, ENCRYPTED, SIGNED,
+  ALL, ARCHIVED, ENCRYPTED, SIGNED,
 } from "../constants";
 
 export const documentsGetter = (state) => state.multiOperations.entities;
@@ -18,8 +18,9 @@ export const filteredOperationsResultsSelector = createSelector(documentsGetter,
       (
         types[ENCRYPTED] && document.extension === "enc" ||
         types[SIGNED] && document.extension === "sig" ||
+        types[ARCHIVED] && document.extension === "zip" ||
         (
-          !types[ENCRYPTED] && !types[SIGNED]
+          !types[ENCRYPTED] && !types[SIGNED] && !types[ARCHIVED]
         )
       );
   });

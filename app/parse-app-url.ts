@@ -144,10 +144,11 @@ export function parseUrlCommandApiV7(urlWithCommand: string): IUrlCommandApiV4Ty
   // Trim the trailing / from the URL
   const parsedPath = pathName.substr(1);
 
-  // // enable only https
-  // if (URL.parse(parsedPath, true).protocol !== "https:") {
-  //   return result;
-  // }
+
+  // enable only https
+  if (URL.parse(parsedPath, true).protocol !== "https:") {
+     return result;
+  }
 
   result.command = recievedCommand;
   result.id = getQueryStringValue(query, "id");

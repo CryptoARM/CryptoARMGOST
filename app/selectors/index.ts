@@ -1,7 +1,7 @@
 import { List, OrderedMap } from "immutable";
 import { createSelector } from "reselect";
 import {
-  ALL, ENCRYPTED, SIGNED, MY,
+  ALL, ENCRYPTED, SIGNED, MY, ARCHIVED,
 } from "../constants";
 import { mapToArr } from "../utils";
 
@@ -97,8 +97,9 @@ export const filteredFilesSelector = createSelector(filesGetter, filtersGetter, 
       (
         types[ENCRYPTED] && file.extension === "enc" ||
         types[SIGNED] && file.extension === "sig" ||
+        types[ARCHIVED] && file.extension === "zip" ||
         (
-          !types[ENCRYPTED] && !types[SIGNED]
+          !types[ENCRYPTED] && !types[SIGNED] && !types[ARCHIVED]
         )
       );
   });
