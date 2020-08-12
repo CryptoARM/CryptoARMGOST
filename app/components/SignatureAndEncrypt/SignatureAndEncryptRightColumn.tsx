@@ -191,7 +191,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   render() {
     const { localize, locale } = this.context;
     const { activeFiles, activeFilesArr, isDocumentsReviewed, recipients, setting, settings, signer,
-      operationIsRemote } = this.props;
+      operationIsRemote, operationRemoteAction } = this.props;
     const { file, saveSettingsWithNewName } = this.state;
 
     const disabledNavigate = this.isFilesFromSocket();
@@ -454,8 +454,9 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
                   <div className="col s4 waves-effect waves-cryptoarm" onClick={() => {
                     this.props.removeAllFiles();
-                    if (this.props.operationRemoteAction) {
-                      cancelUrlAction(this.props.operationRemoteAction.json);
+                    if (operationRemoteAction) {
+                      console.log("operationRemoteAction", operationRemoteAction);
+                      cancelUrlAction("signAndEncrypt.outDirectResults", operationRemoteAction.url, operationRemoteAction.id);
                     }
 
                     removeUrlAction();
@@ -484,8 +485,8 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
                   <div className="col s4 waves-effect waves-cryptoarm" onClick={() => {
                     this.props.removeAllFiles();
-                    if (this.props.operationRemoteAction) {
-                      cancelUrlAction(this.props.operationRemoteAction.json);
+                    if (operationRemoteAction) {
+                      cancelUrlAction("signAndEncrypt.outDirectResults", operationRemoteAction.url, operationRemoteAction.id);
                     }
                     removeUrlAction();
                   }}>
@@ -1765,7 +1766,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               method: "signAndEncrypt.outDirectResults",
               params: {
                 directResults: [],
-                id: operationRemoteAction.accessToken,
+                id: operationRemoteAction.id,
               },
             };
 
@@ -1786,7 +1787,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               },
               (error) => {
                 // tslint:disable-next-line: no-console
-                console.log("Error sending of diagnostics info with id " + operationRemoteAction.accessToken
+                console.log("Error sending of diagnostics info with id " + operationRemoteAction.id
                   + ". Error description: " + error);
               },
             );

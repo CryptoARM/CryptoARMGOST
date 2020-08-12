@@ -159,7 +159,7 @@ function uploadFiles(
     method: "signAndEncrypt.outDirectResults",
     params: {
       directResults: [],
-      id: urlActions.action.accessToken,
+      id: urlActions.action.id,
     },
   };
 
@@ -189,7 +189,7 @@ function uploadFiles(
     },
     (error) => {
       // tslint:disable-next-line: no-console
-      console.log("Error sending of diagnostics info with id " + urlActions.accessToken
+      console.log("Error sending of diagnostics info with id " + urlActions.id
         + ". Error description: " + error);
     },
   );

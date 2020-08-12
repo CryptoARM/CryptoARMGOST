@@ -6,21 +6,21 @@ export interface ISignDocumentsFromURLAction {
   name: "sign-documents-from-url";
   url: string;
   command?: string;
-  accessToken?: string;
+  id?: string;
 }
 
 export interface IVerifyDocumentsFromURLAction {
   name: "verify-documents-from-url";
   url: string;
   command?: string;
-  accessToken?: string;
+  id?: string;
 }
 
 export interface IUnknownAction {
   name: "unknown";
   url: string;
   command?: string;
-  accessToken?: string;
+  id?: string;
 }
 
 export type URLActionType =
@@ -48,64 +48,6 @@ function getQueryStringValue(query: any, key: any) {
   }
 
   return value;
-}
-
-export function parseAppURL(url: string): URLActionType {
-  const parsedURL = URL.parse(url, true);
-  const hostname = parsedURL.hostname;
-  const unknown: IUnknownAction = { name: "unknown", url };
-  if (!hostname) {
-    return unknown;
-  }
-
-  const query = parsedURL.query;
-
-  const actionName = hostname.toLowerCase();
-  const command = getQueryStringValue(query, "command");
-  const accessToken = getQueryStringValue(query, "accessToken");
-
-  // we require something resembling a URL first
-  // - bail out if it's not defined
-  // - bail out if you only have `/`
-  const pathName = parsedURL.pathname;
-  if (!pathName || pathName.length <= 1) {
-    return unknown;
-  }
-
-  // Trim the trailing / from the URL
-  const parsedPath = pathName.substr(1);
-
-  if (actionName === "certificates") {
-    return {
-      name: "url-action-certificates",
-      url: parsedPath,
-      // tslint:disable-next-line: object-literal-sort-keys
-      command,
-      accessToken,
-    };
-  }
-
-  if (actionName === "sign") {
-    return {
-      name: "sign-documents-from-url",
-      url: parsedPath,
-      // tslint:disable-next-line: object-literal-sort-keys
-      command,
-      accessToken,
-    };
-  }
-
-  if (actionName === "verify") {
-    return {
-      name: "verify-documents-from-url",
-      url: parsedPath,
-      // tslint:disable-next-line: object-literal-sort-keys
-      command,
-      accessToken,
-    };
-  }
-
-  return unknown;
 }
 
 export function handlePossibleProtocolLauncherArgs(args: string[], possibleProtocols: Set<string>): string {

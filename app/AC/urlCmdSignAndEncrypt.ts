@@ -50,7 +50,7 @@ export function handleUrlCommandSignAmdEncrypt( command: IUrlCommandApiV4Type ) 
           name: "sign-documents-from-url",
           url: command.url,
           // tslint:disable-next-line: object-literal-sort-keys
-          accessToken: command.id,
+          id: command.id,
           props,
         });
       } else {
@@ -58,7 +58,7 @@ export function handleUrlCommandSignAmdEncrypt( command: IUrlCommandApiV4Type ) 
           name: "verify-documents-from-url",
           url: command.url,
           // tslint:disable-next-line: object-literal-sort-keys
-          accessToken: command.id,
+          id: command.id,
           props,
         });
       }

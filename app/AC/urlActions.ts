@@ -20,6 +20,7 @@ import { toggleReverseOperations, toggleSigningOperation } from "./settingsActio
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
 import { handleUrlCommandSignAmdEncrypt } from "./urlCmdSignAndEncrypt";
+import { postRequest } from "./urlCmdUtils";
 
 const remote = window.electron.remote;
 
@@ -96,29 +97,33 @@ export function removeUrlAction() {
   });
 }
 
-export async function cancelUrlAction(data: ISignRequest | IEncryptRequest) {
+export async function cancelUrlAction(
+  method: string,
+  url: string,
+  id: string,
+) {
+  const data = {
+    jsonrpc: "2.0",
+    method,
+    params: {
+      id,
+      status: "Canceled",
+      // tslint:disable-next-line: object-literal-sort-keys
+      error: null,
+      errorDescription: null,
+    },
+  };
 
-  const { params } = data;
-
-  if (!params) {
-    return;
-  }
-  const { extra, files, uploader } = params;
-
-  for (const file of files) {
-
-    const form = new FormData();
-
-    form.append("id", file.id);
-    form.append("success", "0");
-
-    await window.fetch(uploader,
-      {
-        method: "POST",
-        body: form,
-      });
-
-  }
+  postRequest(url, JSON.stringify(data)).then(
+    (respData: any) => {
+      remote.getCurrentWindow().minimize();
+    },
+    (error) => {
+      // tslint:disable-next-line: no-console
+      console.log("Error cancel action with id " + id
+        + ". Error description: " + error);
+    },
+  );
 
   store.dispatch({
     type: CANCEL_URL_ACTION,
@@ -143,18 +148,9 @@ function signDocumentsFromURL(action: URLActionType) {
     try {
       let data: any;
 
-      const urlObj = new URL(action.url);
-
-      if (action.accessToken) {
-        urlObj.searchParams.append("accessToken", action.accessToken);
-      }
-
-      if (action.command) {
-        urlObj.searchParams.append("command", action.command);
-      }
-
       data = action.props;
       data.method = "sign";
+      data.uploader = action.url;
 
       if (data && data.files) {
         await downloadFiles(data);
@@ -190,18 +186,9 @@ function verifyDocumentsFromURL(action: URLActionType) {
     try {
       let data: any;
 
-      const urlObj = new URL(action.url);
-
-      if (action.accessToken) {
-        urlObj.searchParams.append("accessToken", action.accessToken);
-      }
-
-      if (action.command) {
-        urlObj.searchParams.append("command", action.command);
-      }
-
       data = action.props;
       data.method = "verify";
+      data.uploader = action.url;
 
       if (data && data.files) {
         await downloadFiles(data);

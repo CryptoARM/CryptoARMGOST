@@ -1,5 +1,5 @@
 const { app, BrowserWindow, Tray, Menu, protocol } = require('electron');
-const { parseAppURL, handlePossibleProtocolLauncherArgs,
+const { handlePossibleProtocolLauncherArgs,
   setAsDefaultProtocolClient, parseUrlCommandApiV7 } = require('./parse-app-url.ts');
 
 let mainWindow = null;
@@ -364,10 +364,6 @@ function handleAppURL(url) {
     mainWindow.webContents.send('url-command', { command: parsedCommand });
     return;
   }
-
-  const action = parseAppURL(url);
-
-  mainWindow.webContents.send('url-action', { action });
 }
 
 

@@ -5,7 +5,7 @@ import {
 } from "../constants";
 
 export const ActionModel = Record({
-  accessToken: null,
+  id: null,
   command: null,
   isDetachedSign: null,
   json: null,

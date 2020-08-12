@@ -53,7 +53,7 @@ export async function postRequest(url: string, requestData: string|Buffer) {
             throw new Error(`Unexpected status code ${statusCode}`);
         }
 
-        if (data !== "" && data.error) {
+        if (data && data.error) {
           if (data.error.data) {
             // tslint:disable-next-line: no-console
             console.log(`Server error data: ${JSON.stringify(data.error.data)}`);
