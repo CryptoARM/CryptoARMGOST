@@ -1,34 +1,34 @@
 {
-    "jsonrpc":"2.0",
-    "method":"sign",
-    "params":{
-        "license":"",
-        "token":"",
-        "files":[
-            {
-                "name":"file1.txt",
-                "url":"http://localhost:8080/public/files/file1.txt",
-                "id":1,
-                "urlSign":""
-            },
-			{
-                "name":"file2.txt",
-                "url":"http://localhost:8080/public/files/file2.txt",
-                "id":2,
-                "urlSign":""
-            },
-			{
-                "name":"file4.pdf",
-                "url":"http://localhost:8080/public/files/file4.pdf",
-                "id":4,
-                "urlSign":""
-            }
-        ],
-        "extra":{
-            "token":"9c7101f7-9c47-4481-b4da-a6a497abde08",
-            "signType":"1",
-            "signStandart":"1"
-        },
-        "uploader":"http://localhost:8080/upload"
-    }
+  "jsonrpc": "2.0",
+  "method": "sign",
+  "params": {
+    "license": "",
+    "token": "",
+    "files": [
+      {
+        "name": "file1.txt",
+        "url": "http://localhost:8080/public/files/file1.txt",
+        "id": 1,
+        "urlSign": ""
+      },
+      {
+        "name": "file2.txt",
+        "url": "http://localhost:8080/public/files/file2.txt",
+        "id": 2,
+        "urlSign": ""
+      },
+      {
+        "name": "file4.pdf",
+        "url": "http://localhost:8080/public/files/file4.pdf",
+        "id": 4,
+        "urlSign": ""
+      }
+    ],
+    "extra": {
+      "token": "9c7101f7-9c47-4481-b4da-a6a497abde08",
+      "signType": "1",
+      "signStandart": "1"
+    },
+    "uploader": "http://localhost:8080/upload"
+  }
 }

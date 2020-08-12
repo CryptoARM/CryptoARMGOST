@@ -5,7 +5,7 @@ import {
 } from "../constants";
 
 export const ActionModel = Record({
-  accessToken: null,
+  id: null,
   command: null,
   isDetachedSign: null,
   json: null,
@@ -35,7 +35,7 @@ export default (urlAction = new DefaultReducerState(), action) => {
         .set("performing", false)
         .set("action", new ActionModel(payload));
 
-      if (payload.json && payload.json.params && payload.json.params.extra && payload.json.params.extra.signType == 1) {
+      if (payload.json && payload.json.extra && payload.json.extra.signType == 1) {
         urlAction = urlAction.setIn(["action", "isDetachedSign"], true);
       } else {
         urlAction = urlAction.setIn(["action", "isDetachedSign"], false);
