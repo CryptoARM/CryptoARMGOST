@@ -82,7 +82,7 @@ export function handlePossibleProtocolLauncherArgs(args: string[], possibleProto
 }
 
 function registerForURLSchemeLinux(scheme: string) {
-  execSync(`xdg-mime default CryptoARM_GOST.desktop x-scheme-handler/${scheme}`);
+  execSync(`xdg-mime query default x-scheme-handler/${scheme}`);
 }
 
 /**
