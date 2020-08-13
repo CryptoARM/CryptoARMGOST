@@ -19,11 +19,9 @@ class CertificateStatusIcon extends React.Component<ICertificateStatusIconProps,
     }
 
     this.timerHandle = setTimeout(() => {
-      if (!certificate.verified) {
-        verifyCertificate(certificate.id);
-      }
 
-      this.timerHandle = null;
+        verifyCertificate(certificate.id);
+        this.timerHandle = null;
     }, 2000);
   }
 

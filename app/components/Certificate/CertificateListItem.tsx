@@ -39,10 +39,7 @@ class CertificateListItem extends React.Component<ICertificateListItemProps, {}>
     const { cert, verifyCertificate } = this.props;
 
     this.timerHandle = setTimeout(() => {
-      if (!cert.verified) {
-        verifyCertificate(cert.id);
-      }
-
+      verifyCertificate(cert.id);
       this.timerHandle = null;
     }, 2000);
   }
@@ -68,7 +65,7 @@ class CertificateListItem extends React.Component<ICertificateListItemProps, {}>
       curStatusStyle = cert.dssUserID ? "cloud_cert_status_ok" : "cert_status_ok";
       rectangleStyle = rectangleValidStyle;
     } else {
-      curStatusStyle = cert.dssUserID  ? "cloud_cert_status_error" : "cert_status_error";
+      curStatusStyle = cert.dssUserID ? "cloud_cert_status_error" : "cert_status_error";
       rectangleStyle = rectangleUnvalidStyle;
     }
 

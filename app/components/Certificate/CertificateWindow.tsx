@@ -6,7 +6,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import Media from "react-media";
 import { connect } from "react-redux";
-import { loadAllCertificates, loadAllContainers, removeAllCertificates, removeAllContainers } from "../../AC";
+import { loadAllCertificates, loadAllContainers, removeAllCertificates, removeAllContainers, verifyCertificate } from "../../AC";
 import { deleteRequestCA } from "../../AC/caActions";
 import { resetCloudCSP } from "../../AC/cloudCspActions";
 import { changeSearchValue } from "../../AC/searchActions";
@@ -908,7 +908,7 @@ class CertWindow extends React.Component<any, any> {
     const { localize, locale } = this.context;
 
     let cert: any = null;
-
+    verifyCertificate(certificate.id);
     if (certificate && activeCertInfoTab) {
       cert = <CertificateInfo certificate={certificate} />;
     } else if (certificate) {
