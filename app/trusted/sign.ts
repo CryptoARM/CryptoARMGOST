@@ -486,7 +486,7 @@ export function unSign(uri: string, folderOut: string, logOperation = true): any
     } else {
       $(".toast-files_unsigned_detached").remove();
       Materialize.toast(localize("Sign.files_unsigned_detached", window.locale), 2000, "toast-files_unsigned_detached");
-      return "";
+      return "undeatached";
     }
   } catch (err) {
     if (logOperation) {

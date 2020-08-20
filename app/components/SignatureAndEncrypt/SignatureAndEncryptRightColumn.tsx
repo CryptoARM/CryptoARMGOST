@@ -831,7 +831,18 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (setting.operations.reverse_operations) {
+
+      if (activeFilesArr.length === 1 && activeFilesArr[0].extension === "sig") {
+        let cms = signs.loadSign(activeFilesArr[0].fullpath);
+
+        if (cms.isDetached()) {
+          $(".toast-files_unsigned_detached").remove();
+          Materialize.toast(localize("Sign.files_unsigned_detached", window.locale), 2000, "toast-files_unsigned_detached");
+          return;
+         }
+      }
       for (const activeFileItem of activeFilesArr) {
+
         if (activeFileItem.extension === "enc") {
           if (licenseStatus !== true) {
             $(".toast-jwtErrorLicense").remove();
