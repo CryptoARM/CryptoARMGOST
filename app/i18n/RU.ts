@@ -264,7 +264,7 @@ export default {
     version: "Версия",
   },
   CertificateStore: {
-    AddressBook: "Другие пользователи",
+    AddressBook: "Контакты",
     CA: "Промежуточные центры сертификации",
     MY: "Личное",
     ROOT: "Доверенные корневые",
