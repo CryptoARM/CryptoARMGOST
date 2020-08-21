@@ -209,6 +209,8 @@ export default {
     cert_import_auto: "Import certificate in store that auto choosed",
     cert_import_current: "Import certificate in current store",
     cert_import_failed: "The certificate import failed",
+    cert_add_is_GOST: "Error. Only GOST encryption certificates can be selected at the same time ",
+    cert_add_is_RSA: "Error. Only RSA encryption certificates can be selected at the same time",
     cert_import_from_file: "Import from file",
     cert_import_ok: "The certificate is successfully imported",
     cert_imported: "The certificate is already imported",
