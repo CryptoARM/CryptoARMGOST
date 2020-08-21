@@ -34,10 +34,10 @@ export function addServiceCertificate(certificate: trusted.pki.Certificate, cert
     serial: certificate.serialNumber,
     signatureAlgorithm: certificate.signatureAlgorithm,
     signatureDigestAlgorithm: certificate.signatureDigestAlgorithm,
-    status: certificateProps.Status && certificateProps.Status.Value === "ACTIVE",
+    status: false,
     subjectFriendlyName: certificate.subjectFriendlyName,
     subjectName: certificate.subjectName,
-    verified: true,
+    verified: false,
     version: certificate.version,
     x509: certificate.export(trusted.DataFormat.PEM).toString(),
   };

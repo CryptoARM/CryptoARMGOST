@@ -1,7 +1,7 @@
 import { notEqual } from "assert";
 import { createSelector } from "reselect";
 import {
-  ALL, ENCRYPTED, SIGNED,
+  ALL, ENCRYPTED, SIGNED, ARCHIVED,
 } from "../constants";
 
 export const documentsGetter = (state) => state.documents.entities;
@@ -19,8 +19,9 @@ export const filteredDocumentsSelector = createSelector(documentsGetter, filters
       (
         types[ENCRYPTED] && document.extension === "enc" ||
         types[SIGNED] && document.extension === "sig" ||
+        types[ARCHIVED] && document.extension === "zip" ||
         (
-          !types[ENCRYPTED] && !types[SIGNED]
+          !types[ENCRYPTED] && !types[SIGNED] && !types[ARCHIVED]
         )
       );
   });

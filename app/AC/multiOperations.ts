@@ -7,15 +7,16 @@ import * as unzipper from "unzipper";
 import {
   AES_128, AES_192, AES_256, ARCHIVATION_OPERATION, BASE64,
   DEFAULT_DOCUMENTS_PATH, DEFAULT_TEMP_PATH, DER,
-  DES, DES3, ENCRYPTION_OPERATION, GOST_28147,
-  GOST_R3412_2015_K, GOST_R3412_2015_M, HOME_DIR,
-  LOCATION_RESULTS_MULTI_OPERATIONS,
-  MULTI_DIRECT_OPERATION, MULTI_REVERSE_OPERATION,
-  SELECT_ALL_DOCUMENTS_IN_OPERAIONS_RESULT, SELECT_ARCHIVED_DOCUMENTS_IN_OPERAIONS_RESULT,
+  DES, DES3, ENCRYPTION_OPERATION, FAIL,
+  GOST_28147, GOST_R3412_2015_K, GOST_R3412_2015_M,
+  HOME_DIR,
+  LOCATION_RESULTS_MULTI_OPERATIONS, MULTI_DIRECT_OPERATION,
+  MULTI_REVERSE_OPERATION, SELECT_ALL_DOCUMENTS_IN_OPERAIONS_RESULT,
+  SELECT_ARCHIVED_DOCUMENTS_IN_OPERAIONS_RESULT,
   SELECT_DOCUMENT_IN_OPERAIONS_RESULT,
   SELECT_ENCRYPTED_DOCUMENTS_IN_OPERAIONS_RESULT,
-  SELECT_SIGNED_DOCUMENTS_IN_OPERAIONS_RESULT,
-  SIGNING_OPERATION, START, SUCCESS,
+  SELECT_SIGNED_DOCUMENTS_IN_OPERAIONS_RESULT, SIGNING_OPERATION, START,
+  SUCCESS,
   UNSELECT_ALL_DOCUMENTS_IN_OPERAIONS_RESULT,
   UNSELECT_DOCUMENT_IN_OPERAIONS_RESULT,
 } from "../constants";
@@ -107,7 +108,7 @@ export function multiDirectOperation(
       }
 
       if (signing_operation) {
-        const policies: string [] = [];
+        const policies: string[] = [];
 
         if (setting.sign.detached) {
           policies.push("detached");
@@ -217,7 +218,7 @@ export function multiDirectOperation(
       let archiveName = "";
       let archivedFiles: any[] = [];
 
-      if (archivation_operation) {
+      if (archivation_operation && packageResult) {
         const newoutfolder = encryption_operation ? DEFAULT_TEMP_PATH : save_result_to_folder ? outfolder : "";
 
         let filesForArchive: any[] = signedFiles.slice(0);
@@ -226,48 +227,83 @@ export function multiDirectOperation(
           filesForArchive = filesForArchive.concat(files);
         }
 
-        archiveName = await archiveFiles(filesForArchive, newoutfolder);
-        if (!encryption_operation && save_copy_to_documents) {
-          const copyUri = path.join(DEFAULT_DOCUMENTS_PATH, path.basename(archiveName));
+        try {
+          archiveName = await archiveFiles(filesForArchive, newoutfolder);
+          if (!encryption_operation && save_copy_to_documents) {
+            const copyUri = path.join(DEFAULT_DOCUMENTS_PATH, path.basename(archiveName));
 
-          if (!fileExists(copyUri)) {
-            fs.copyFileSync(archiveName, copyUri);
+            if (!fileExists(copyUri)) {
+              fs.copyFileSync(archiveName, copyUri);
+            }
           }
-        }
 
-        archivedFiles = [getFileProps(archiveName)];
+          archivedFiles = [getFileProps(archiveName)];
 
-        const newFileProps = getFileProps(archiveName);
+          const newFileProps = getFileProps(archiveName);
 
-        directResult.results.push({
-          id: Date.now() + Math.random(),
-          in: filesForArchive,
-          operation: ARCHIVATION_OPERATION,
-          out: {
-            ...newFileProps,
-            operation: 2,
-          },
-          result: true,
-        });
-
-        for (const signedFile of signedFiles) {
-          const currentId = signedFile.originalId ? signedFile.originalId : signedFile.id;
-
-          directFiles[currentId] = {
-            ...directFiles[currentId],
-            archivation_operation: {
-              out: {
-                ...newFileProps,
-                operation: 2,
-              },
-              result: true,
+          directResult.results.push({
+            id: Date.now() + Math.random(),
+            in: filesForArchive,
+            operation: ARCHIVATION_OPERATION,
+            out: {
+              ...newFileProps,
+              operation: 2,
             },
-          };
+            result: true,
+          });
+
+          for (const signedFile of signedFiles) {
+            const currentId = signedFile.originalId ? signedFile.originalId : signedFile.id;
+
+            directFiles[currentId] = {
+              ...directFiles[currentId],
+              archivation_operation: {
+                out: {
+                  ...newFileProps,
+                  operation: 2,
+                },
+                result: true,
+              },
+            };
+          }
+        } catch (error) {
+
+          directResult.results.push({
+            id: Date.now() + Math.random(),
+            in: filesForArchive,
+            operation: ARCHIVATION_OPERATION,
+            out: {
+              operation: 2,
+            },
+            result: false,
+          });
+          packageResult = false;
+          dispatch({
+            payload: { status: packageResult, directResult },
+            type: MULTI_DIRECT_OPERATION + FAIL,
+          });
+
         }
+
       } else {
         archivedFiles = [...signedFiles];
       }
-
+      if (archivation_operation && !packageResult) {
+        directResult.results.push({
+          id: Date.now() + Math.random(),
+          in: signedFiles.slice(0),
+          operation: ARCHIVATION_OPERATION,
+          out: {
+            operation: 2,
+          },
+          result: false,
+        });
+        packageResult = false;
+        dispatch({
+          payload: { status: packageResult, directResult },
+          type: MULTI_DIRECT_OPERATION + FAIL,
+        });
+      }
       let encryptedFiles: any[] = [];
 
       if (encryption_operation) {
@@ -475,7 +511,6 @@ export function multiReverseOperation(
     dispatch({
       type: MULTI_REVERSE_OPERATION + START,
     });
-
     const filesForRemoveFromTemp = getTempDirectoryFiles();
 
     const packageResult = { packageResult: true };
@@ -574,7 +609,7 @@ const reverseOperations = async (file: any, reverseFiles: any, packageResult: IP
       const newPath = signs.unSign(file.fullpath, DEFAULT_TEMP_PATH);
       const currentId = file.originalId ? file.originalId : file.id;
 
-      if (newPath) {
+      if (newPath !== "undeatached" || "") {
         const newFileProps = { ...getFileProps(newPath), originalId: file.id };
 
         reverseResult.results.push({
@@ -602,7 +637,10 @@ const reverseOperations = async (file: any, reverseFiles: any, packageResult: IP
         if (newFileProps.extension === "enc" || newFileProps.extension === "sig" || newFileProps.extension === "zip") {
           await reverseOperations(newFileProps, reverseFiles, packageResult, reverseResult);
         }
+      } else if (newPath === "undeatached") {
+        packageResult.packageResult = true;
       } else {
+
         packageResult.packageResult = false;
 
         reverseResult.results.push({
@@ -742,7 +780,14 @@ async function archiveFiles(files: any[], folderOut: string): Promise<string> {
     archive.pipe(output);
 
     files.forEach((file) => {
-      archive.append(fs.createReadStream(file.fullpath), { name: file.filename });
+      const stream = fs.createReadStream(file.fullpath);
+      stream.on("error", () => {
+        output.end();
+        fs.unlinkSync(newOutUri);
+        reject("error");
+      },
+      );
+      archive.append(stream, { name: file.filename });
     });
 
     archive.finalize();

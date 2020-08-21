@@ -30,7 +30,7 @@ export const APPLY_DOCUMENTS_FILTERS = "APPLY_DOCUMENTS_FILTERS";
 export const RESET_DOCUMENTS_FILTERS = "RESET_DOCUMENTS_FILTERS";
 export const SIGNED = "SIGNED";
 export const ENCRYPTED = "ENCRYPTED";
-
+export const ARCHIVED = "ARCHIVED";
 export const ALL = "ALL";
 export const SIGN = "SIGN";
 export const VERIFY = "VERIFY";

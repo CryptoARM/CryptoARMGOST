@@ -20,7 +20,7 @@ interface ISideMenuProps {
   pathname: string;
   setting: any;
   removeAllFiles: () => void;
- }
+}
 
 class SideMenu extends React.Component<ISideMenuProps, {}> {
   static contextTypes = {
@@ -43,7 +43,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
 
   render() {
     const { operationIsRemote } = this.props;
-    const disabledNavigate = operationIsRemote ;
+    const disabledNavigate = operationIsRemote;
     const { localize, locale } = this.context;
     const { pathname } = this.props;
 
@@ -56,14 +56,14 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
         </div>
 
         <div className="row">
-          <div className={`row nobottom ${ disabledNavigate ? "disabled" : ""}`}>
+          <div className={`row nobottom ${disabledNavigate ? "disabled" : ""}`}>
             {LOCATION_MAIN === pathname ? < div className="side-nav-rectangle" /> : null}
             <Link id="sign_encrypt" to={LOCATION_MAIN} data-activates="dropdown-sign_and_encrypt" data-hover="hover" style={{ padding: "0 10px" }}>
               <i className={`material-icons sidevan sign_and_encrypt ${disabledNavigate ? "disabledIcon" : ""}`}></i>
             </Link>
           </div>
 
-          <div className={`row nobottom ${ disabledNavigate ? "disabled" : ""}`}>
+          <div className={`row nobottom ${disabledNavigate ? "disabled" : ""}`}>
             {LOCATION_DOCUMENTS === pathname ? < div className="side-nav-rectangle" /> : null}
             <Link id="document_stores" to={LOCATION_DOCUMENTS} data-activates="dropdown-documents-stores" data-hover="hover" style={{ padding: "0 10px" }}>
               <i className={`material-icons sidevan document ${disabledNavigate ? "disabledIcon" : ""}`}></i>
@@ -363,11 +363,11 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
     );
   }
 
-   onExit = async () => {
-    const { setting } = this.props;
+  onExit = async () => {
+    const { operationRemoteAction, setting } = this.props;
 
-    if (this.props.operationRemoteAction) {
-     await cancelUrlAction(this.props.operationRemoteAction.json);
+    if (operationRemoteAction) {
+      await cancelUrlAction("signAndEncrypt.outDirectResults", operationRemoteAction.url, operationRemoteAction.id);
     }
     this.props.removeAllFiles();
     removeUrlAction();

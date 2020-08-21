@@ -356,7 +356,7 @@ function collectDiagnosticInfo(
   return result;
 }
 
-function checkIfUtilIsAvailable(utilName: string, params?: string[]) {
+export function checkIfUtilIsAvailable(utilName: string, params?: string[]) {
   const { spawnSync } = require("child_process");
 
   let paramsToUse = params;

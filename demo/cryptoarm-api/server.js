@@ -26,9 +26,13 @@ app.post('/json', function (req, res) {
     console.log("Error! Wrong jsonrpc version! (" + req.body.jsonrpc + " but MUST be 2.0)");
   }
 
+
+  console.log("req.body", req.body);
+
   if (req.body.method === "certificates.parameters"
     || req.body.method === "certificateInfo.parameters"
     || req.body.method === "diagnostics.parameters"
+    || req.body.method === "signAndEncrypt.parameters"
   ) {
     if (id !== req.body.id) {
       console.log("Error! Id from URL and ID from request is not match! (" + id + " and " + req.body.id + ")");
@@ -57,6 +61,20 @@ app.post('/json', function (req, res) {
           break;
         case "14a52a48-dac7-4b21-8836-744e453a82d2":
           res.sendFile(__dirname + '/public/json/server-errors/parse-error.json');
+          break;
+
+        // signAndEncrypt
+        case "71407d37-ae12-4a60-9c38-a77664c31f27":
+          res.sendFile(__dirname + '/public/json/signAndEncrypt/sign-attached-file.json');
+          break;
+        case "3a2fca10-fb2c-45eb-a61e-2e0da2a92bf0":
+          res.sendFile(__dirname + '/public/json/signAndEncrypt/sign-detached-file.json');
+          break;
+        case "6afd40d9-4ef2-4d88-a9cc-3f15e4b0a3c0":
+          res.sendFile(__dirname + '/public/json/signAndEncrypt/sign-multiple-files.json');
+          break;
+        case "1b9e26e0-0524-402c-b255-b17dd49ef49b":
+          res.sendFile(__dirname + '/public/json/signAndEncrypt/verify-attached-sign.json');
           break;
 
 
@@ -118,6 +136,9 @@ app.post('/json', function (req, res) {
     res.status(200).send("");
   } else if (req.body.method === "diagnostics.information") {
     printDiagnosticInformation(req.body.params);
+    res.status(200).send("");
+  } else if (req.body.method === "signAndEncrypt.outDirectResults") {
+    console.log("outDirectResults", req.body.params.directResults);
     res.status(200).send("");
   } else {
     console.log("Unsupported method: " + req.body.method);
@@ -209,16 +230,16 @@ function printDiagnosticInformation(params) {
   if (params.SYSTEMINFORMATION) {
     var sysinfo = params.SYSTEMINFORMATION;
     console.log("\n\tSYSTEMINFORMATION");
-    if(sysinfo.type) {
+    if (sysinfo.type) {
       console.log("type: " + sysinfo.type);
     }
-    if(sysinfo.arch) {
+    if (sysinfo.arch) {
       console.log("arch: " + sysinfo.arch);
     }
-    if(sysinfo.platform) {
+    if (sysinfo.platform) {
       console.log("platform: " + sysinfo.platform);
     }
-    if(sysinfo.packageType) {
+    if (sysinfo.packageType) {
       console.log("packageType: " + sysinfo.packageType);
     }
   }
@@ -236,10 +257,10 @@ function printDiagnosticInformation(params) {
   if (params.VERSIONS) {
     var versions = params.VERSIONS;
     console.log("\n\tVERSIONS");
-    if(versions.cryptoarm) {
+    if (versions.cryptoarm) {
       console.log("cryptoarm: " + versions.cryptoarm);
     }
-    if(versions.csp) {
+    if (versions.csp) {
       console.log("csp: " + versions.csp);
     }
   }
@@ -254,7 +275,7 @@ function printDiagnosticInformation(params) {
   if (params.LICENSES) {
     var licenses = params.LICENSES;
     console.log("\n\tLICENSES");
-    if(licenses.cryptoarm) {
+    if (licenses.cryptoarm) {
       console.log("cryptoarm.status: " + licenses.cryptoarm.status);
       if (licenses.cryptoarm.type) {
         console.log("cryptoarm.type: " + licenses.cryptoarm.type);
@@ -263,7 +284,7 @@ function printDiagnosticInformation(params) {
         console.log("cryptoarm.expiration: " + licenses.cryptoarm.expiration);
       }
     }
-    if(licenses.csp) {
+    if (licenses.csp) {
       console.log("csp.status: " + licenses.csp.status);
       if (licenses.csp.type) {
         console.log("csp.type: " + licenses.csp.type);
