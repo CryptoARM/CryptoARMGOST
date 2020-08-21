@@ -292,11 +292,9 @@ class CertificateSelectionForEncrypt extends React.Component<any, any> {
         selectedRecipients: [...this.state.selectedRecipients, cert],
       }); }
       } else {
-        const msg = isGost ? "Certificate.cert_add_is_GOST" : "Certificate.cert_add_is_RSA"  ;
-
         $(".toast-ca_req_error").remove();
         Materialize.toast(
-          localize (msg, locale) , 3000, "toast-ca_req_error");
+          localize ("Certificate.cert_add_is_GOST_or_RSA", locale) , 3000, "toast-ca_req_error");
       }
     }
   }
