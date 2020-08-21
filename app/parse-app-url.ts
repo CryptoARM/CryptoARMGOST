@@ -1,6 +1,7 @@
 import { execSync } from "child_process";
 import { app } from "electron";
 import * as URL from "url";
+import { checkIfUtilIsAvailable } from "./AC/urlCmdDiagnostic";
 
 export interface ISignDocumentsFromURLAction {
   name: "sign-documents-from-url";
@@ -82,7 +83,11 @@ export function handlePossibleProtocolLauncherArgs(args: string[], possibleProto
 }
 
 function registerForURLSchemeLinux(scheme: string) {
-  execSync(`xdg-mime default CryptoARM_GOST.desktop x-scheme-handler/${scheme}`);
+  if (checkIfUtilIsAvailable("dpkg")) {
+            execSync(`xdg-mime default CryptoARM_GOST.desktop x-scheme-handler/${scheme}`);
+          } else {
+           execSync(`xdg-mime default cryptoarm-gost.desktop x-scheme-handler/${scheme}`);
+          }
 }
 
 /**
