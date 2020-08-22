@@ -77,29 +77,6 @@ function paramsRequestDiag(id: string) {
 }
 
 export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
-  const state = store.getState();
-  const { trustedServices } = state;
-
-  if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
-    //
-  } else {
-    store.dispatch(showModalAddTrustedService());
-
-    const remote = window.electron.remote;
-    const curWindow = remote.getCurrentWindow();
-
-    if ( curWindow.isMinimized()) {
-      curWindow.restore();
-    }
-
-    curWindow.show();
-    curWindow.focus();
-
-    store.dispatch(push(LOCATION_MAIN));
-  }
-
-  store.dispatch(addTrustedService(command.url));
-
   store.dispatch({
     type: DIAGNOSTIC_FROM_URL + START,
   });

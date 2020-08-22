@@ -9,7 +9,7 @@ import {
   LOCATION_MAIN, PACKAGE_SELECT_FILE, REMOVE_ALL_FILES,
   REMOVE_ALL_REMOTE_FILES, REMOVE_URL_ACTION, SET_REMOTE_FILES_PARAMS,
   SIGN, SIGN_DOCUMENTS_FROM_URL, START, SUCCESS,
-  TMP_DIR, VERIFY, VERIFY_DOCUMENTS_FROM_URL, VERIFY_SIGNATURE,
+  TMP_DIR, VERIFY, VERIFY_DOCUMENTS_FROM_URL, VERIFY_SIGNATURE, URL_CMD,
 } from "../constants";
 import { IUrlCommandApiV4Type, URLActionType } from "../parse-app-url";
 import store from "../store";
@@ -17,6 +17,7 @@ import { checkLicense } from "../trusted/jwt";
 import * as signs from "../trusted/sign";
 import { extFile, fileExists, md5 } from "../utils";
 import { toggleReverseOperations, toggleSigningOperation } from "./settingsActions";
+import { showModalAddTrustedService, addTrustedService } from "./trustedServicesActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
 import { handleUrlCommandSignAmdEncrypt } from "./urlCmdSignAndEncrypt";
@@ -54,6 +55,43 @@ interface IEncryptRequest {
     license?: string;
   };
   controller: string;
+}
+
+export function checkTrustedServiceForCommand(
+  command: IUrlCommandApiV4Type,
+) {
+  const state = store.getState();
+  const { trustedServices } = state;
+
+  if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
+    const curWindow = remote.getCurrentWindow();
+
+    if ( curWindow.isMinimized()) {
+      curWindow.restore();
+    }
+
+    curWindow.show();
+    curWindow.focus();
+
+    dispatchURLCommand(command);
+  } else {
+    store.dispatch(showModalAddTrustedService());
+
+    const curWindow = remote.getCurrentWindow();
+
+    if ( curWindow.isMinimized()) {
+      curWindow.restore();
+    }
+
+    curWindow.show();
+    curWindow.focus();
+
+    store.dispatch(startUrlCmd(command));
+
+    store.dispatch(push(LOCATION_MAIN));
+
+    return;
+  }
 }
 
 export function dispatchURLCommand(
@@ -424,4 +462,11 @@ const openWindow = (operation: string) => {
     default:
       return;
   }
+};
+
+export const startUrlCmd = (command: any) => {
+  return {
+    payload: { command },
+    type: URL_CMD + START,
+  };
 };
