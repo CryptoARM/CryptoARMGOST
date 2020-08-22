@@ -299,7 +299,7 @@ function collectDiagnosticInfo(id: string, diagOperations: string[]): IDiagnosti
   return result;
 }
 
-export function checkIfUtilIsAvailable(utilName: string, params?: string[]) {
+function checkIfUtilIsAvailable(utilName: string, params?: string[]) {
   const { spawnSync } = require("child_process");
 
   let paramsToUse = params;
