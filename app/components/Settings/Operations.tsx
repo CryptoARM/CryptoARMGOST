@@ -79,7 +79,7 @@ class Operations extends React.Component<IOperationsProps, {}> {
         </div>
         <div className="col s12">
           <CheckBoxWithLabel
-            isChecked={save_copy_to_documents}
+            isChecked={save_copy_to_documents && !operationIsRemote}
             disabled={is_disabled}
             elementId="save_copy_to_documents"
             onClickCheckBox={this.handleSaveCopyClick}
