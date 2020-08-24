@@ -504,7 +504,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               <React.Fragment>
                 <div className="col s12">
                   <a className={`btn btn-outlined waves-effect waves-light ${this.checkEnableMultiOperations() ? "" : "disabled"}`}
-                    onClick={this.checkCertificatesBeforePerformOperation}
+                    onClick={setting.operations.signing_operation ?  this.checkCertificatesBeforePerformOperation : this.handleClickPerformOperations}
                     style={{ width: "100%" }}>
                     {localize("Common.perform", locale)}
                   </a>
