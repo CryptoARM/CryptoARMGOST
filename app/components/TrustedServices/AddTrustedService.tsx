@@ -1,5 +1,8 @@
 import PropTypes from "prop-types";
 import React from "react";
+import { connect } from "react-redux";
+import { addTrustedService, hideModalAddTrustedService } from "../../AC/trustedServicesActions";
+import store from "../../store";
 
 interface IAddTrustedServiceProps {
   onCancel?: () => void;
@@ -33,6 +36,9 @@ class AddTrustedService extends React.Component<
   render() {
     const { saveService } = this.state;
     const { localize, locale } = this.context;
+    const { trustedServices } = this.props;
+
+    const urlToCheck = trustedServices && trustedServices.urlToCheck ? trustedServices.urlToCheck : "Unknown URL";
 
     return (
       <React.Fragment>
@@ -41,6 +47,7 @@ class AddTrustedService extends React.Component<
             <div className="content-wrapper tbody border_group">
               <div className="row">
                 <div className="input-field col s12">
+                  {urlToCheck}
                   <input
                     name="groupDelCont"
                     type="checkbox"
@@ -71,9 +78,9 @@ class AddTrustedService extends React.Component<
             <div style={{ display: "inline-block", margin: "10px" }}>
               <a
                 className="btn btn-outlined waves-effect waves-light modal-close"
-                onClick={() => console.log("service")}
+                onClick={this.handleProcessCommandWithService}
               >
-                {localize("Common.delete", locale)}
+                {localize("Common.perform", locale)}
               </a>
             </div>
           </div>
@@ -82,17 +89,33 @@ class AddTrustedService extends React.Component<
     );
   }
 
+  handleProcessCommandWithService = () => {
+    const { trustedServices } = this.props;
+
+    const urlToCheck = trustedServices && trustedServices.urlToCheck ? trustedServices.urlToCheck : "Unknown URL";
+
+    if (this.state.saveService) {
+      store.dispatch(addTrustedService(urlToCheck));
+    }
+
+    store.dispatch(hideModalAddTrustedService());
+  }
+
   handelCancel = () => {
     const { onCancel } = this.props;
 
     if (onCancel) {
       onCancel();
     }
-  };
+  }
 
   toggleSaveService = () => {
     this.setState({ saveService: !this.state.saveService });
-  };
+  }
 }
 
-export default AddTrustedService;
+export default connect((state) => {
+  return {
+    trustedServices: state.trustedServices,
+  };
+})(AddTrustedService);

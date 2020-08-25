@@ -9,7 +9,7 @@ import {
   LOCATION_MAIN, PACKAGE_SELECT_FILE, REMOVE_ALL_FILES,
   REMOVE_ALL_REMOTE_FILES, REMOVE_URL_ACTION, SET_REMOTE_FILES_PARAMS,
   SIGN, SIGN_DOCUMENTS_FROM_URL, START, SUCCESS,
-  TMP_DIR, VERIFY, VERIFY_DOCUMENTS_FROM_URL, VERIFY_SIGNATURE, URL_CMD,
+  TMP_DIR, URL_CMD, VERIFY, VERIFY_DOCUMENTS_FROM_URL, VERIFY_SIGNATURE,
 } from "../constants";
 import { IUrlCommandApiV4Type, URLActionType } from "../parse-app-url";
 import store from "../store";
@@ -17,7 +17,7 @@ import { checkLicense } from "../trusted/jwt";
 import * as signs from "../trusted/sign";
 import { extFile, fileExists, md5 } from "../utils";
 import { toggleReverseOperations, toggleSigningOperation } from "./settingsActions";
-import { showModalAddTrustedService, addTrustedService } from "./trustedServicesActions";
+import { showModalAddTrustedService } from "./trustedServicesActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
 import { handleUrlCommandSignAmdEncrypt } from "./urlCmdSignAndEncrypt";
@@ -63,7 +63,18 @@ export function checkTrustedServiceForCommand(
   const state = store.getState();
   const { trustedServices } = state;
 
+  let serviceIsTrusted = false;
+
   if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
+    const findResult = trustedServices.entities.find(
+      (value: any, key: any, iter: any) => {
+        return value.url === command.url;
+      },
+    );
+    serviceIsTrusted = (undefined !== findResult);
+  }
+
+  if (serviceIsTrusted) {
     const curWindow = remote.getCurrentWindow();
 
     if ( curWindow.isMinimized()) {
@@ -75,7 +86,7 @@ export function checkTrustedServiceForCommand(
 
     dispatchURLCommand(command);
   } else {
-    store.dispatch(showModalAddTrustedService());
+    store.dispatch(showModalAddTrustedService(command.url));
 
     const curWindow = remote.getCurrentWindow();
 

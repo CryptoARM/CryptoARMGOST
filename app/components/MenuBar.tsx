@@ -52,8 +52,14 @@ class MenuBar extends React.Component<any, IMenuBarState> {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.trustedServices.showModal !== this.props.trustedServices.showModal) {
+    if (prevProps.trustedServices.showModal === false
+      && this.props.trustedServices.showModal === true) {
       this.handleShowModalAddTrustedService();
+    }
+
+    if (prevProps.trustedServices.showModal === true
+      && this.props.trustedServices.showModal === false) {
+      this.handleCloseModalAddTrustedService();
     }
   }
 

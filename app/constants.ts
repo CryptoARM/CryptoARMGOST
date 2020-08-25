@@ -319,6 +319,7 @@ export const DIAGNOSTIC_FROM_URL = "diagnostic-from-url";
 export const ADD_TRUSTED_SERVICE = "ADD_TRUSTED_SERVICE";
 export const TRUSTED_SERVICES_JSON = window.TRUSTED_SERVICES_JSON;
 export const SHOW_MODAL_ADD_TRUSTED_SERVICE = "SHOW_MODAL_ADD_TRUSTED_SERVICE";
+export const HIDE_MODAL_ADD_TRUSTED_SERVICE = "HIDE_MODAL_ADD_TRUSTED_SERVICE";
 
 export const SERVICE_URL = "https://id.trusted.plus";
 export const SERVICE_TRUSTEDAPP = SERVICE_URL + "/trustedapp";
