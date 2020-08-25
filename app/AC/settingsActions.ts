@@ -166,8 +166,8 @@ export function changeEncryptionAlgorithm(algorithm: string) {
 
 export function isGostRecipients(recipients: any) {
   return recipients.filter(function(recipient: any) {
-    return recipient.signatureAlgorithm !== "1.2.643.7.1.1.3.2"
-      && recipient.signatureAlgorithm !== "1.2.643.2.2.3";
+    return recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+      && recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2";
   }).length === 0;
 }
 
