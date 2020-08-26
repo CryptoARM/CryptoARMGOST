@@ -3,6 +3,7 @@ import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
 import { push } from "react-router-redux";
+import * as URL from "url";
 import {
   ADD_LICENSE, ADD_REMOTE_FILE, CANCEL_URL_ACTION, DECRYPT,
   DOWNLOAD_REMOTE_FILE, ENCRYPT, ENCRYPTED, FAIL,
@@ -66,9 +67,10 @@ export function checkTrustedServiceForCommand(
   let serviceIsTrusted = false;
 
   if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
+    const hostToCheck = getHostFromUrl(command.url);
     const findResult = trustedServices.entities.find(
       (value: any, key: any, iter: any) => {
-        return value.url === command.url;
+        return value.url === hostToCheck;
       },
     );
     serviceIsTrusted = (undefined !== findResult);
@@ -98,7 +100,6 @@ export function checkTrustedServiceForCommand(
     curWindow.focus();
 
     store.dispatch(startUrlCmd(command));
-
     store.dispatch(push(LOCATION_MAIN));
 
     return;
@@ -477,7 +478,12 @@ const openWindow = (operation: string) => {
 
 export const startUrlCmd = (command: any) => {
   return {
-    payload: { command },
+    payload: { urlCommand: command },
     type: URL_CMD + START,
   };
 };
+
+export const getHostFromUrl = (urlValue: string): string => {
+  const parsedUrl = URL.parse(urlValue);
+  return (parsedUrl && parsedUrl.host) ? parsedUrl.host : urlValue;
+}

@@ -3,6 +3,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { addTrustedService, hideModalAddTrustedService } from "../../AC/trustedServicesActions";
 import store from "../../store";
+import { dispatchURLCommand, getHostFromUrl } from "../../AC/urlActions";
 
 interface IAddTrustedServiceProps {
   onCancel?: () => void;
@@ -36,27 +37,33 @@ class AddTrustedService extends React.Component<
   render() {
     const { saveService } = this.state;
     const { localize, locale } = this.context;
-    const { trustedServices } = this.props;
+    const { trustedServices, urlCmds } = this.props;
 
-    const urlToCheck = trustedServices && trustedServices.urlToCheck ? trustedServices.urlToCheck : "Unknown URL";
+    const urlToCheck = trustedServices && trustedServices.urlToCheck ? getHostFromUrl(trustedServices.urlToCheck) : "Unknown URL";
 
     return (
       <React.Fragment>
         <div className="row halftop">
           <div className="col s12">
-            <div className="content-wrapper tbody border_group">
+            <div className="content-wrapper z-depth-1 tbody">
+              <div className="row">
+                <div className="col s12">
+                  <div className="primary-text">
+                    {localize("TrustedServices.site", locale)} {urlToCheck} {localize("TrustedServices.requests_for_cryptoarm", locale)}
+                  </div>
+                </div>
+              </div>
               <div className="row">
                 <div className="input-field col s12">
-                  {urlToCheck}
                   <input
                     name="groupDelCont"
                     type="checkbox"
                     id="delCont"
-                    className="checkbox-red"
+                    className="filled-in"
                     checked={saveService}
                     onClick={this.toggleSaveService}
                   />
-                  <label htmlFor="delCont">Сохранить сервис</label>
+                  <label htmlFor="delCont">{localize("TrustedServices.do_not_show_again", locale)}</label>
                 </div>
               </div>
             </div>
@@ -80,7 +87,7 @@ class AddTrustedService extends React.Component<
                 className="btn btn-outlined waves-effect waves-light modal-close"
                 onClick={this.handleProcessCommandWithService}
               >
-                {localize("Common.perform", locale)}
+                {localize("Common.allow", locale)}
               </a>
             </div>
           </div>
@@ -90,15 +97,16 @@ class AddTrustedService extends React.Component<
   }
 
   handleProcessCommandWithService = () => {
-    const { trustedServices } = this.props;
+    const { trustedServices, urlCmds } = this.props;
 
-    const urlToCheck = trustedServices && trustedServices.urlToCheck ? trustedServices.urlToCheck : "Unknown URL";
+    const urlToCheck = (trustedServices && trustedServices.urlToCheck) ? trustedServices.urlToCheck : "'Unknown resource'";
 
     if (this.state.saveService) {
-      store.dispatch(addTrustedService(urlToCheck));
+      store.dispatch(addTrustedService(getHostFromUrl(urlToCheck)));
     }
 
     store.dispatch(hideModalAddTrustedService());
+    dispatchURLCommand(urlCmds);
   }
 
   handelCancel = () => {
@@ -107,6 +115,8 @@ class AddTrustedService extends React.Component<
     if (onCancel) {
       onCancel();
     }
+
+    store.dispatch(hideModalAddTrustedService());
   }
 
   toggleSaveService = () => {
@@ -117,5 +127,6 @@ class AddTrustedService extends React.Component<
 export default connect((state) => {
   return {
     trustedServices: state.trustedServices,
+    urlCmds: state.urlCmds,
   };
 })(AddTrustedService);

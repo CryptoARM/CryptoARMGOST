@@ -279,7 +279,7 @@ class MenuBar extends React.Component<any, IMenuBarState> {
       <Modal
         isOpen={showModalAddTrustedService}
         key="showModalAddTrustedService"
-        header="Подтвердите операцию"
+        header={localize("TrustedServices.external_resource_request", locale)}
         onClose={this.handleCloseModalAddTrustedService}
         style={{ width: "500px" }}>
 

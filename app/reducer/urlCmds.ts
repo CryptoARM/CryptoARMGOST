@@ -8,14 +8,14 @@ const defaultCmd = {
   url: "",
 };
 
-export default (urlCmds = defaultCmd, action) => {
+export default (urlCmds = defaultCmd, action: any) => {
   const { type, payload } = action;
 
   switch (type) {
     case URL_CMD + START:
       return {
         ...urlCmds,
-        ...payload.comand,
+        ...payload.urlCommand,
       };
   }
 
