@@ -1502,20 +1502,20 @@ class CertWindow extends React.Component<any, any> {
 
                   {
                     OS_TYPE === "Windows_NT" && certificate && certificate.category !== REQUEST ?
-                      <div className="col s4 waves-effect waves-cryptoarm" onClick={this.viewCertificate}>
+                      <div style = {{right: '2px'}} className="col s4 waves-effect waves-cryptoarm" onClick={this.viewCertificate}>
                         <div className="col s12 svg_icon">
                           <a data-position="bottom">
                             <i className="material-icons certificate import" />
                           </a>
                         </div>
-                        <div className="col s12 svg_icon_text">{localize("Common.open", locale)}</div>
+                        <div  className="col s12 svg_icon_text">{localize("Common.open", locale)}</div>
                       </div>
                       : null
                   }
 
                   {
                     certificate && certificate.category === REQUEST ?
-                      <div className="col s4 waves-effect waves-cryptoarm" onClick={this.handleOpenCSRFolder}>
+                      <div style = {{marginRight: '10px'}} className="col s4 waves-effect waves-cryptoarm" onClick={this.handleOpenCSRFolder}>
                         <div className="col s12 svg_icon">
                           <a data-position="bottom">
                             <i className="material-icons certificate csrfolder" />

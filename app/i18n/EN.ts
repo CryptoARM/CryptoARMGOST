@@ -264,7 +264,7 @@ export default {
     version: "Version",
   },
   CertificateStore: {
-    AddressBook: "Address Book",
+    AddressBook: "Contacts",
     CA: "Certificate Authority",
     MY: "MY",
     ROOT: "Root",
