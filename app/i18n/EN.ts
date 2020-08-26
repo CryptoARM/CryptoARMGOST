@@ -285,6 +285,7 @@ export default {
     Back: "Back",
     add_all_files: "Add files from all the subfolders?",
     add_files: "Add files",
+    allow: "Allow",
     apply: "Apply",
     back: "Back",
     cancel: "Cancel",
@@ -890,6 +891,12 @@ export default {
   SignAndEncrypt: {
     SignAndEncrypt: "SIGNING AND ENCRYPTION",
     sign_and_encrypt: "Signature and encryption",
+  },
+  TrustedServices: {
+    do_not_show_again: "Don't show again for this site",
+    external_resource_request: "Request from an external site",
+    requests_for_cryptoarm: "requests permission to call CryptoARM GOST.",
+    site: "The site",
   },
   Tsp: {
     accuracy: "Accuracy",
