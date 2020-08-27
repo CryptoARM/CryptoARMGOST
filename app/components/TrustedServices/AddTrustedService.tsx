@@ -46,15 +46,11 @@ class AddTrustedService extends React.Component<
         <div className="row halftop">
           <div className="col s12">
             <div className="content-wrapper z-depth-1 tbody">
-              <div className="row">
-                <div className="col s12">
-                  <div className="primary-text">
-                    {localize("TrustedServices.site", locale)} {urlToCheck} {localize("TrustedServices.requests_for_cryptoarm", locale)}
-                  </div>
-                </div>
+              <div className="dialog-text">
+                {localize("TrustedServices.site", locale)} <span className="cryptoarm-blue" style={{ fontWeight: "bold" }}>{urlToCheck}</span> {localize("TrustedServices.requests_for_cryptoarm", locale)}
               </div>
               <div className="row">
-                <div className="input-field col s12">
+                <div className="input-field col">
                   <input
                     name="groupDelCont"
                     type="checkbox"
