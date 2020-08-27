@@ -271,14 +271,17 @@ class CertificateSelectionForEncrypt extends React.Component<any, any> {
   isGostRecipients(recipients: any) {
     return recipients.filter(function(recipient: any) {
       return recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
-        && recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2";
+        && recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+        && recipient.publicKeyAlgorithm !== "1.2.643.2.2.19";
     }).length === 0;
   }
-
   handleAddRecipient = (cert: any) => {
     const { localize, locale } = this.context;
-    const isSelectedGost = cert.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
-        && cert.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2" ? false : true;
+    const isSelectedGost =
+    cert.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+        && cert.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+        && cert.publicKeyAlgorithm !== "1.2.643.2.2.19"
+        ? false : true;
 
     if  (this.state.selectedRecipients.length < 1) {
       this.setState({

@@ -698,7 +698,8 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   isGostRecipients(recipients: any) {
     return recipients.filter(function(recipient: any) {
       return recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
-        && recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2";
+        && recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+        && recipient.publicKeyAlgorithm !== "1.2.643.2.2.19";
     }).length === 0;
   }
 
@@ -720,8 +721,11 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       const isGost = this.isGostRecipients(recipients);
 
       for (const items of recipients) {
-        const isItemGost = items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
-          && items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2" ? false : true;
+        const isItemGost =
+        items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+          && items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+          && items.publicKeyAlgorithm !== "1.2.643.2.2.19" ?
+           false : true;
         if (isGost === isItemGost) {
           $(".toast-ca_req_error").remove();
           Materialize.toast(
