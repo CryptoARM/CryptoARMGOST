@@ -7,7 +7,7 @@ import {
   loadAllCertificates, removeAllCertificates,
 } from "../../AC";
 import { changeSearchValue } from "../../AC/searchActions";
-import { changeEncryptionAlgorithm, getDefaultEncryptionAlg, isGostRecipients } from "../../AC/settingsActions";
+import { changeEncryptionAlgorithm, getDefaultEncryptionAlg, isGostRecipients} from "../../AC/settingsActions";
 import { urlCmdCertExportFail, urlCmdSendCerts } from "../../AC/urlCmdCertificates";
 import { URL_CMD_CERTIFICATES_EXPORT } from "../../constants";
 import { filteredCertificatesSelector } from "../../selectors";
@@ -268,12 +268,37 @@ class CertificateSelectionForEncrypt extends React.Component<any, any> {
 
     return title;
   }
-
+  isGostRecipients(recipients: any) {
+    return recipients.filter(function(recipient: any) {
+      return recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+        && recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+        && recipient.publicKeyAlgorithm !== "1.2.643.2.2.19";
+    }).length === 0;
+  }
   handleAddRecipient = (cert: any) => {
-    if (!this.state.selectedRecipients.includes(cert)) {
+    const { localize, locale } = this.context;
+    const isSelectedGost =
+    cert.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+        && cert.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+        && cert.publicKeyAlgorithm !== "1.2.643.2.2.19"
+        ? false : true;
+
+    if  (this.state.selectedRecipients.length < 1) {
       this.setState({
         selectedRecipients: [...this.state.selectedRecipients, cert],
       });
+    } else {
+      const isGost = this.isGostRecipients(this.state.selectedRecipients);
+      if (isGost  === isSelectedGost) {
+        if (!this.state.selectedRecipients.includes(cert)) {
+      this.setState({
+        selectedRecipients: [...this.state.selectedRecipients, cert],
+      }); }
+      } else {
+        $(".toast-ca_req_error").remove();
+        Materialize.toast(
+          localize ("Certificate.cert_add_is_GOST_or_RSA", locale) , 3000, "toast-ca_req_error");
+      }
     }
   }
 
@@ -378,8 +403,8 @@ class CertificateSelectionForEncrypt extends React.Component<any, any> {
 
   handleCloseModalContinue = () => {
     const { selectedRecipients } = this.state;
-    const isGost = isGostRecipients (selectedRecipients);
-    const defaultAlg = getDefaultEncryptionAlg (isGost);
+    const isGost = isGostRecipients(selectedRecipients);
+    const defaultAlg = getDefaultEncryptionAlg(isGost);
 
     this.props.changeEncryptionAlgorithm(defaultAlg);
     this.setState({ showModalWrongCertificate: false });

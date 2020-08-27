@@ -697,8 +697,17 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     );
   }
 
+  isGostRecipients(recipients: any) {
+    return recipients.filter(function(recipient: any) {
+      return recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+        && recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+        && recipient.publicKeyAlgorithm !== "1.2.643.2.2.19";
+    }).length === 0;
+  }
+
   checkCertificatesBeforePerformOperation = () => {
     const { setting, signer, recipients } = this.props;
+    const { localize, locale } = this.context;
     const isSignCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
 
     if (isSignCertFromDSS && signer && !signer.status) {
@@ -720,7 +729,20 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (setting.operations.encryption_operation && !setting.changedRecipients) {
+      const isGost = this.isGostRecipients(recipients);
+
       for (const items of recipients) {
+        const isItemGost =
+        items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+          && items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+          && items.publicKeyAlgorithm !== "1.2.643.2.2.19" ?
+           false : true;
+        if (isGost === isItemGost) {
+          $(".toast-ca_req_error").remove();
+          Materialize.toast(
+            localize("Certificate.cert_error_mixed_GOST_RSA", locale), 3000, "toast-ca_req_error");
+          return;
+        }
         if (!items.status) {
           this.handleshowModalWrongCertificate();
           this.setState({ isOnlySignerCertWrong: false });
