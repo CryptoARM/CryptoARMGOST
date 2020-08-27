@@ -17,7 +17,7 @@ import store from "../store";
 import { checkLicense } from "../trusted/jwt";
 import * as signs from "../trusted/sign";
 import { extFile, fileExists, md5 } from "../utils";
-import { toggleReverseOperations, toggleSigningOperation } from "./settingsActions";
+import { toggleReverseOperations, toggleSaveCopyToDocuments, toggleSigningOperation } from "./settingsActions";
 import { showModalAddTrustedService } from "./trustedServicesActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
@@ -190,7 +190,7 @@ function signDocumentsFromURL(action: URLActionType) {
 
   store.dispatch(toggleReverseOperations(false));
   store.dispatch(toggleSigningOperation(true));
-
+  store.dispatch(toggleSaveCopyToDocuments(false));
   store.dispatch({
     type: SIGN_DOCUMENTS_FROM_URL + START,
   });
