@@ -167,7 +167,7 @@ class FileTable extends React.Component<IFileTableProps & IFileTableDispatch, IF
                         <div className="col s2">
                           <FileIcon file={rowData} />
                         </div>
-                        <div className="col s10">
+                        <div className="col s10" title={cellData}>
                           <div className="truncate">{cellData}</div>
                         </div>
                       </div>
@@ -181,7 +181,7 @@ class FileTable extends React.Component<IFileTableProps & IFileTableDispatch, IF
                   <Column
                     cellRenderer={({ cellData, rowData }) =>
                       <div className="row nobottom">
-                        <div className="col s12">
+                        <div className="col s12" title={path.dirname(cellData)}>
                           <div className="truncate">{path.dirname(cellData)}</div>
                         </div>
                       </div>

@@ -41,9 +41,9 @@ export default {
     send: "Отправить",
     support: "Техническая поддержка",
     username: "Имя",
-    version: "2.5.4",
+    version: "2.5.5",
     version_app: "Версия приложения",
-    version_full: "Версия продукта: 2.5.4",
+    version_full: "Версия продукта: 2.5.5",
   },
   AddressBook: {
     address_book: "Контакты",
@@ -209,6 +209,8 @@ export default {
     cert_import_auto: "Поместить сертификат в хранилище, выбранное автоматически",
     cert_import_current: "Поместить сертификат в текущее хранилище",
     cert_import_failed: "Не удалось импортировать сертификат",
+    cert_add_is_GOST_or_RSA: "Выберите сертификаты с одним алгоритмом (только ГОСТ либо только RSA)",
+    cert_error_mixed_GOST_RSA: "Ошибка. Одновременно можно выбрать сертификаты шифрования только ГОСТ либо только RSA",
     cert_import_from_file: "Импорт из файла",
     cert_import_ok: "Сертификат успешно импортирован",
     cert_imported: "Сертификат уже импортирован",
@@ -285,6 +287,7 @@ export default {
     Back: "НАЗАД",
     add_all_files: "Добавить файлы из всех подкаталогов?",
     add_files: "Добавление файлов",
+    allow: "Разрешить",
     apply: "Применить",
     back: "Назад",
     cancel: "Отмена",
@@ -896,6 +899,12 @@ export default {
   SignAndEncrypt: {
     SignAndEncrypt: "ПОДПИСЬ И ШИФРОВАНИЕ",
     sign_and_encrypt: "Подпись и шифрование",
+  },
+  TrustedServices: {
+    do_not_show_again: "Не показывать больше для этого сайта",
+    external_resource_request: "Запрос с внешнего сайта",
+    requests_for_cryptoarm: "зарпашивает разрешение на вызов КриптоАРМ ГОСТ.",
+    site: "Сайт",
   },
   Tsp: {
     accuracy: "Точность",

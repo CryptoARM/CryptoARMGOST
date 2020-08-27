@@ -41,9 +41,9 @@ export default {
     send: "Send",
     support: "Support",
     username: "Name",
-    version: "2.5.4",
+    version: "2.5.5",
     version_app: "Application version",
-    version_full: "Version: 2.5.4",
+    version_full: "Version: 2.5.5",
   },
   AddressBook: {
     address_book: "Address book",
@@ -209,6 +209,8 @@ export default {
     cert_import_auto: "Import certificate in store that auto choosed",
     cert_import_current: "Import certificate in current store",
     cert_import_failed: "The certificate import failed",
+    cert_add_is_GOST_or_RSA: "Select certificates with one algorithm (only GOST or only RSA)",
+    cert_error_mixed_GOST_RSA: "Error. At the same time, you can select only GOST or RSA encryption certificates",
     cert_import_from_file: "Import from file",
     cert_import_ok: "The certificate is successfully imported",
     cert_imported: "The certificate is already imported",
@@ -285,6 +287,7 @@ export default {
     Back: "Back",
     add_all_files: "Add files from all the subfolders?",
     add_files: "Add files",
+    allow: "Allow",
     apply: "Apply",
     back: "Back",
     cancel: "Cancel",
@@ -890,6 +893,12 @@ export default {
   SignAndEncrypt: {
     SignAndEncrypt: "SIGNING AND ENCRYPTION",
     sign_and_encrypt: "Signature and encryption",
+  },
+  TrustedServices: {
+    do_not_show_again: "Don't show again for this site",
+    external_resource_request: "Request from an external site",
+    requests_for_cryptoarm: "requests permission to call CryptoARM GOST.",
+    site: "The site",
   },
   Tsp: {
     accuracy: "Accuracy",

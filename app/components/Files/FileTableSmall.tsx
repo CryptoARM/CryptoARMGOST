@@ -174,12 +174,12 @@ class FileTableSmall extends React.Component<IFileTableSmallProps & IFileTableSm
                           <div className="col s2">
                             <FileIcon file={rowData} />
                           </div>
-                          <div className="col s10">
+                          <div className="col s10" title={cellData}>
                             <div className="collection-title truncate">{cellData}</div>
                           </div>
                         </div>);
                     }
-                    }
+                    }                    
                     dataKey="filename"
                     headerRenderer={this.headerRenderer}
                     width={width * 0.35}

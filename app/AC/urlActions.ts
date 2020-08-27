@@ -3,13 +3,14 @@ import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
 import { push } from "react-router-redux";
+import * as URL from "url";
 import {
   ADD_LICENSE, ADD_REMOTE_FILE, CANCEL_URL_ACTION, DECRYPT,
   DOWNLOAD_REMOTE_FILE, ENCRYPT, ENCRYPTED, FAIL,
   LOCATION_MAIN, PACKAGE_SELECT_FILE, REMOVE_ALL_FILES,
   REMOVE_ALL_REMOTE_FILES, REMOVE_URL_ACTION, SET_REMOTE_FILES_PARAMS,
   SIGN, SIGN_DOCUMENTS_FROM_URL, START, SUCCESS,
-  TMP_DIR, VERIFY, VERIFY_DOCUMENTS_FROM_URL, VERIFY_SIGNATURE,
+  TMP_DIR, URL_CMD, VERIFY, VERIFY_DOCUMENTS_FROM_URL, VERIFY_SIGNATURE,
 } from "../constants";
 import { IUrlCommandApiV4Type, URLActionType } from "../parse-app-url";
 import store from "../store";
@@ -17,6 +18,7 @@ import { checkLicense } from "../trusted/jwt";
 import * as signs from "../trusted/sign";
 import { extFile, fileExists, md5 } from "../utils";
 import { toggleReverseOperations, toggleSaveCopyToDocuments, toggleSigningOperation } from "./settingsActions";
+import { showModalAddTrustedService } from "./trustedServicesActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
 import { handleUrlCommandSignAmdEncrypt } from "./urlCmdSignAndEncrypt";
@@ -54,6 +56,54 @@ interface IEncryptRequest {
     license?: string;
   };
   controller: string;
+}
+
+export function checkTrustedServiceForCommand(
+  command: IUrlCommandApiV4Type,
+) {
+  const state = store.getState();
+  const { trustedServices } = state;
+
+  let serviceIsTrusted = false;
+
+  if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
+    const hostToCheck = getHostFromUrl(command.url);
+    const findResult = trustedServices.entities.find(
+      (value: any, key: any, iter: any) => {
+        return value.url === hostToCheck;
+      },
+    );
+    serviceIsTrusted = (undefined !== findResult);
+  }
+
+  if (serviceIsTrusted) {
+    const curWindow = remote.getCurrentWindow();
+
+    if ( curWindow.isMinimized()) {
+      curWindow.restore();
+    }
+
+    curWindow.show();
+    curWindow.focus();
+
+    dispatchURLCommand(command);
+  } else {
+    store.dispatch(showModalAddTrustedService(command.url));
+
+    const curWindow = remote.getCurrentWindow();
+
+    if ( curWindow.isMinimized()) {
+      curWindow.restore();
+    }
+
+    curWindow.show();
+    curWindow.focus();
+
+    store.dispatch(startUrlCmd(command));
+    store.dispatch(push(LOCATION_MAIN));
+
+    return;
+  }
 }
 
 export function dispatchURLCommand(
@@ -425,3 +475,15 @@ const openWindow = (operation: string) => {
       return;
   }
 };
+
+export const startUrlCmd = (command: any) => {
+  return {
+    payload: { urlCommand: command },
+    type: URL_CMD + START,
+  };
+};
+
+export const getHostFromUrl = (urlValue: string): string => {
+  const parsedUrl = URL.parse(urlValue);
+  return (parsedUrl && parsedUrl.host) ? parsedUrl.host : urlValue;
+}
