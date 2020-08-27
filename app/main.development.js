@@ -208,16 +208,16 @@ if (!gotInstanceLock && !isMAS) {
   if (!isMAS) {
     app.on('second-instance', (e, argv) => {
       if (mainWindow) {
-        if (mainWindow.isMinimized()) {
-          mainWindow.restore();
-        }
-
-        mainWindow.show();
-        mainWindow.focus();
-
         const urlToProcess = handlePossibleProtocolLauncherArgs(argv, possibleProtocols);
         if (urlToProcess !== "") {
           handleAppURL(urlToProcess);
+        } else {
+          if (mainWindow.isMinimized()) {
+            mainWindow.restore();
+          }
+
+          mainWindow.show();
+          mainWindow.focus();
         }
 
         mainWindow.webContents.send("cmdArgs", argv);

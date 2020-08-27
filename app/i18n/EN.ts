@@ -41,9 +41,9 @@ export default {
     send: "Send",
     support: "Support",
     username: "Name",
-    version: "2.5.4",
+    version: "2.5.5",
     version_app: "Application version",
-    version_full: "Version: 2.5.4",
+    version_full: "Version: 2.5.5",
   },
   AddressBook: {
     address_book: "Address book",
@@ -266,7 +266,7 @@ export default {
     version: "Version",
   },
   CertificateStore: {
-    AddressBook: "Address Book",
+    AddressBook: "Contacts",
     CA: "Certificate Authority",
     MY: "MY",
     ROOT: "Root",
@@ -287,6 +287,7 @@ export default {
     Back: "Back",
     add_all_files: "Add files from all the subfolders?",
     add_files: "Add files",
+    allow: "Allow",
     apply: "Apply",
     back: "Back",
     cancel: "Cancel",
@@ -892,6 +893,12 @@ export default {
   SignAndEncrypt: {
     SignAndEncrypt: "SIGNING AND ENCRYPTION",
     sign_and_encrypt: "Signature and encryption",
+  },
+  TrustedServices: {
+    do_not_show_again: "Don't show again for this site",
+    external_resource_request: "Request from an external site",
+    requests_for_cryptoarm: "requests permission to call CryptoARM GOST.",
+    site: "The site",
   },
   Tsp: {
     accuracy: "Accuracy",

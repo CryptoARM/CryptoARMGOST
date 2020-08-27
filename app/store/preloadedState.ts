@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { OrderedMap, Record } from "immutable";
 import { CA_CERTREGUESTS_JSON, CA_CERTTEMPLATE_JSON, CA_CSR_JSON, CA_REGREGUESTS_JSON, CERTIFICATES_DSS_JSON,
-  DSS_TOKENS_JSON, DSS_USERS_JSON, POLICY_DSS_JSON, SERVICES_JSON, SETTINGS_JSON, TEMPLATES_PATH } from "../constants";
+  DSS_TOKENS_JSON, DSS_USERS_JSON, POLICY_DSS_JSON, SERVICES_JSON, SETTINGS_JSON, TEMPLATES_PATH, TRUSTED_SERVICES_JSON } from "../constants";
 import { CertificateModel, DefaultReducerState as DefaultCertificatesState } from "../reducer/certificates";
 import { CertificateDSSModel, DefaultReducerState as DefaultCertificatesDSSState } from "../reducer/certificatesDSS";
 import { CertificateRequestCAModel, DefaultReducerState as DefaultRequestsReducerState } from "../reducer/certrequests";
@@ -17,6 +17,7 @@ import {
 } from "../reducer/settings";
 import { DefaultReducerState as DefaultTemplatesReducerState, TemplateModel } from "../reducer/templates";
 import { DefaultReducerState as DefaultTokenReducerState, TokenDSSModel } from "../reducer/tokens";
+import { DefaultReducerState as DefaultTrustedServicesReducerState, TrustedServiceModel } from "../reducer/trustedServices";
 import { DefaultReducerState as DefaultUsersDSSReducerState, UsersDSSModel } from "../reducer/users";
 import { fileExists, mapToArr } from "../utils";
 
@@ -92,6 +93,29 @@ if (fileExists(SERVICES_JSON)) {
     } catch (e) {
       console.log(e)
       odata.services = {};
+    }
+  }
+}
+
+if (fileExists(TRUSTED_SERVICES_JSON)) {
+  const tservices = fs.readFileSync(TRUSTED_SERVICES_JSON, "utf8");
+
+  if (tservices) {
+    try {
+      let servicesMap = new DefaultTrustedServicesReducerState();
+
+      const data = JSON.parse(tservices);
+
+      for (const service of data.trustedServices) {
+        const mservice = new TrustedServiceModel({ ...service });
+        servicesMap = servicesMap.setIn(["entities", service.id], mservice);
+      }
+
+      odata.trustedServices = servicesMap;
+    } catch (e) {
+      // tslint:disable-next-line: no-console
+      console.log(e);
+      odata.trustedServices = {};
     }
   }
 }

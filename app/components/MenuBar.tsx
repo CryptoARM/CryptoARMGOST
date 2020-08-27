@@ -18,6 +18,7 @@ import Modal from "./Modal";
 import AskSaveSetting from "./Settings/AskSaveSetting";
 import LocaleSelect from "./Settings/LocaleSelect";
 import SideMenu from "./SideMenu";
+import AddTrustedService from "./TrustedServices/AddTrustedService";
 
 const remote = window.electron.remote;
 if (remote.getGlobal("sharedObject").logcrypto) {
@@ -32,6 +33,7 @@ if (remote.getGlobal("sharedObject").logcrypto) {
 interface IMenuBarState {
   isMaximized: boolean;
   showModalAskSaveSetting: boolean;
+  showModalAddTrustedService: boolean;
 }
 
 class MenuBar extends React.Component<any, IMenuBarState> {
@@ -44,8 +46,21 @@ class MenuBar extends React.Component<any, IMenuBarState> {
     super(props);
     this.state = ({
       isMaximized: false,
+      showModalAddTrustedService: false,
       showModalAskSaveSetting: false,
     });
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.trustedServices.showModal === false
+      && this.props.trustedServices.showModal === true) {
+      this.handleShowModalAddTrustedService();
+    }
+
+    if (prevProps.trustedServices.showModal === true
+      && this.props.trustedServices.showModal === false) {
+      this.handleCloseModalAddTrustedService();
+    }
   }
 
   maximizeWindow() {
@@ -191,6 +206,7 @@ class MenuBar extends React.Component<any, IMenuBarState> {
         </nav>
         {this.props.children}
         <Diagnostic />
+        {this.showModalAddTrustedService()}
         {this.showModalAskSaveSetting()}
       </React.Fragment>
     );
@@ -199,7 +215,7 @@ class MenuBar extends React.Component<any, IMenuBarState> {
   isFilesFromSocket = () => {
     const { operationIsRemote } = this.props;
 
-    if( operationIsRemote ) {
+    if (operationIsRemote) {
       return true;
     }
 
@@ -250,6 +266,37 @@ class MenuBar extends React.Component<any, IMenuBarState> {
   handleCloseModalAskSaveSetting = () => {
     this.setState({ showModalAskSaveSetting: false });
   }
+
+  showModalAddTrustedService = () => {
+    const { localize, locale } = this.context;
+    const { showModalAddTrustedService } = this.state;
+
+    if (!showModalAddTrustedService) {
+      return;
+    }
+
+    return (
+      <Modal
+        isOpen={showModalAddTrustedService}
+        key="showModalAddTrustedService"
+        header={localize("TrustedServices.external_resource_request", locale)}
+        onClose={this.handleCloseModalAddTrustedService}
+        style={{ width: "380px" }}>
+
+        <AddTrustedService
+          onCancel={this.handleCloseModalAddTrustedService}
+        />
+      </Modal>
+    );
+  }
+
+  handleShowModalAddTrustedService = () => {
+    this.setState({ showModalAddTrustedService: true });
+  }
+
+  handleCloseModalAddTrustedService = () => {
+    this.setState({ showModalAddTrustedService: false });
+  }
 }
 
 export default connect((state, ownProps) => {
@@ -266,6 +313,7 @@ export default connect((state, ownProps) => {
     settings: state.settings,
     signSettings: state.settings.getIn(["entities", state.settings.default]).sign,
     tempContentOfSignedFiles: state.files.tempContentOfSignedFiles,
+    trustedServices: state.trustedServices,
     operationIsRemote: state.urlActions.performed || state.urlActions.performing,
   };
 }, { filePackageDelete })(MenuBar);

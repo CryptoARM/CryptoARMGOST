@@ -1,12 +1,24 @@
 import * as fs from "fs";
 import os from "os";
-import { CERTIFICATES_DSS_JSON, LICENSE_PATH, LicenseManager, TSP_OCSP_ENABLED } from "../constants";
+import {
+  CERTIFICATES_DSS_JSON,
+  LICENSE_PATH,
+  LicenseManager,
+  TSP_OCSP_ENABLED,
+  DIAGNOSTIC_FROM_URL,
+  START,
+  LOCATION_MAIN,
+  SHOW_MODAL_ADD_TRUSTED_SERVICE,
+} from "../constants";
 import localize from "../i18n/localize";
 import { IUrlCommandApiV4Type } from "../parse-app-url";
+import store from "../store";
 import { Store } from "../trusted/store";
 import { fileExists } from "../utils";
 import { PkiCertToCertInfo } from "./urlCmdCertInfo";
 import { paramsRequest, postRequest } from "./urlCmdUtils";
+import { addTrustedService, showModalAddTrustedService } from "./trustedServicesActions";
+import { push } from "react-router-redux";
 
 interface IDiagnosticsInformation {
   id: string;
@@ -65,6 +77,10 @@ function paramsRequestDiag(id: string) {
 }
 
 export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
+  store.dispatch({
+    type: DIAGNOSTIC_FROM_URL + START,
+  });
+
   postRequest(command.url, paramsRequestDiag(command.id)).then(
     (data: any) => {
       const operation = data.result.operation;
@@ -87,20 +103,31 @@ export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
         },
         (error) => {
           // tslint:disable-next-line: no-console
-          console.log("Error sending of diagnostics info with id " + command.id
-            + ". Error description: " + error);
-        },
+          console.log(
+            "Error sending of diagnostics info with id " +
+              command.id +
+              ". Error description: " +
+              error
+          );
+        }
       );
     },
     (error) => {
       // tslint:disable-next-line: no-console
-      console.log("Error recieving parameters of diagnostics command with id " + command.id
-        + ". Error description: " + error);
-    },
+      console.log(
+        "Error recieving parameters of diagnostics command with id " +
+          command.id +
+          ". Error description: " +
+          error
+      );
+    }
   );
 }
 
-function collectDiagnosticInfo(id: string, diagOperations: string[]): IDiagnosticsInformation {
+function collectDiagnosticInfo(
+  id: string,
+  diagOperations: string[]
+): IDiagnosticsInformation {
   const result: IDiagnosticsInformation = { id };
   if (diagOperations.includes("SYSTEMINFORMATION")) {
     const sysinfo: ISystemInformation = {
@@ -161,7 +188,10 @@ function collectDiagnosticInfo(id: string, diagOperations: string[]): IDiagnosti
     };
 
     try {
-      versions.csp = trusted.utils.Csp.getCPCSPVersion() + "." + trusted.utils.Csp.getCPCSPVersionPKZI();
+      versions.csp =
+        trusted.utils.Csp.getCPCSPVersion() +
+        "." +
+        trusted.utils.Csp.getCPCSPVersionPKZI();
     } catch (e) {
       //
     }
@@ -280,7 +310,11 @@ function collectDiagnosticInfo(id: string, diagOperations: string[]): IDiagnosti
         if (chain && chain.length) {
           const rootCertInChain = chain.items(chain.length - 1);
 
-          if (rootCertInChain && rootCertInChain.thumbprint.toLowerCase() === "4BC6DC14D97010C41A26E058AD851F81C842415A".toLowerCase()) {
+          if (
+            rootCertInChain &&
+            rootCertInChain.thumbprint.toLowerCase() ===
+              "4BC6DC14D97010C41A26E058AD851F81C842415A".toLowerCase()
+          ) {
             isMynsvyaz = true;
           } else {
             isMynsvyaz = false;
@@ -308,7 +342,10 @@ function checkIfUtilIsAvailable(utilName: string, params?: string[]) {
   }
 
   try {
-    const res = spawnSync(utilName, paramsToUse, { timeout: 3000, windowsHide: true });
+    const res = spawnSync(utilName, paramsToUse, {
+      timeout: 3000,
+      windowsHide: true,
+    });
     if (res.output && !res.error) {
       return true;
     }

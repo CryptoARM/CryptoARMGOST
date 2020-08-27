@@ -176,6 +176,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
                 <div className="row">
                   <div className="input-field input-field-csr col s12">
                     <input
+                      placeholder={localize("CSR.ogrnip", locale)}
                       id="ogrnip"
                       type="text"
                       className={!ogrnip || !ogrnip.length ? "validate" : validateOgrnip(ogrnip) ? "valid" : "invalid"}
@@ -201,6 +202,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
           <div className="row">
             <div className="input-field input-field-csr col s6">
               <input
+                placeholder={localize("CSR.snils", locale)}
                 id="snils"
                 type="text"
                 className={!snils || !snils.length ? "validate" : validateSnils(snils) ? "valid" : "invalid"}
@@ -221,6 +223,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
             </div>
             <div className="input-field input-field-csr col s6">
               <input
+                placeholder={localize("CSR.inn", locale)}
                 id="inn"
                 type="text"
                 className={!inn || !inn.length ? "validate" : validateInn(inn) ? "valid" : "invalid"}
@@ -242,6 +245,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
                 <div className="row">
                   <div className="input-field input-field-csr col s6">
                     <input
+                      placeholder={localize("CSR.organizational_unit_name", locale)}
                       id="organizationUnitName"
                       type="text"
                       className="validate"
@@ -254,6 +258,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
                   </div>
                   <div className="input-field input-field-csr col s6">
                     <input
+                      placeholder={localize("CSR.title", locale)}
                       id="title"
                       type="text"
                       className="validate"

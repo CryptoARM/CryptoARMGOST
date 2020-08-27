@@ -511,7 +511,6 @@ export function multiReverseOperation(
     dispatch({
       type: MULTI_REVERSE_OPERATION + START,
     });
-
     const filesForRemoveFromTemp = getTempDirectoryFiles();
 
     const packageResult = { packageResult: true };
@@ -610,7 +609,7 @@ const reverseOperations = async (file: any, reverseFiles: any, packageResult: IP
       const newPath = signs.unSign(file.fullpath, DEFAULT_TEMP_PATH);
       const currentId = file.originalId ? file.originalId : file.id;
 
-      if (newPath) {
+      if (newPath !== "undeatached" || "") {
         const newFileProps = { ...getFileProps(newPath), originalId: file.id };
 
         reverseResult.results.push({
@@ -638,7 +637,10 @@ const reverseOperations = async (file: any, reverseFiles: any, packageResult: IP
         if (newFileProps.extension === "enc" || newFileProps.extension === "sig" || newFileProps.extension === "zip") {
           await reverseOperations(newFileProps, reverseFiles, packageResult, reverseResult);
         }
+      } else if (newPath === "undeatached") {
+        packageResult.packageResult = true;
       } else {
+
         packageResult.packageResult = false;
 
         reverseResult.results.push({
@@ -780,10 +782,10 @@ async function archiveFiles(files: any[], folderOut: string): Promise<string> {
     files.forEach((file) => {
       const stream = fs.createReadStream(file.fullpath);
       stream.on("error", () => {
-          output.end();
-          fs.unlinkSync (newOutUri);
-          reject("error");
-        },
+        output.end();
+        fs.unlinkSync(newOutUri);
+        reject("error");
+      },
       );
       archive.append(stream, { name: file.filename });
     });

@@ -6,6 +6,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { Link } from "react-router-dom";
+import { push } from "react-router-redux";
 import {
   activeFile, deleteFile, deleteRecipient,
   filePackageDelete, filePackageSelect, packageReSign, packageSign,
@@ -20,25 +21,27 @@ import {
   activeSetting, changeDefaultSettings, deleteSetting, saveSettings,
 } from "../../AC/settingsActions";
 import { cancelUrlAction, removeUrlAction } from "../../AC/urlActions";
+import { postRequest } from "../../AC/urlCmdUtils";
 import {
-  ARCHIVATION_OPERATION, ARCHIVE, DECRYPT, DSS_ACTIONS, ENCRYPT, ENCRYPTION_OPERATION, GOST_28147,
-  GOST_R3412_2015_K, GOST_R3412_2015_M,
-  HOME_DIR,
-  LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT, LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE,
-  LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT, MULTI_REVERSE, REMOVE, SIGN,
-  SIGNING_OPERATION, UNSIGN, UNZIPPING, USER_NAME, VERIFY, LOCATION_RESULTS_MULTI_OPERATIONS, MULTI_DIRECT_OPERATION, SUCCESS,
-  PACKAGE_SIGN, INTERRUPT, DEFAULT_DOCUMENTS_PATH,
+  ARCHIVATION_OPERATION, ARCHIVE, DECRYPT, DEFAULT_DOCUMENTS_PATH, DSS_ACTIONS, ENCRYPT, ENCRYPTION_OPERATION,
+  GOST_28147, GOST_R3412_2015_K,
+  GOST_R3412_2015_M,
+  HOME_DIR, INTERRUPT,
+  LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT, LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE, LOCATION_RESULTS_MULTI_OPERATIONS, LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT,
+  MULTI_DIRECT_OPERATION, MULTI_REVERSE, PACKAGE_SIGN, REMOVE, SIGN, SIGNING_OPERATION, SUCCESS, UNSIGN,
+  UNZIPPING, USER_NAME, VERIFY,
 } from "../../constants";
 import { DEFAULT_ID, ISignParams } from "../../reducer/settings";
 import { activeFilesSelector, connectedSelector, filesInTransactionsSelector, loadingRemoteFilesSelector } from "../../selectors";
 import { DECRYPTED, ENCRYPTED, ERROR, SIGNED, UPLOADED } from "../../server/constants";
+import store from "../../store";
 import * as trustedEncrypts from "../../trusted/encrypt";
 import * as jwt from "../../trusted/jwt";
 import { checkLicense } from "../../trusted/jwt";
 import * as signs from "../../trusted/sign";
 import * as trustedSign from "../../trusted/sign";
 import { bytesToSize, dirExists, fileCoding, fileNameForResign, fileNameForSign, mapToArr } from "../../utils";
-import { fileExists, extFile, md5 } from "../../utils";
+import { extFile, fileExists, md5 } from "../../utils";
 import { buildDocumentDSS, buildDocumentPackageDSS, buildTransaction } from "../../utils/dss/helpers";
 import logger from "../../winstonLogger";
 import CheckBoxWithLabel from "../CheckBoxWithLabel";
@@ -55,9 +58,6 @@ import SaveSettings from "../Settings/SaveSettings";
 import SettingsSelector from "../Settings/SettingsSelector";
 import WrongCertificate from "../Settings/WrongCertificate";
 import SignerInfo from "../Signature/SignerInfo";
-import store from "../../store";
-import { push } from "react-router-redux";
-import { postRequest } from "../../AC/urlCmdUtils";
 
 const dialog = window.electron.remote.dialog;
 
@@ -136,7 +136,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   componentWillMount() {
     this.props.activeSetting(this.props.setting.id);
 
-    $(document).ready(function () {
+    $(document).ready(function() {
       $(".tooltipped").tooltip();
     });
   }
@@ -504,7 +504,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               <React.Fragment>
                 <div className="col s12">
                   <a className={`btn btn-outlined waves-effect waves-light ${this.checkEnableMultiOperations() ? "" : "disabled"}`}
-                    onClick={setting.operations.signing_operation && isSignCertFromDSS ? this.handleClickSign : this.checkCertificatesBeforePerformOperation}
+                    onClick={setting.operations.signing_operation ?  this.checkCertificatesBeforePerformOperation : this.handleClickPerformOperations}
                     style={{ width: "100%" }}>
                     {localize("Common.perform", locale)}
                   </a>
@@ -674,6 +674,8 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   showModalWrongCertificate = () => {
     const { localize, locale } = this.context;
     const { showModalWrongCertificate } = this.state;
+    const {signer } = this.props;
+    const isSignCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
 
     if (!showModalWrongCertificate) {
       return;
@@ -688,7 +690,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
         <WrongCertificate
           onCancel={this.handleCloseModalWrongCertificate}
-          onContinue={this.handleClickPerformOperations}
+          onContinue={isSignCertFromDSS ? this.handleClickSign : this.handleClickPerformOperations}
           message={this.state.isOnlySignerCertWrong ? localize("Problems.problem_9_1", locale) : localize("Problems.problem_9", locale)}
         />
       </Modal>
@@ -706,6 +708,15 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   checkCertificatesBeforePerformOperation = () => {
     const { setting, signer, recipients } = this.props;
     const { localize, locale } = this.context;
+    const isSignCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
+
+    if (isSignCertFromDSS && signer && !signer.status) {
+      this.handleshowModalWrongCertificate();
+      return;
+    } else if ( isSignCertFromDSS) {
+      this.handleClickSign();
+      return;
+    }
 
     if (setting.operations.signing_operation && !setting.changedSigner && signer && !signer.status) {
       this.handleshowModalWrongCertificate();
@@ -739,7 +750,6 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         }
       }
     }
-
     this.handleClickPerformOperations();
   }
 
@@ -853,7 +863,18 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     }
 
     if (setting.operations.reverse_operations) {
+
+      if (activeFilesArr.length === 1 && activeFilesArr[0].extension === "sig") {
+        let cms = signs.loadSign(activeFilesArr[0].fullpath);
+
+        if (cms.isDetached()) {
+          $(".toast-files_unsigned_detached").remove();
+          Materialize.toast(localize("Sign.files_unsigned_detached", window.locale), 2000, "toast-files_unsigned_detached");
+          return;
+         }
+      }
       for (const activeFileItem of activeFilesArr) {
+
         if (activeFileItem.extension === "enc") {
           if (licenseStatus !== true) {
             $(".toast-jwtErrorLicense").remove();
@@ -1083,11 +1104,11 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                     (data2) => {
                       this.props.dssPerformOperation(
                         user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
-                        data2.AccessToken, pinCode ? { "Signature": { "PinCode": pinCode } } : undefined)
+                        data2.AccessToken, pinCode ? { Signature: { PinCode: pinCode } } : undefined)
                         .then(
                           (dataCMS: any) => {
                             let i: number = 0;
-                            let outURIList: string[] = [];
+                            const outURIList: string[] = [];
 
                             const directResult: any = {};
                             directResult.results = [];
@@ -1186,7 +1207,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
             .then(
               (dataCMS) => {
                 let i: number = 0;
-                let outURIList: string[] = [];
+                const outURIList: string[] = [];
 
                 const directResult: any = {};
                 directResult.results = [];
@@ -1334,7 +1355,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   resignDss = (filesAtt: IFilePackage, filesDet: IFilePackage, setting: any, cert: any,
-    multipackage: boolean = false) => {
+               multipackage: boolean = false) => {
     const { signer, tokensAuth, users, policyDSS, uploader,
       createTransactionDSS, packageReSign } = this.props;
     const { pinCode } = this.state;
@@ -1366,7 +1387,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         documentsId)
         .then(
           (data1: any) => {
-            resign
+            this.resign(packageReSign, cert);
             $(".toast-transaction_created_successful").remove();
             Materialize.toast(localize("DSS.transaction_created_successful", locale), 3000, "toast-transaction_created_successful");
 
@@ -1379,11 +1400,11 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                 (data2) => {
                   this.props.dssPerformOperation(
                     user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
-                    data2.AccessToken, pinCode ? { "Signature": { "PinCode": pinCode } } : undefined)
+                    data2.AccessToken, pinCode ? { Signature: { PinCode: pinCode } } : undefined)
                     .then(
                       (dataCMS: any) => {
                         let i: number = 0;
-                        let outURIList: string[] = [];
+                        const outURIList: string[] = [];
 
                         const directResult: any = {};
                         directResult.results = [];
@@ -1504,7 +1525,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         .then(
           (dataCMS: any) => {
             let i: number = 0;
-            let outURIList: string[] = [];
+            const outURIList: string[] = [];
 
             const directResult: any = {};
             directResult.results = [];
@@ -1622,8 +1643,8 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         const documentsDetached: IDocumentContent[] = [];
         const documentsIdDetached: string[] = [];
 
-        var filesAttached = [];
-        var filesDetached = [];
+        let filesAttached = [];
+        let filesDetached = [];
 
         files.forEach((file) => {
           const uri = file.fullpath;
@@ -1671,12 +1692,12 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         const packageAtt = {
           files: filesAttached,
           documents: documentsAttached,
-          documentsId: documentsIdAttached
+          documentsId: documentsIdAttached,
         };
         const packageDet = {
           files: filesDetached,
           documents: documentsDetached,
-          documentsId: documentsIdDetached
+          documentsId: documentsIdDetached,
         };
         if ((filesDetached.length > 0) && (filesAttached.length > 0)) {
           this.resignDss(packageAtt, packageDet, setting, cert, multipackage);
@@ -1694,7 +1715,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           ocspModel: setting.ocsp.toJS(),
         };
 
-        let remoteFilesToUpload: any[] = [];
+        const remoteFilesToUpload: any[] = [];
 
         files.every((file) => {
           const newPath = trustedSign.resignFile(file.fullpath, cert, policies, signParams, format, folderOut);
@@ -1755,9 +1776,9 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                 }
 
                 remoteFilesToUpload.push({
-                  file: file,
-                  newPath: newPath,
-                  normalyzeSignatureInfo: normalyzeSignatureInfo
+                  file,
+                  newPath,
+                  normalyzeSignatureInfo
                 });
               }
             } else {
@@ -2358,11 +2379,11 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                     (data2) => {
                       this.props.dssPerformOperation(
                         user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
-                        data2.AccessToken, pinCode ? { "Signature": { "PinCode": pinCode } } : undefined)
+                        data2.AccessToken, pinCode ? { Signature: { PinCode: pinCode } } : undefined)
                         .then(
                           (dataCMS: any) => {
                             let i: number = 0;
-                            let outURIList: string[] = [];
+                            const outURIList: string[] = [];
 
                             const directResult: any = {};
                             directResult.results = [];
@@ -2465,7 +2486,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
             .then(
               (dataCMS) => {
                 let i: number = 0;
-                let outURIList: string[] = [];
+                const outURIList: string[] = [];
 
                 const directResult: any = {};
                 directResult.results = [];
