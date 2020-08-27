@@ -15,6 +15,8 @@ const defaultFilters = {
     isDefaultFilters: true,
     sizeFrom: undefined,
     sizeTo: undefined,
+    sizeTypeFrom: 1024,
+    sizeTypeTo: 1024,
     types: {
       ARCHIVED: false,
       ENCRYPTED: false,
@@ -180,6 +182,8 @@ export default (filters = defaultFilters, action) => {
           isDefaultFilters: true,
           sizeFrom: undefined,
           sizeTo: undefined,
+          sizeTypeFrom: 1024,
+          sizeTypeTo: 1024,
           types: {
             ARCHIVED: false,
             ENCRYPTED: false,
@@ -199,6 +203,8 @@ const checkDefaultDocumentsFilters = (filters: any) => {
     defaultFilters.documents.filename === filters.filename &&
     defaultFilters.documents.sizeFrom === filters.sizeFrom &&
     defaultFilters.documents.sizeTo === filters.sizeTo &&
+    defaultFilters.documents.sizeTypeFrom === filters.sizeTypeFrom &&
+    defaultFilters.documents.sizeTypeTo === filters.sizeTypeTo &&
     defaultFilters.documents.types.ENCRYPTED === filters.types.ENCRYPTED &&
     defaultFilters.documents.types.SIGNED === filters.types.SIGNED &&
     defaultFilters.documents.types.ARCHIVED === filters.types.ARCHIVED
