@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { OrderedMap, Record } from "immutable";
 import {
-  ACTIVE_SETTING, ADD_RECIPIENT_CERTIFICATE, APPLY_SETTINGS, BASE64,
+  ACTIVE_SETTING, ADD_RECIPIENT_CERTIFICATE, APPLY_SETTINGS,
   CHANGE_ARCHIVE_FILES_BEFORE_ENCRYPT, CHANGE_DEFAULT_SETTINGS,
   CHANGE_DELETE_FILES_AFTER_ENCRYPT, CHANGE_DSS_AUTH_URL, CHANGE_DSS_REST_URL, CHANGE_ECRYPT_ALGORITHM,
   CHANGE_ECRYPT_ENCODING, CHANGE_LOCALE, CHANGE_OCSP_PROXY_LOGIN,
@@ -15,7 +15,7 @@ import {
   SAVE_SETTINGS, SELECT_SIGNER_CERTIFICATE, SETTINGS_JSON,
   TOGGLE_ARCHIVATION_OPERATION, TOGGLE_ENCRYPTION_OPERATION, TOGGLE_REVERSE_OPERATIONS,
   TOGGLE_SAVE_COPY_TO_DOCUMENTS,
-  TOGGLE_SAVE_RESULT_TO_FOLDER, TOGGLE_SAVE_TO_DOCUMENTS, TOGGLE_SIGNING_OPERATION,
+  TOGGLE_SAVE_RESULT_TO_FOLDER, TOGGLE_SAVE_TO_DOCUMENTS, TOGGLE_SIGNING_OPERATION, DER,
 } from "../constants";
 import { fileExists, mapToArr, uuid } from "../utils";
 
@@ -59,7 +59,7 @@ export interface ISignParams {
 
 export const SignModel = Record({
   detached: false,
-  encoding: BASE64,
+  encoding: DER,
   signer: "",
   standard: "CMS",
   time: true,
@@ -71,7 +71,7 @@ export const EncryptModel = Record({
   algorithm: GOST_28147,
   archive: false,
   delete: false,
-  encoding: BASE64,
+  encoding: DER,
   recipients: OrderedMap({}),
 });
 
