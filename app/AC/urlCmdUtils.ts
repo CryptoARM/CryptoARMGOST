@@ -21,6 +21,7 @@ export async function postRequest(url: string, requestData: string|Buffer) {
 
     curl.setOpt("URL", url);
     curl.setOpt("FOLLOWLOCATION", true);
+    curl.setOpt("TIMEOUT", 600);
     curl.setOpt(window.Curl.option.HTTPHEADER, headerfields);
     curl.setOpt(window.Curl.option.POSTFIELDS, requestData.toString());
 
