@@ -97,17 +97,16 @@ class AllSettings extends React.Component<any, {}> {
     const disabled = this.getDisabled();
     const isCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
 
-    let encoding = settings.sign.encoding;
     const signatureStandard = settings.sign.standard;
     const classDisabledTspAndOcsp = (signatureStandard === SignatureStandard.CADES && !isCertFromDSS) ? "" : "disabled";
     const classDisabledTsp = isCertFromDSS ? "disabled" : "";
     const isDetached = settings.sign.detached;
-
+    const encoding = settings.sign.encoding;
     const isGostRecp = isGostRecipients(recipients);
 
-    if (isCertFromDSS && encoding !== "BASE-64") {
-      encoding = "BASE-64";
-    }
+    // if (isCertFromDSS && encoding !== "BASE-64") {
+    //   encoding = "BASE-64";
+    // } Disable for falid show state
 
     return (
       <div className="row">
