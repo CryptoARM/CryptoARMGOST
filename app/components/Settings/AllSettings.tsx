@@ -104,10 +104,6 @@ class AllSettings extends React.Component<any, {}> {
     const encoding = settings.sign.encoding;
     const isGostRecp = isGostRecipients(recipients);
 
-    // if (isCertFromDSS && encoding !== "BASE-64") {
-    //   encoding = "BASE-64";
-    // } Disable for falid show state
-
     return (
       <div className="row">
         <div className="row" />
