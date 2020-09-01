@@ -18,6 +18,8 @@ interface IFilterDocumentsProps {
   onCancel?: () => void;
   sizeFrom: number | undefined;
   sizeTo: number | undefined;
+  sizeTypeFrom: number;
+  sizeTypeTo: number;
   types: any;
   resetDocumentsFilters: () => void;
   unselectAllFiles: () => void;
@@ -30,6 +32,8 @@ interface IDocumentsFilters {
   filename: string;
   sizeFrom: number | undefined;
   sizeTo: number | undefined;
+  sizeTypeFrom: number;
+  sizeTypeTo: number;
   types: {
     ENCRYPTED: boolean;
     SIGNED: boolean;
@@ -40,8 +44,6 @@ interface IDocumentsFilters {
 
 interface IDocumentsState {
   filters: IDocumentsFilters;
-  sizeTypeFrom: number;
-  sizeTypeTo: number;
 }
 
 const initialState = {
@@ -50,6 +52,8 @@ const initialState = {
   filename: "",
   sizeFrom: "",
   sizeTo: "",
+  sizeTypeFrom: 1024,
+  sizeTypeTo: 1024,
   types: {
     ARCHIVED: false,
     ENCRYPTED: false,
@@ -72,13 +76,11 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
         dateFrom: props.dateFrom,
         dateTo: props.dateTo,
       },
-      sizeTypeFrom: 1024,
-      sizeTypeTo: 1024,
     };
   }
 
   componentDidMount() {
-    const { dateFrom, dateTo, filename, sizeFrom, sizeTo, types } = this.props;
+    const { dateFrom, dateTo, filename, sizeFrom, sizeTo, sizeTypeFrom, sizeTypeTo, types } = this.props;
 
     this.setState({
       filters: {
@@ -86,8 +88,10 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
         dateFrom,
         dateTo,
         filename,
-        sizeFrom: sizeFrom ? sizeFrom / 1024 : sizeFrom,
-        sizeTo: sizeTo ? sizeTo / 1024 : sizeTo,
+        sizeFrom: sizeFrom ? sizeFrom / sizeTypeFrom : sizeFrom,
+        sizeTo: sizeTo ? sizeTo / sizeTypeTo : sizeTo,
+        sizeTypeFrom,
+        sizeTypeTo,
         types,
       },
     });
@@ -104,6 +108,11 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
 
     $(ReactDOM.findDOMNode(this.refs.sizeTypeSelectFrom)).on("change", this.handleChangeSizeTypeFrom);
     $(ReactDOM.findDOMNode(this.refs.sizeTypeSelectTo)).on("change", this.handleChangeSizeTypeTo);
+
+    $(".res_btn").click(function(){
+      $("select").val(1024);
+      $("select").material_select()
+    });
   }
 
   componentDidUpdate() {
@@ -115,10 +124,9 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
   }
 
   render() {
-    const { filters, sizeTypeFrom, sizeTypeTo } = this.state;
-    const { dateFrom, dateTo, filename, sizeFrom, sizeTo, types } = filters;
+    const { filters } = this.state;
+    const { dateFrom, dateTo, filename, sizeFrom, sizeTo, sizeTypeFrom, sizeTypeTo, types } = filters;
     const { localize, locale } = this.context;
-
     return (
       <div>
         <div className="row halftop">
@@ -195,7 +203,7 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
                     </label>
                   </div>
                   <div className="input-field input-field-csr col s2">
-                    <select className="select" ref="sizeTypeSelectFrom" defaultValue={sizeTypeFrom.toString()} onChange={this.handleChangeSizeTypeFrom} >>
+                    <select className="select" ref="sizeTypeSelectFrom" defaultValue={sizeTypeFrom.toString()} value={sizeTypeFrom.toString()} onChange={this.handleChangeSizeTypeFrom} >
                       <option value={1024}>KB</option>
                       <option value={1048576}>MB</option>
                       <option value={1073741824}>GB</option>
@@ -220,7 +228,7 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
                     </label>
                   </div>
                   <div className="input-field input-field-csr col s2">
-                    <select className="select" ref="sizeTypeSelectTo" defaultValue={sizeTypeTo.toString()} onChange={this.handleChangeSizeTypeTo} >>
+                    <select className="select" ref="sizeTypeSelectTo" defaultValue={sizeTypeTo.toString()} value={sizeTypeTo.toString()} onChange={this.handleChangeSizeTypeTo} >
                       <option value={1024}>KB</option>
                       <option value={1048576}>MB</option>
                       <option value={1073741824}>GB</option>
@@ -304,7 +312,7 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
         <div className="row halfbottom">
           <div style={{ float: "left" }}>
             <div style={{ display: "inline-block", margin: "10px" }}>
-              <a className={"btn btn-text waves-effect waves-light"} onClick={this.handleResetFilters}>{localize("Common.reset", locale)}</a>
+              <a className={"res_btn btn btn-text waves-effect waves-light"} onClick={this.handleResetFilters}>{localize("Common.reset", locale)}</a>
             </div>
           </div>
 
@@ -379,11 +387,11 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
   }
 
   handleChangeSizeTypeFrom = (ev: any) => {
-    this.setState({ sizeTypeFrom: ev.target.value });
+    this.setState({ filters: { ...this.state.filters, sizeTypeFrom: ev.target.value } });
   }
 
   handleChangeSizeTypeTo = (ev: any) => {
-    this.setState({ sizeTypeTo: ev.target.value });
+    this.setState({ filters: { ...this.state.filters, sizeTypeTo: ev.target.value } });
   }
 
   handleFromChange = (ev: any) => {
@@ -401,8 +409,9 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
   handleApplyFilters = () => {
     this.props.applyDocumentsFilters({
       ...this.state.filters,
-      sizeFrom: this.state.filters.sizeFrom ? this.state.filters.sizeFrom * this.state.sizeTypeFrom : undefined,
-      sizeTo: this.state.filters.sizeTo ? this.state.filters.sizeTo * this.state.sizeTypeTo : undefined,
+      sizeFrom: this.state.filters.sizeFrom ? this.state.filters.sizeFrom * this.state.filters.sizeTypeFrom : undefined,
+      sizeTo: this.state.filters.sizeTo ? this.state.filters.sizeTo * this.state.filters.sizeTypeTo : undefined,
+
     });
     this.props.unselectAllFiles();
     this.props.unselectAllDocuments();
@@ -423,6 +432,8 @@ export default connect((state) => ({
   filename: state.filters.documents.filename,
   sizeFrom: state.filters.documents.sizeFrom,
   sizeTo: state.filters.documents.sizeTo,
+  sizeTypeFrom: state.filters.documents.sizeTypeFrom,
+  sizeTypeTo: state.filters.documents.sizeTypeTo,
   types: state.filters.documents.types,
 }), {
   applyDocumentsFilters, resetDocumentsFilters, unselectAllDocuments, unselectAllFiles,
