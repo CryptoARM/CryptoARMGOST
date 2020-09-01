@@ -141,7 +141,7 @@ class DocumentTable extends React.Component<IDocumentsTableProps & IDocumentsTab
                     dataKey="extension"
                     disableSort={false}
                     headerRenderer={this.headerRenderer}
-                    width={50}
+                    width={55}
                     label={localize("Documents.type", locale)}
                   />
                   <Column
