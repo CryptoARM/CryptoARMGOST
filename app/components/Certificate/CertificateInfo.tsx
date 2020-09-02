@@ -90,9 +90,9 @@ export default class CertificateInfo extends React.Component<ICertificateInfoPro
           {
             this.isMinsvyazRoot() ?
               <React.Fragment>               
-                <div className="collection-title selectable-text valid">выдан аккредитованным УЦ</div>
+                <div className="collection-title selectable-text valid">{localize("Certificate.accredited", locale)}</div>
               </React.Fragment>
-              :null
+            :null
           }
         </div>
         <div className="collection-item certs-collection certificate-info">
