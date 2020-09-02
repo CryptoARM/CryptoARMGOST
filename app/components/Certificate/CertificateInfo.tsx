@@ -87,22 +87,15 @@ export default class CertificateInfo extends React.Component<ICertificateInfoPro
         <div className="collection-item certs-collection certificate-info">
           <div className="caption-text">{localize("Certificate.issuer_name", locale)}</div>
           <div className="collection-title selectable-text">{certificate.issuerFriendlyName}</div>
-        </div>
-        <div className="collection-item certs-collection certificate-info">
           {
             this.isMinsvyazRoot() ?
-              <React.Fragment>
-                <div className="caption-text">{localize("Certificate.issuer_name", locale)}</div>
-                <div className="collection-title selectable-text">{certificate.issuerFriendlyName}</div>
+              <React.Fragment>               
                 <div className="collection-title selectable-text valid">выдан аккредитованным УЦ</div>
               </React.Fragment>
-              :
-              <React.Fragment>
-                <div className="caption-text">{localize("Certificate.issuer_name", locale)}</div>
-                <div className="collection-title selectable-text">{certificate.issuerFriendlyName}</div>
-              </React.Fragment>
+              :null
           }
-
+        </div>
+        <div className="collection-item certs-collection certificate-info">
           <div className="caption-text">{localize("Certificate.cert_valid", locale)}</div>
           <div className="collection-title selectable-text">{(new Date(certificate.notAfter)).toLocaleDateString(locale, {
             day: "numeric",
