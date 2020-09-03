@@ -3,7 +3,7 @@ import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
 import { push } from "react-router-redux";
-import * as URL from "url";
+import * as URLmod from "url";
 import {
   ADD_LICENSE, ADD_REMOTE_FILE, CANCEL_URL_ACTION, DECRYPT,
   DOWNLOAD_REMOTE_FILE, ENCRYPT, ENCRYPTED, FAIL,
@@ -484,6 +484,6 @@ export const startUrlCmd = (command: any) => {
 };
 
 export const getHostFromUrl = (urlValue: string): string => {
-  const parsedUrl = URL.parse(urlValue);
+  const parsedUrl = URLmod.parse(urlValue);
   return (parsedUrl && parsedUrl.host) ? parsedUrl.host : urlValue;
 }
