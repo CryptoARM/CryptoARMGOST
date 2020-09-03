@@ -1,3 +1,4 @@
+import { resolve } from "dns";
 import React from "react";
 import { connect } from "react-redux";
 import { verifyCertificate } from "../../AC";
@@ -9,6 +10,19 @@ interface ISignerInfoProps {
 }
 
 class SignerInfo extends React.Component<ISignerInfoProps, any> {
+  timerHandle: NodeJS.Timer | null;
+  componentDidMount() {
+    const { verifyCertificate, signer } = this.props;
+
+    this.timerHandle = setTimeout(() => {
+      if (!signer.verified) {
+        verifyCertificate(signer.id);
+      }
+
+      this.timerHandle = null;
+    }, 2000);
+  }
+
   render() {
     // tslint:disable-next-line:no-shadowed-variable
     const { signer, verifyCertificate } = this.props;
@@ -27,7 +41,18 @@ class SignerInfo extends React.Component<ISignerInfoProps, any> {
     }
 
     if (signer && !signer.verified) {
-      verifyCertificate(signer.id);
+     let certificate = signer.object ? signer.object : null;
+     if (certificate === null) {
+      if (signer.x509) {
+        try {
+          certificate = trusted.pki.Certificate.import(Buffer.from(signer.x509), trusted.DataFormat.PEM);
+        } catch (e) {
+          return null;
+        }
+      } else {
+        certificate = window.PKISTORE.getPkiObject(signer);
+      }
+    }
     }
 
     return (
