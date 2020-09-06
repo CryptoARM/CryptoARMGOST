@@ -11,10 +11,14 @@ export function addTrustedService(service: string) {
   };
 }
 
-export function showModalAddTrustedService(serviceUrl: string) {
+export function showModalAddTrustedService(
+  serviceUrl: string,
+  cert: trusted.pki.Certificate | undefined  = undefined
+  ) {
   return {
     payload: {
       urlToCheck: serviceUrl,
+      cert
     },
     type: SHOW_MODAL_ADD_TRUSTED_SERVICE,
   };

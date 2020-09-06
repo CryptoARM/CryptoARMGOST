@@ -14,6 +14,7 @@ export const DefaultReducerState = Record({
   entities: OrderedMap({}),
   showModal: false,
   urlToCheck: "",
+  cert: undefined
 });
 
 export default (trustedServices = new DefaultReducerState(), action) => {
@@ -28,7 +29,8 @@ export default (trustedServices = new DefaultReducerState(), action) => {
 
     case SHOW_MODAL_ADD_TRUSTED_SERVICE:
       return trustedServices.set("showModal", true)
-        .set("urlToCheck", payload.urlToCheck);
+        .set("urlToCheck", payload.urlToCheck)
+        .set("cert", payload.cert);
 
     case HIDE_MODAL_ADD_TRUSTED_SERVICE:
       return trustedServices.set("showModal", false)

@@ -64,20 +64,65 @@ export function checkTrustedServiceForCommand(
   const state = store.getState();
   const { trustedServices } = state;
 
-  let serviceIsTrusted = false;
+  const hostToCheck = getHostFromUrl(command.url);
 
-  if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
-    const hostToCheck = getHostFromUrl(command.url);
-    const findResult = trustedServices.entities.find(
-      (value: any, key: any, iter: any) => {
-        return value.url === hostToCheck;
-      },
-    );
-    serviceIsTrusted = (undefined !== findResult);
-  }
+  const curl = new window.Curl();
+  curl.setOpt("URL", "https://" + hostToCheck);
 
+  curl.setOpt("CERTINFO", true);
+  curl.on("end", status => {
+    console.log("CURL transaction end with status code: " + status);
+    let cert: trusted.pki.Certificate | undefined  = undefined;
+    if (status !== 200) {
+      // throw Error(`Invalid status code: ${status}`)
+    } else {
+      try {
+        let certInfo: string | number | any[] | null = curl.getInfo(Curl.info.CERTINFO);
+
+        const certs: string[] = certInfo.filter((itm: string): boolean => itm.search("Cert:") === 0);
+        if (certs.length === 0) {
+          throw new Error("Certificate blob is not found in recieved data");
+        }
+        // TODO: find server certificate in chain
+        cert = findServerCert(certs);
+      } catch (e) {
+        console.error("Error loading certificate ", e.message);
+      }
+    }
+
+    curl.close();
+
+    let serviceIsTrusted = false;
+
+    if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
+      const findResult = trustedServices.entities.find(
+        (value: any, key: any, iter: any) => {
+          return value.url === hostToCheck;
+        },
+      );
+      // TODO: compare certificates
+      serviceIsTrusted = (undefined !== findResult);
+    }
+
+    processCommandForService( command, serviceIsTrusted, cert );
+  });
+
+  curl.on("error", (error: any) => {
+    curl.close();
+    console.error(error);
+    processCommandForService( command, false );
+  });
+
+  curl.perform();
+}
+
+function processCommandForService(
+  command: IUrlCommandApiV4Type,
+  serviceIsTrusted: boolean,
+  cert: trusted.pki.Certificate | undefined  = undefined
+) {
+  const curWindow = remote.getCurrentWindow();
   if (serviceIsTrusted) {
-    const curWindow = remote.getCurrentWindow();
 
     if ( curWindow.isMinimized()) {
       curWindow.restore();
@@ -88,9 +133,7 @@ export function checkTrustedServiceForCommand(
 
     dispatchURLCommand(command);
   } else {
-    store.dispatch(showModalAddTrustedService(command.url));
-
-    const curWindow = remote.getCurrentWindow();
+    store.dispatch(showModalAddTrustedService(command.url, cert));
 
     if ( curWindow.isMinimized()) {
       curWindow.restore();
@@ -104,6 +147,45 @@ export function checkTrustedServiceForCommand(
 
     return;
   }
+}
+
+function findServerCert(certs: string[]): trusted.pki.Certificate | undefined {
+  const parsedCerts: trusted.pki.Certificate[] = [];
+  // importing chain certificates to trusted.pki.Certificate objects
+  certs.forEach( (certItem: string) => {
+    try {
+      const cert = new trusted.pki.Certificate();
+      cert.import(Buffer.from(certItem.substr(5)), trusted.DataFormat.PEM);
+      parsedCerts.push(cert);
+    } catch (e) {
+      console.error("Error parsing certificate ", e.message);
+    }
+  });
+
+  if (parsedCerts.length === 0) {
+    return undefined;
+  }
+
+  if (parsedCerts.length === 1) {
+    return parsedCerts[0];
+  }
+
+  let result = parsedCerts[0];
+  let nextCert = undefined;
+  // Search last certificate in chain
+  do {
+    nextCert = parsedCerts.find((curCert: trusted.pki.Certificate) => {
+      // next cert must be issued by current result
+      // and must not be selfsigned (to avoid infinite loop on root certificate)
+      return (result.subjectName === curCert.issuerName) && (!curCert.isSelfSigned);
+    });
+
+    if (nextCert) {
+      result = nextCert;
+    }
+  } while(nextCert);
+
+  return result;
 }
 
 export function dispatchURLCommand(

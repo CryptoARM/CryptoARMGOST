@@ -901,7 +901,12 @@ export default {
     sign_and_encrypt: "Подпись и шифрование",
   },
   TrustedServices: {
+    cert_params: "Сертификат сайта:",
+    cert_issuer: "Издатель",
+    cert_not_after: "Истекает",
+    cert_subj: "Владелец",
     do_not_show_again: "Не показывать больше для этого сайта",
+    error_load_cert: "Не удалось получить сертификат",
     external_resource_request: "Запрос с внешнего сайта",
     requests_for_cryptoarm: "зарпашивает разрешение на вызов КриптоАРМ ГОСТ.",
     site: "Сайт",

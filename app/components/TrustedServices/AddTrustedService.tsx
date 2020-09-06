@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { addTrustedService, hideModalAddTrustedService } from "../../AC/trustedServicesActions";
 import store from "../../store";
 import { dispatchURLCommand, getHostFromUrl } from "../../AC/urlActions";
+import { formatDate } from "../../utils";
 
 interface IAddTrustedServiceProps {
   onCancel?: () => void;
@@ -49,8 +50,11 @@ class AddTrustedService extends React.Component<
               <div className="dialog-text">
                 {localize("TrustedServices.site", locale)} <span className="cryptoarm-blue" style={{ fontWeight: "bold" }}>{urlToCheck}</span> {localize("TrustedServices.requests_for_cryptoarm", locale)}
               </div>
+              <div>
+                {this.certInfo()}
+              </div>
               <div className="row">
-                <div className="input-field col">
+                <div className="dialog-text">
                   <input
                     name="groupDelCont"
                     type="checkbox"
@@ -117,6 +121,22 @@ class AddTrustedService extends React.Component<
 
   toggleSaveService = () => {
     this.setState({ saveService: !this.state.saveService });
+  }
+
+  certInfo = () => {
+    const { cert, urlToCheck } = this.props.trustedServices;
+    const { localize, locale } = this.context;
+
+    if (!cert) {
+      return (<React.Fragment>{localize("TrustedServices.error_load_cert", locale)}</React.Fragment>);
+    }
+
+    return (<div className="dialog-text">
+      <div key="host">{localize("TrustedServices.cert_params", locale)}</div>
+      <div key="subj">{localize("TrustedServices.cert_subj", locale)}: {cert.subjectFriendlyName}</div>
+      <div key="iss">{localize("TrustedServices.cert_issuer", locale)}: {cert.issuerFriendlyName}</div>
+      <div key="naft">{localize("TrustedServices.cert_not_after", locale)}: {formatDate(cert.notAfter)}</div>
+    </div>);
   }
 }
 
