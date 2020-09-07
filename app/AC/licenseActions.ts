@@ -59,20 +59,20 @@ export function loadLicense(license?: string) {
         jti: "",
         sub: "CryptoARM GOST",
       };
-
+      
       if (license && license.length) {
         data = license;
       } else if (fs.existsSync(LICENSE_PATH)) {
         data = fs.readFileSync(LICENSE_PATH, "utf8");
       }
-
+      
       data = data.replace(/(\r\n|\n|\r)/gm, "");
       data = data.trim();
-
+      
       try {
         if (data && data.length) {
           const status = JSON.parse(LicenseManager.checkLicense(data));
-
+ 
           if (status.verify) {
             lic_format = status.type;
             lic.exp = status.attribute ? status.attribute.ExpirationTime : status.payload ? JSON.parse(status.payload).exp : null;
@@ -83,7 +83,7 @@ export function loadLicense(license?: string) {
           } else {
             lic_format = status.type;
             licenseStatus = false;
-            lic_error = status.error; // CTLICENSE_R_ERROR_NO_LICENSE_IN_STORE
+            lic_error = status.errcode; // CTLICENSE_R_ERROR_NO_LICENSE_IN_STORE
             dispatch({ payload: { data, lic_format, licenseStatus, lic_error }, type: LOAD_LICENSE + FAIL });
           }
         } else {
