@@ -73,8 +73,6 @@ export default class CertificateInfo extends React.Component<ICertificateInfoPro
     const signatureDigestAlgorithm = localize(`OIDs.${certificate.signatureDigestAlgorithm}`, locale);
     const publicKeyAlgorithm = localize(`OIDs.${certificate.publicKeyAlgorithm}`, locale);
 
-    console.log("CERTIFICATE", certificate);
-
     if (!certificate) {
       return null;
     }
