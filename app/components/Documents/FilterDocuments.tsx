@@ -27,6 +27,8 @@ interface IFilterDocumentsProps {
 interface IDocumentsFilters {
   dateFrom: Date | undefined;
   dateTo: Date | undefined;
+  sizeTypeFrom: number;
+  sizeTypeTo: number;
   filename: string;
   sizeFrom: number | undefined;
   sizeTo: number | undefined;
@@ -38,11 +40,11 @@ interface IDocumentsFilters {
   };
 }
 
-interface IDocumentsState {
-  filters: IDocumentsFilters;
-  sizeTypeFrom: number;
-  sizeTypeTo: number;
-}
+// interface IDocumentsState {
+//   filters: IDocumentsFilters;
+//   sizeTypeFrom: number;
+//   sizeTypeTo: number;
+// }
 
 const initialState = {
   dateFrom: undefined,
@@ -57,7 +59,7 @@ const initialState = {
   },
 };
 
-class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsState> {
+class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsFilters> {
   static contextTypes = {
     locale: PropTypes.string,
     localize: PropTypes.func,
@@ -67,13 +69,11 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
     super(props);
 
     this.state = {
-      filters: {
         ...initialState,
         dateFrom: props.dateFrom,
         dateTo: props.dateTo,
-      },
-      sizeTypeFrom: 1024,
-      sizeTypeTo: 1024,
+        sizeTypeFrom: 1024,
+        sizeTypeTo: 1024,
     };
   }
 
@@ -81,7 +81,6 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
     const { dateFrom, dateTo, filename, sizeFrom, sizeTo, types } = this.props;
 
     this.setState({
-      filters: {
         ...initialState,
         dateFrom,
         dateTo,
@@ -89,7 +88,6 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
         sizeFrom: sizeFrom ? sizeFrom / 1024 : sizeFrom,
         sizeTo: sizeTo ? sizeTo / 1024 : sizeTo,
         types,
-      },
     });
 
     $(document).ready(function () {
@@ -115,8 +113,7 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
   }
 
   render() {
-    const { filters, sizeTypeFrom, sizeTypeTo } = this.state;
-    const { dateFrom, dateTo, filename, sizeFrom, sizeTo, types } = filters;
+    const { sizeTypeFrom, sizeTypeTo, dateFrom, dateTo, filename, sizeFrom, sizeTo, types } = this.state;
     const { localize, locale } = this.context;
 
     return (
@@ -154,9 +151,7 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
                       key="input_from"
                       label="From"
                       onClear={() => {
-                        this.setState({
-                          filters: { ...filters, dateFrom: undefined },
-                        });
+                        this.setState({ dateFrom: undefined});
                       }}
                       onSelect={this.handleFromChange}
                       selected={dateFrom}
@@ -169,9 +164,7 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
                       label="To"
                       min={dateFrom}
                       onClear={() => {
-                        this.setState({
-                          filters: { ...filters, dateTo: undefined },
-                        });
+                        this.setState({dateTo: undefined});
                       }}
                       onSelect={this.handleToChange}
                       selected={dateTo}
@@ -322,8 +315,7 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
   }
 
   isAllTypesChecked = () => {
-    const { filters } = this.state;
-    const { types } = filters;
+    const { types } = this.state;
 
     return !types.ENCRYPTED && !types.SIGNED && !types.ARCHIVED;
   }
@@ -333,13 +325,11 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
     const name = target.name;
 
     this.setState({
-      filters: {
-        ...this.state.filters,
+        ...this.state,
         types: {
-          ...this.state.filters.types,
-          [name]: !this.state.filters.types[name],
+          ...this.state.types,
+          [name]: !this.state.types[name],
         },
-      },
     });
   }
 
@@ -347,13 +337,11 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
     const value = !this.isAllTypesChecked();
 
     this.setState({
-      filters: {
-        ...this.state.filters,
+        ...this.state,
         types: {
           ARCHIVED: !value,
           ENCRYPTED: !value,
           SIGNED: !value,
-        },
       },
     });
   }
@@ -367,15 +355,15 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
   }
 
   handleFilenameChange = (ev: any) => {
-    this.setState({ filters: { ...this.state.filters, filename: ev.target.value } });
+    this.setState({ ...this.state, filename: ev.target.value });
   }
 
   handleSizeFromChange = (ev: any) => {
-    this.setState({ filters: { ...this.state.filters, sizeFrom: ev.target.value } });
+    this.setState({ ...this.state, sizeFrom: ev.target.value });
   }
 
   handleSizeToChange = (ev: any) => {
-    this.setState({ filters: { ...this.state.filters, sizeTo: ev.target.value } });
+    this.setState({ ...this.state, sizeTo: ev.target.value });
   }
 
   handleChangeSizeTypeFrom = (ev: any) => {
@@ -388,21 +376,21 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
 
   handleFromChange = (ev: any) => {
     if (ev && ev.select) {
-      this.setState({ filters: { ...this.state.filters, dateFrom: new Date(ev.select) } });
+      this.setState({ ...this.state, dateFrom: new Date(ev.select) });
     }
   }
 
   handleToChange = (ev: any) => {
     if (ev && ev.select) {
-      this.setState({ filters: { ...this.state.filters, dateTo: new Date(ev.select) } });
+      this.setState({ ...this.state, dateTo: new Date(ev.select) });
     }
   }
 
   handleApplyFilters = () => {
     this.props.applyDocumentsFilters({
-      ...this.state.filters,
-      sizeFrom: this.state.filters.sizeFrom ? this.state.filters.sizeFrom * this.state.sizeTypeFrom : undefined,
-      sizeTo: this.state.filters.sizeTo ? this.state.filters.sizeTo * this.state.sizeTypeTo : undefined,
+      ...this.state,
+      sizeFrom: this.state.sizeFrom ? this.state.sizeFrom * this.state.sizeTypeFrom : undefined,
+      sizeTo: this.state.sizeTo ? this.state.sizeTo * this.state.sizeTypeTo : undefined,
     });
     this.props.unselectAllFiles();
     this.props.unselectAllDocuments();
@@ -410,10 +398,14 @@ class FilterDocuments extends React.Component<IFilterDocumentsProps, IDocumentsS
   }
 
   handleResetFilters = () => {
-    this.setState({ filters: { ...initialState } });
+    this.setState({ ...initialState });
     this.props.unselectAllFiles();
     this.props.unselectAllDocuments();
     this.props.resetDocumentsFilters();
+    $(document).ready(() => {
+      $("select").material_select();
+      Materialize.updateTextFields();
+    });
   }
 }
 
