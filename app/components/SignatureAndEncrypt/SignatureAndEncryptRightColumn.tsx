@@ -728,7 +728,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       return;
     }
 
-    if (setting.operations.encryption_operation && !setting.changedRecipients) {
+    if (setting.operations.encryption_operation && !setting.changedRecipients && !(this.props.lic_error === 911)) {
       const isGost = this.isGostRecipients(recipients);
 
       for (const items of recipients) {
