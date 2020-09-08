@@ -215,9 +215,9 @@ class DocumentsRightColumn extends React.Component<IDocumentsWindowProps, {}> {
   }
 
   checkEnableOperationButton = (operation: string) => {
-    const { documents } = this.props;
+    const { filtredDocuments } = this.props;
 
-    if (!documents.length) {
+    if (!filtredDocuments.size) {
 
       return false;
     }
