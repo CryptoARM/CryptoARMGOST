@@ -2,8 +2,10 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { addTrustedService, hideModalAddTrustedService } from "../../AC/trustedServicesActions";
-import store from "../../store";
 import { dispatchURLCommand, getHostFromUrl } from "../../AC/urlActions";
+import { PkiCertToCertInfo } from "../../AC/urlCmdCertInfo";
+import store from "../../store";
+import CertificateChainInfo from "../Certificate/CertificateChainInfo";
 
 interface IAddTrustedServiceProps {
   onCancel?: () => void;
@@ -49,8 +51,14 @@ class AddTrustedService extends React.Component<
               <div className="dialog-text">
                 {localize("TrustedServices.site", locale)} <span className="cryptoarm-blue" style={{ fontWeight: "bold" }}>{urlToCheck}</span> {localize("TrustedServices.requests_for_cryptoarm", locale)}
               </div>
+              <div>
+                <div className="dialog-text">
+                  {localize("TrustedServices.cert_params", locale)}
+                </div>
+                {this.certInfo()}
+              </div>
               <div className="row">
-                <div className="input-field col">
+                <div className="dialog-text">
                   <input
                     name="groupDelCont"
                     type="checkbox"
@@ -117,6 +125,18 @@ class AddTrustedService extends React.Component<
 
   toggleSaveService = () => {
     this.setState({ saveService: !this.state.saveService });
+  }
+
+  certInfo = () => {
+    const { cert } = this.props.trustedServices;
+    const { localize, locale } = this.context;
+
+    if (!cert) {
+      return <div className="dialog-text">{localize("TrustedServices.error_load_cert", locale)}</div>;
+    }
+
+    const certInfo = PkiCertToCertInfo(cert.subjectKeyIdentifier, cert, false);
+    return <CertificateChainInfo certificate={certInfo} style="" onClick={() => { return; }} />;
   }
 }
 

@@ -73,7 +73,7 @@ export async function postRequest(url: string, requestData: string|Buffer) {
 
     curl.on("error", (error: { message: any; }) => {
       curl.close();
-      reject(new Error(`Cannot load data by url ${url}, error: ${error.message}`));
+      reject(new Error(`Cannot load data by url ${url}, error: ${error.message ? error.message : error}`));
     });
 
     curl.perform();

@@ -95,7 +95,7 @@ class CertificateChainInfo extends React.Component<any, any> {
         }
 
         if (j === 0) {
-          curKeyStyle = certificate.key.length > 0 ? "key " : "";
+          curKeyStyle = (certificate.key && certificate.key.length > 0) ? "key " : "";
 
           if (curKeyStyle) {
             if (certificate.dssUserID) {
