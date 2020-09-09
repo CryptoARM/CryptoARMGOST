@@ -2,9 +2,10 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { addTrustedService, hideModalAddTrustedService } from "../../AC/trustedServicesActions";
-import store from "../../store";
 import { dispatchURLCommand, getHostFromUrl } from "../../AC/urlActions";
-import { formatDate } from "../../utils";
+import { PkiCertToCertInfo } from "../../AC/urlCmdCertInfo";
+import store from "../../store";
+import CertificateChainInfo from "../Certificate/CertificateChainInfo";
 
 interface IAddTrustedServiceProps {
   onCancel?: () => void;
@@ -51,6 +52,9 @@ class AddTrustedService extends React.Component<
                 {localize("TrustedServices.site", locale)} <span className="cryptoarm-blue" style={{ fontWeight: "bold" }}>{urlToCheck}</span> {localize("TrustedServices.requests_for_cryptoarm", locale)}
               </div>
               <div>
+                <div className="dialog-text">
+                  {localize("TrustedServices.cert_params", locale)}
+                </div>
                 {this.certInfo()}
               </div>
               <div className="row">
@@ -124,19 +128,15 @@ class AddTrustedService extends React.Component<
   }
 
   certInfo = () => {
-    const { cert, urlToCheck } = this.props.trustedServices;
+    const { cert } = this.props.trustedServices;
     const { localize, locale } = this.context;
 
     if (!cert) {
-      return (<React.Fragment>{localize("TrustedServices.error_load_cert", locale)}</React.Fragment>);
+      return <div className="dialog-text">{localize("TrustedServices.error_load_cert", locale)}</div>;
     }
 
-    return (<div className="dialog-text">
-      <div key="host">{localize("TrustedServices.cert_params", locale)}</div>
-      <div key="subj">{localize("TrustedServices.cert_subj", locale)}: {cert.subjectFriendlyName}</div>
-      <div key="iss">{localize("TrustedServices.cert_issuer", locale)}: {cert.issuerFriendlyName}</div>
-      <div key="naft">{localize("TrustedServices.cert_not_after", locale)}: {formatDate(cert.notAfter)}</div>
-    </div>);
+    const certInfo = PkiCertToCertInfo(cert.subjectKeyIdentifier, cert, false);
+    return <CertificateChainInfo certificate={certInfo} style="" onClick={() => { return; }} />;
   }
 }
 

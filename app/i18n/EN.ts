@@ -895,14 +895,14 @@ export default {
     sign_and_encrypt: "Signature and encryption",
   },
   TrustedServices: {
-    cert_params: "Site certificate:",
     cert_issuer: "Issuer",
     cert_not_after: "Not after",
+    cert_params: "Service certificate:",
     cert_subj: "Subject",
     do_not_show_again: "Don't show again for this site",
     error_load_cert: "Unable to obtain site certificate",
     external_resource_request: "Request from an external site",
-    requests_for_cryptoarm: "requests permission to call CryptoARM GOST.",
+    requests_for_cryptoarm: "requests permission for access to CryptoARM GOST for data exchange.",
     site: "The site",
   },
   Tsp: {
