@@ -3,7 +3,6 @@ import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
 import { push } from "react-router-redux";
-import * as URLmod from "url";
 import {
   ADD_LICENSE, ADD_REMOTE_FILE, CANCEL_URL_ACTION, DECRYPT,
   DOWNLOAD_REMOTE_FILE, ENCRYPT, ENCRYPTED, FAIL,
@@ -16,7 +15,7 @@ import { IUrlCommandApiV4Type, URLActionType } from "../parse-app-url";
 import store from "../store";
 import { checkLicense } from "../trusted/jwt";
 import * as signs from "../trusted/sign";
-import { extFile, fileExists, md5 } from "../utils";
+import { extFile, fileExists, mapToArr, md5 } from "../utils";
 import { toggleReverseOperations, toggleSaveCopyToDocuments, toggleSigningOperation } from "./settingsActions";
 import { showModalAddTrustedService } from "./trustedServicesActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
@@ -64,28 +63,31 @@ export function checkTrustedServiceForCommand(
   const state = store.getState();
   const { trustedServices } = state;
 
-  const hostToCheck = getHostFromUrl(command.url);
+  const hostToCheck = getServiceBaseLinkFromUrl(command.url);
 
   const curl = new window.Curl();
-  curl.setOpt("URL", "https://" + hostToCheck);
+  curl.setOpt("URL", hostToCheck);
 
   curl.setOpt("CERTINFO", true);
-  curl.on("end", status => {
-    console.log("CURL transaction end with status code: " + status);
-    let cert: trusted.pki.Certificate | undefined  = undefined;
+  curl.on("end", (status: any) => {
+    let cert: trusted.pki.Certificate | undefined;
     if (status !== 200) {
       // throw Error(`Invalid status code: ${status}`)
     } else {
       try {
-        let certInfo: string | number | any[] | null = curl.getInfo(Curl.info.CERTINFO);
+        const certInfo: string | number | any[] | null = curl.getInfo(Curl.info.CERTINFO);
+
+        if (!certInfo) {
+          throw new Error("Error while recieving certificate info");
+        }
 
         const certs: string[] = certInfo.filter((itm: string): boolean => itm.search("Cert:") === 0);
         if (certs.length === 0) {
           throw new Error("Certificate blob is not found in recieved data");
         }
-        // TODO: find server certificate in chain
         cert = findServerCert(certs);
       } catch (e) {
+        // tslint:disable-next-line:no-console
         console.error("Error loading certificate ", e.message);
       }
     }
@@ -94,23 +96,43 @@ export function checkTrustedServiceForCommand(
 
     let serviceIsTrusted = false;
 
-    if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
-      const findResult = trustedServices.entities.find(
-        (value: any, key: any, iter: any) => {
-          return value.url === hostToCheck;
+    if (cert && trustedServices && trustedServices.entities) {
+      const serviceUrlToCheck = getServiceBaseLinkFromUrl(hostToCheck);
+      const findResult = mapToArr(trustedServices.entities).find(
+        (value: any) => {
+          if (value.url !== serviceUrlToCheck) {
+            return false;
+          }
+
+          let curCert: trusted.pki.Certificate;
+          if (value.cert) {
+            try {
+              curCert = new trusted.pki.Certificate();
+              curCert.import(Buffer.from(value.cert), trusted.DataFormat.PEM);
+            } catch (e) {
+              //
+            }
+          }
+
+          if (!curCert) {
+            return false;
+          }
+
+          return curCert.compare(cert) === 0;
         },
       );
-      // TODO: compare certificates
+
       serviceIsTrusted = (undefined !== findResult);
     }
 
-    processCommandForService( command, serviceIsTrusted, cert );
+    processCommandForService(command, serviceIsTrusted, cert);
   });
 
   curl.on("error", (error: any) => {
     curl.close();
+    // tslint:disable-next-line:no-console
     console.error(error);
-    processCommandForService( command, false );
+    processCommandForService(command, false);
   });
 
   curl.perform();
@@ -119,12 +141,12 @@ export function checkTrustedServiceForCommand(
 function processCommandForService(
   command: IUrlCommandApiV4Type,
   serviceIsTrusted: boolean,
-  cert: trusted.pki.Certificate | undefined  = undefined
+  cert?: trusted.pki.Certificate,
 ) {
   const curWindow = remote.getCurrentWindow();
   if (serviceIsTrusted) {
 
-    if ( curWindow.isMinimized()) {
+    if (curWindow.isMinimized()) {
       curWindow.restore();
     }
 
@@ -135,7 +157,7 @@ function processCommandForService(
   } else {
     store.dispatch(showModalAddTrustedService(command.url, cert));
 
-    if ( curWindow.isMinimized()) {
+    if (curWindow.isMinimized()) {
       curWindow.restore();
     }
 
@@ -152,12 +174,13 @@ function processCommandForService(
 function findServerCert(certs: string[]): trusted.pki.Certificate | undefined {
   const parsedCerts: trusted.pki.Certificate[] = [];
   // importing chain certificates to trusted.pki.Certificate objects
-  certs.forEach( (certItem: string) => {
+  certs.forEach((certItem: string) => {
     try {
       const cert = new trusted.pki.Certificate();
       cert.import(Buffer.from(certItem.substr(5)), trusted.DataFormat.PEM);
       parsedCerts.push(cert);
     } catch (e) {
+      // tslint:disable-next-line:no-console
       console.error("Error parsing certificate ", e.message);
     }
   });
@@ -171,7 +194,7 @@ function findServerCert(certs: string[]): trusted.pki.Certificate | undefined {
   }
 
   let result = parsedCerts[0];
-  let nextCert = undefined;
+  let nextCert;
   // Search last certificate in chain
   do {
     nextCert = parsedCerts.find((curCert: trusted.pki.Certificate) => {
@@ -183,7 +206,7 @@ function findServerCert(certs: string[]): trusted.pki.Certificate | undefined {
     if (nextCert) {
       result = nextCert;
     }
-  } while(nextCert);
+  } while (nextCert);
 
   return result;
 }
@@ -565,7 +588,16 @@ export const startUrlCmd = (command: any) => {
   };
 };
 
-export const getHostFromUrl = (urlValue: string): string => {
-  const parsedUrl = URLmod.parse(urlValue);
-  return (parsedUrl && parsedUrl.host) ? parsedUrl.host : urlValue;
-}
+export const getServiceBaseLinkFromUrl = (urlValue: string, includeProtocol: boolean = true): string => {
+  const parsedUrl = new URL(urlValue);
+
+  if (!parsedUrl) {
+    return urlValue;
+  }
+
+  if (includeProtocol && parsedUrl.origin) {
+    return parsedUrl.origin;
+  }
+
+  return (parsedUrl.host) ? parsedUrl.host : urlValue;
+};

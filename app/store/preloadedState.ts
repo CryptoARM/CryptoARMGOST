@@ -105,10 +105,10 @@ if (fileExists(TRUSTED_SERVICES_JSON)) {
       let servicesMap = new DefaultTrustedServicesReducerState();
 
       const data = JSON.parse(tservices);
-
-      for (const service of data.trustedServices) {
+      for (const key of Object.keys(data.trustedServices)) {
+        const service = data.trustedServices[key];
         const mservice = new TrustedServiceModel({ ...service });
-        servicesMap = servicesMap.setIn(["entities", service.id], mservice);
+        servicesMap = servicesMap.setIn(["entities", key], mservice);
       }
 
       odata.trustedServices = servicesMap;
