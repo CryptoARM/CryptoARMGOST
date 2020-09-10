@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { addTrustedService, hideModalAddTrustedService } from "../../AC/trustedServicesActions";
-import { dispatchURLCommand, getHostFromUrl } from "../../AC/urlActions";
+import { dispatchURLCommand, getServiceBaseLinkFromUrl } from "../../AC/urlActions";
 import { PkiCertToCertInfo } from "../../AC/urlCmdCertInfo";
 import store from "../../store";
 import CertificateChainInfo from "../Certificate/CertificateChainInfo";
@@ -39,9 +39,9 @@ class AddTrustedService extends React.Component<
   render() {
     const { saveService } = this.state;
     const { localize, locale } = this.context;
-    const { trustedServices, urlCmds } = this.props;
+    const { trustedServices } = this.props;
 
-    const urlToCheck = trustedServices && trustedServices.urlToCheck ? getHostFromUrl(trustedServices.urlToCheck) : "Unknown URL";
+    const urlToCheck = trustedServices && trustedServices.urlToCheck ? getServiceBaseLinkFromUrl(trustedServices.urlToCheck, false) : "Unknown URL";
 
     return (
       <React.Fragment>
@@ -106,7 +106,8 @@ class AddTrustedService extends React.Component<
     const urlToCheck = (trustedServices && trustedServices.urlToCheck) ? trustedServices.urlToCheck : "'Unknown resource'";
 
     if (this.state.saveService) {
-      store.dispatch(addTrustedService(getHostFromUrl(urlToCheck)));
+      const certificateValue = trustedServices.cert.export(trusted.DataFormat.PEM).toString();
+      store.dispatch(addTrustedService(getServiceBaseLinkFromUrl(urlToCheck), certificateValue));
     }
 
     store.dispatch(hideModalAddTrustedService());
