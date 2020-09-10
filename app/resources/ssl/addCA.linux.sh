@@ -21,9 +21,9 @@ elif rpm -q -f /bin/ls >/dev/null 2>&1
 then
   case "$(arch)" in
     x86_64)
-     xdg-mime default cryptoarm-gost.desktop x-scheme-handler/cryptoarm ;;
+     su $USER xdg-mime default cryptoarm-gost.desktop x-scheme-handler/cryptoarm ;;
     i368)
-      xdg-mime default cryptoarm-gost.desktop x-scheme-handler/cryptoarm;;
+     su $USER xdg-mime default cryptoarm-gost.desktop x-scheme-handler/cryptoarm;;
     *)
       exit 1
       ;;
