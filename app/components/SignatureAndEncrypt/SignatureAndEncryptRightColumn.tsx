@@ -21,7 +21,7 @@ import {
   activeSetting, changeDefaultSettings, deleteSetting, saveSettings,
 } from "../../AC/settingsActions";
 import { cancelUrlAction, removeUrlAction } from "../../AC/urlActions";
-import { postRequest } from "../../AC/urlCmdUtils";
+import { postRequest, removeWarningMessage } from "../../AC/urlCmdUtils";
 import {
   ARCHIVATION_OPERATION, ARCHIVE, DECRYPT, DEFAULT_DOCUMENTS_PATH, DSS_ACTIONS, ENCRYPT, ENCRYPTION_OPERATION,
   GOST_28147, GOST_R3412_2015_K,
@@ -1827,6 +1827,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               (respData: any) => {
                 const remote = window.electron.remote;
                 remote.getCurrentWindow().minimize();
+                removeWarningMessage();
               },
               (error) => {
                 // tslint:disable-next-line: no-console

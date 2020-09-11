@@ -623,6 +623,28 @@ div::-webkit-scrollbar-thumb {
   letter-spacing: 0.10204081632rem;
 }
 
+.btn-toast {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0 15px 0 15px;
+  border-width: 1px;
+  overflow: hidden;
+  vertical-align: middle;
+  border-radius: 4px;
+  color: #e4dedc;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: bold;
+  letter-spacing: 0.10204081632rem;
+}
+
+.btn-toast:hover, .btn-text:hover  {
+  background-color: #464341;
+  box-shadow: none;
+}
+
 .btn-outlined {
   background-color: transparent;
   border-style: solid;

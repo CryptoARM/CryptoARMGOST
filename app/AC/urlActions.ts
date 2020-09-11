@@ -21,7 +21,7 @@ import { showModalAddTrustedService } from "./trustedServicesActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
 import { handleUrlCommandSignAmdEncrypt } from "./urlCmdSignAndEncrypt";
-import { postRequest } from "./urlCmdUtils";
+import { postRequest, removeWarningMessage } from "./urlCmdUtils";
 
 const remote = window.electron.remote;
 
@@ -317,11 +317,13 @@ function signDocumentsFromURL(action: URLActionType) {
         addLicenseToStore(data.extra.token, data.license);
       }
 
+      removeWarningMessage();
       store.dispatch({
         payload: { ...action, json: data },
         type: SIGN_DOCUMENTS_FROM_URL + SUCCESS,
       });
     } catch (error) {
+      removeWarningMessage();
       store.dispatch({
         type: SIGN_DOCUMENTS_FROM_URL + FAIL,
       });
@@ -351,11 +353,13 @@ function verifyDocumentsFromURL(action: URLActionType) {
         throw new Error("Error get JSON or json incorrect");
       }
 
+      removeWarningMessage();
       store.dispatch({
         payload: { ...action, json: data },
         type: VERIFY_DOCUMENTS_FROM_URL + SUCCESS,
       });
     } catch (error) {
+      removeWarningMessage();
       store.dispatch({
         type: VERIFY_DOCUMENTS_FROM_URL + FAIL,
       });

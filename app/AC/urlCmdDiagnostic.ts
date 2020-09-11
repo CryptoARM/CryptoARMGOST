@@ -16,7 +16,7 @@ import store from "../store";
 import { Store } from "../trusted/store";
 import { fileExists } from "../utils";
 import { PkiCertToCertInfo } from "./urlCmdCertInfo";
-import { paramsRequest, postRequest } from "./urlCmdUtils";
+import { paramsRequest, postRequest, removeWarningMessage } from "./urlCmdUtils";
 import { addTrustedService, showModalAddTrustedService } from "./trustedServicesActions";
 import { push } from "react-router-redux";
 
@@ -100,8 +100,10 @@ export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
         (respData: any) => {
           const remote = window.electron.remote;
           remote.getCurrentWindow().minimize();
+          removeWarningMessage();
         },
         (error) => {
+          removeWarningMessage();
           // tslint:disable-next-line: no-console
           console.log(
             "Error sending of diagnostics info with id " +
@@ -113,6 +115,7 @@ export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
       );
     },
     (error) => {
+      removeWarningMessage();
       // tslint:disable-next-line: no-console
       console.log(
         "Error recieving parameters of diagnostics command with id " +

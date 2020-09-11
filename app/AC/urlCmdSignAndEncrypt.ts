@@ -1,6 +1,6 @@
 import { IUrlCommandApiV4Type } from "../parse-app-url";
 import { dispatchURLAction } from "./urlActions";
-import { paramsRequest, postRequest } from "./urlCmdUtils";
+import { displayWarningMessage, paramsRequest, postRequest } from "./urlCmdUtils";
 
 interface ICertResp {
   jsonrpc: string;
@@ -35,6 +35,8 @@ export function handleUrlCommandSignAmdEncrypt( command: IUrlCommandApiV4Type ) 
     (data: any) => {
       const operation = data.result.operation;
       const props = data.result.props;
+
+      displayWarningMessage(command.command, command.url);
 
       if (operation && operation.includes("SIGN")) {
         return dispatchURLAction({

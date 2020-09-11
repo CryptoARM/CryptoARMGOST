@@ -2,6 +2,7 @@ import * as fs from "fs";
 import { ADDRESS_BOOK, CA, MY, ROOT, TMP_DIR } from "../constants";
 import history from "../history";
 import localize from "../i18n/localize";
+import { getServiceBaseLinkFromUrl } from "./urlActions";
 
 interface IParamsRequest {
   jsonrpc: "2.0";
@@ -138,4 +139,46 @@ export function writeCertToTmpFile(certBase64: string): string {
   fs.writeFileSync(resultUri, certBase64);
 
   return resultUri;
+}
+
+export function displayWarningMessage(command: string, serviceUrl: string, operation?: string) {
+  let toastMessage: string = "";
+  const serviceBaseUrl = getServiceBaseLinkFromUrl(serviceUrl);
+  switch (command) {
+    case "certificates":
+      switch (operation) {
+        case "export":
+        case "import":
+        case "information":
+        default:
+          toastMessage = "<div>Загружены документы с <span style='fontWeight: \"bold\"'>"
+            + serviceBaseUrl
+            + "</span></div><div>Нажмите \"Выполнить\" для завершения операции</div>";
+          break;
+      }
+      break;
+
+    case "signandencrypt":
+      toastMessage = "<div>Загружены документы с <span style='fontWeight: \"bold\"'>"
+        + serviceBaseUrl
+        + "</span></div><div>Нажмите \"Выполнить\" для завершения операции</div>";
+      break;
+
+    default:
+      toastMessage = "<div>Выполняем команду \"" + command
+        + "\" для сервиса</div> <span style='fontWeight: \"bold\"'>"
+        + serviceBaseUrl
+        + "</span>";
+      break;
+  }
+
+  $(".toast-url-cmd-warning-message").remove();
+  const $toastContent = $('<div><div style="float:left">'
+    + toastMessage
+    + '</div><a class="btn btn-toast waves-effect waves-light" onClick="$(\'.toast-url-cmd-warning-message\').remove();">Закрыть</a></div>');
+  Materialize.toast($toastContent, undefined, "toast-url-cmd-warning-message");
+}
+
+export function removeWarningMessage() {
+  $(".toast-url-cmd-warning-message").remove();
 }
