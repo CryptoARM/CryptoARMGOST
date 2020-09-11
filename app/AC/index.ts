@@ -293,17 +293,18 @@ export function packageSign(
                 fs.copyFileSync(file.fullpath, copyUriOriginalFile); } // копирую оригинальный файл
           }
         }
-        if (policies.includes("detached")) {
-          for (const file of files) {
-            const copyUriOriginalFile = path.join(folderOut, path.basename(file.fullpath));
-            fs.copyFileSync(file.fullpath, copyUriOriginalFile);
-          }
-        }
-
-        dispatch(filePackageDelete(signedFileIdPackage));
         if (!remoteFiles.uploader && !multipackage) {
           dispatch(push(LOCATION_RESULTS_MULTI_OPERATIONS));
         }
+        if (policies.includes("detached")) {
+          for (const file of files) {
+            const copyUriOriginalFile = path.join(folderOut, path.basename(file.fullpath));
+            if (!fileExists(copyUriOriginalFile)) {
+               fs.copyFileSync(file.fullpath, copyUriOriginalFile);
+            }
+          }
+        }
+        dispatch(filePackageDelete(signedFileIdPackage));
       } else {
         dispatch(filePackageSelect(signedFilePackage));
         dispatch(filePackageDelete(signedFileIdPackage));
