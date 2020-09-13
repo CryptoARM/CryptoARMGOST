@@ -13,7 +13,7 @@ export function deleteAllTemporyLicenses() {
     const licenses = connections.get("licenses");
 
     licenses.forEach((license) => {
-      if (license && license.license) {       
+      if (license && license.license) {
         try {
           LicenseManager.deleteLicense(license.license);
         } catch (e) {

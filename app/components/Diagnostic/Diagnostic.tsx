@@ -156,7 +156,7 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
   componentWillReceiveProps(nextProps: any) {
     const { certificatesLoaded, loadingLicense } = this.props;
     const { errors } = this.state;
-  
+
     if (nextProps.statusLicense === false && nextProps.lic_format === "NONE" && nextProps.verifiedLicense == true && loadingLicense === false) {
       this.setState({
         errors: [...this.state.errors, {
@@ -166,7 +166,6 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
       });
 
     }
-   
     if (nextProps.dataLicense && nextProps.lic_format === undefined && nextProps.statusLicense === false && nextProps.verifiedLicense == true && loadingLicense === false) {     
       this.setState({
         errors: [...this.state.errors, {
@@ -300,8 +299,7 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
         <div>
           <div className="row nobottom">
             <div className="diagnostic-content-item">
-              <div className="col s6 m5 l6 problem-contaner">
-                
+              <div className="col s6 m5 l6 problem-contaner"> 
                 <Problems errors={cspErrors.length ? cspErrors : errors} activeError={this.state.activeError} onClick={this.handleClickOnError} />
               </div>
               <div className="col s6 m7 l6 problem-contaner">
