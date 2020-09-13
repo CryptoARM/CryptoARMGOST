@@ -1,5 +1,6 @@
 import { IUrlCommandApiV4Type } from "../parse-app-url";
-import { dispatchURLAction } from "./urlActions";
+import store from "../store";
+import { dispatchURLAction, finishCurrentUrlCmd } from "./urlActions";
 import { displayWarningMessage, paramsRequest, postRequest } from "./urlCmdUtils";
 
 interface ICertResp {
@@ -57,6 +58,7 @@ export function handleUrlCommandSignAmdEncrypt( command: IUrlCommandApiV4Type ) 
       }
     },
     (error) => {
+      store.dispatch(finishCurrentUrlCmd(false));
       $(".toast-url-cmd-cert-params-fail-err-descr").remove();
       Materialize.toast(error, 3000, "toast-url-cmd-cert-params-fail-err-descr");
 

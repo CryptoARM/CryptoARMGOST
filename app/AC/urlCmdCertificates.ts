@@ -7,6 +7,7 @@ import localize from "../i18n/localize";
 import { IUrlCommandApiV4Type } from "../parse-app-url";
 import store from "../store";
 import { navigationLock, navigationUnlock } from "./globalLocks";
+import { finishCurrentUrlCmd } from "./urlActions";
 import { certificateInfo } from "./urlCmdCertInfo";
 import {
   displayWarningMessage, openWindow, paramsRequest,
@@ -149,6 +150,7 @@ function importCertificate(props: ICertificateOperationProps) {
 
 export function urlCmdCertImportFail() {
   navigationUnlock();
+  store.dispatch(finishCurrentUrlCmd(false));
   store.dispatch({type: URL_CMD_CERTIFICATES_IMPORT + FAIL});
   removeWarningMessage();
   $(".toast-url-cmd-cert-import-fail").remove();
@@ -158,6 +160,7 @@ export function urlCmdCertImportFail() {
 
 export function urlCmdCertImportSuccess() {
   navigationUnlock();
+  store.dispatch(finishCurrentUrlCmd());
   store.dispatch({type: URL_CMD_CERTIFICATES_IMPORT + SUCCESS});
   removeWarningMessage();
   $(".toast-url-cmd-cert-import-success").remove();
@@ -170,6 +173,7 @@ export function urlCmdSendCert(cert: any, id: string, url: string) {
   postRequest( url, sendCertReq(id, certValue, cert.subjectFriendlyName )).then(
     (data: any) => {
       navigationUnlock();
+      store.dispatch(finishCurrentUrlCmd());
       store.dispatch({type: URL_CMD_CERTIFICATES_EXPORT + SUCCESS});
       removeWarningMessage();
       $(".toast-url-cmd-cert-export-success").remove();
@@ -178,6 +182,7 @@ export function urlCmdSendCert(cert: any, id: string, url: string) {
     },
     (error) => {
       navigationUnlock();
+      store.dispatch(finishCurrentUrlCmd(false));
       store.dispatch({type: URL_CMD_CERTIFICATES_EXPORT + FAIL});
       removeWarningMessage();
       $(".toast-url-cmd-cert-export-fail-err-descr").remove();
@@ -200,6 +205,7 @@ export function urlCmdSendCerts(certs: any, id: string, url: string) {
   postRequest( url, sendCertsReq(id, certificatesToSend )).then(
     (data: any) => {
       navigationUnlock();
+      store.dispatch(finishCurrentUrlCmd());
       store.dispatch({type: URL_CMD_CERTIFICATES_EXPORT + SUCCESS});
       removeWarningMessage();
       $(".toast-url-cmd-certs-export-success").remove();
@@ -208,6 +214,7 @@ export function urlCmdSendCerts(certs: any, id: string, url: string) {
     },
     (error) => {
       navigationUnlock();
+      store.dispatch(finishCurrentUrlCmd(false));
       store.dispatch({type: URL_CMD_CERTIFICATES_EXPORT + FAIL});
       removeWarningMessage();
       $(".toast-url-cmd-certs-export-fail").remove();

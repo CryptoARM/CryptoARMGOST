@@ -164,7 +164,6 @@ function processCommandForService(
     curWindow.show();
     curWindow.focus();
 
-    store.dispatch(startUrlCmd(command));
     store.dispatch(push(LOCATION_MAIN));
 
     return;
@@ -214,6 +213,7 @@ function findServerCert(certs: string[]): trusted.pki.Certificate | undefined {
 export function dispatchURLCommand(
   command: IUrlCommandApiV4Type,
 ) {
+  store.dispatch(startUrlCmd(command));
   switch (command.command.toLowerCase()) {
     case "certificates":
       handleUrlCommandCertificates(command);
@@ -587,6 +587,12 @@ export const startUrlCmd = (command: any) => {
   return {
     payload: { urlCommand: command },
     type: URL_CMD + START,
+  };
+};
+
+export const finishCurrentUrlCmd = (isSuccessfull: boolean = true) => {
+  return {
+    type: URL_CMD + (isSuccessfull ? SUCCESS : FAIL),
   };
 };
 

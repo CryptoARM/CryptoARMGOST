@@ -1,5 +1,5 @@
 import {
-  START, URL_CMD,
+  FAIL, START, SUCCESS, URL_CMD,
 } from "../constants";
 
 const defaultCmd = {
@@ -16,6 +16,14 @@ export default (urlCmds = defaultCmd, action: any) => {
       return {
         ...urlCmds,
         ...payload.urlCommand,
+      };
+
+    case URL_CMD + SUCCESS:
+    case URL_CMD + FAIL:
+      return {
+        command: "",
+        id: "",
+        url: "",
       };
   }
 

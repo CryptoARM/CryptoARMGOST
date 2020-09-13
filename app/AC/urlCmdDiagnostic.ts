@@ -2,23 +2,20 @@ import * as fs from "fs";
 import os from "os";
 import {
   CERTIFICATES_DSS_JSON,
+  DIAGNOSTIC_FROM_URL,
   LICENSE_PATH,
   LicenseManager,
-  TSP_OCSP_ENABLED,
-  DIAGNOSTIC_FROM_URL,
   START,
-  LOCATION_MAIN,
-  SHOW_MODAL_ADD_TRUSTED_SERVICE,
+  TSP_OCSP_ENABLED,
 } from "../constants";
 import localize from "../i18n/localize";
 import { IUrlCommandApiV4Type } from "../parse-app-url";
 import store from "../store";
 import { Store } from "../trusted/store";
 import { fileExists } from "../utils";
+import { finishCurrentUrlCmd } from "./urlActions";
 import { PkiCertToCertInfo } from "./urlCmdCertInfo";
 import { paramsRequest, postRequest, removeWarningMessage } from "./urlCmdUtils";
-import { addTrustedService, showModalAddTrustedService } from "./trustedServicesActions";
-import { push } from "react-router-redux";
 
 interface IDiagnosticsInformation {
   id: string;
@@ -100,36 +97,39 @@ export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
         (respData: any) => {
           const remote = window.electron.remote;
           remote.getCurrentWindow().minimize();
+          store.dispatch(finishCurrentUrlCmd());
           removeWarningMessage();
         },
         (error) => {
+          store.dispatch(finishCurrentUrlCmd(false));
           removeWarningMessage();
           // tslint:disable-next-line: no-console
           console.log(
             "Error sending of diagnostics info with id " +
               command.id +
               ". Error description: " +
-              error
+              error,
           );
-        }
+        },
       );
     },
     (error) => {
+      store.dispatch(finishCurrentUrlCmd(false));
       removeWarningMessage();
       // tslint:disable-next-line: no-console
       console.log(
         "Error recieving parameters of diagnostics command with id " +
           command.id +
           ". Error description: " +
-          error
+          error,
       );
-    }
+    },
   );
 }
 
 function collectDiagnosticInfo(
   id: string,
-  diagOperations: string[]
+  diagOperations: string[],
 ): IDiagnosticsInformation {
   const result: IDiagnosticsInformation = { id };
   if (diagOperations.includes("SYSTEMINFORMATION")) {

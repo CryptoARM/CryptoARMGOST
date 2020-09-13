@@ -20,7 +20,7 @@ import { multiDirectOperation, multiOperationStart, multiReverseOperation } from
 import {
   activeSetting, changeDefaultSettings, deleteSetting, saveSettings,
 } from "../../AC/settingsActions";
-import { cancelUrlAction, removeUrlAction } from "../../AC/urlActions";
+import { cancelUrlAction, finishCurrentUrlCmd, removeUrlAction } from "../../AC/urlActions";
 import { postRequest, removeWarningMessage } from "../../AC/urlCmdUtils";
 import {
   ARCHIVATION_OPERATION, ARCHIVE, DECRYPT, DEFAULT_DOCUMENTS_PATH, DSS_ACTIONS, ENCRYPT, ENCRYPTION_OPERATION,
@@ -1827,9 +1827,12 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               (respData: any) => {
                 const remote = window.electron.remote;
                 remote.getCurrentWindow().minimize();
+                store.dispatch(finishCurrentUrlCmd());
                 removeWarningMessage();
               },
               (error) => {
+                store.dispatch(finishCurrentUrlCmd(false));
+                removeWarningMessage();
                 // tslint:disable-next-line: no-console
                 console.log("Error sending of diagnostics info with id " + operationRemoteAction.id
                   + ". Error description: " + error);
