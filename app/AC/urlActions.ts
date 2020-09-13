@@ -317,7 +317,6 @@ function signDocumentsFromURL(action: URLActionType) {
         addLicenseToStore(data.extra.token, data.license);
       }
 
-      removeWarningMessage();
       store.dispatch({
         payload: { ...action, json: data },
         type: SIGN_DOCUMENTS_FROM_URL + SUCCESS,
@@ -353,7 +352,6 @@ function verifyDocumentsFromURL(action: URLActionType) {
         throw new Error("Error get JSON or json incorrect");
       }
 
-      removeWarningMessage();
       store.dispatch({
         payload: { ...action, json: data },
         type: VERIFY_DOCUMENTS_FROM_URL + SUCCESS,
