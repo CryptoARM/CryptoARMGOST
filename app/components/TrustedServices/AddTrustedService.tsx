@@ -52,9 +52,6 @@ class AddTrustedService extends React.Component<
                 {localize("TrustedServices.site", locale)} <span className="cryptoarm-blue" style={{ fontWeight: "bold" }}>{urlToCheck}</span> {localize("TrustedServices.requests_for_cryptoarm", locale)}
               </div>
               <div>
-                <div className="dialog-text">
-                  {localize("TrustedServices.cert_params", locale)}
-                </div>
                 {this.certInfo()}
               </div>
               <div className="row">
@@ -137,7 +134,11 @@ class AddTrustedService extends React.Component<
     }
 
     const certInfo = PkiCertToCertInfo(cert.subjectKeyIdentifier, cert, false);
-    return <CertificateChainInfo certificate={certInfo} style="" onClick={() => { return; }} />;
+    return (<React.Fragment>
+      <a className="collection-info chain-info-blue">{localize("Certificate.cert_chain_status", locale)}</a>
+      <div className="collection-info chain-status">{certInfo.status ? localize("Certificate.cert_chain_status_true", locale) : localize("Certificate.cert_chain_status_false", locale)}</div>
+      <CertificateChainInfo certificate={certInfo} style="" onClick={() => { return; }} />
+    </React.Fragment>);
   }
 }
 
