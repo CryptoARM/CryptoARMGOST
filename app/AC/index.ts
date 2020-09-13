@@ -31,7 +31,10 @@ import { ERROR, SIGNED, UPLOADED, VERIFIED } from "../server/constants";
 import * as signs from "../trusted/sign";
 import { Store } from "../trusted/store";
 import { extFile, fileCoding, fileExists, md5 } from "../utils";
-import { postRequest } from "./urlCmdUtils";
+import { postRequest, removeWarningMessage } from "./urlCmdUtils";
+import store from "../store";
+import { finishCurrentUrlCmd } from "./urlActions";
+
 
 export function changeLocation(location: string) {
   return (dispatch: (action: {}) => void) => {
@@ -186,8 +189,12 @@ function uploadFiles(
     (respData: any) => {
       const remote = window.electron.remote;
       remote.getCurrentWindow().minimize();
+      store.dispatch(finishCurrentUrlCmd());
+      removeWarningMessage();
     },
     (error) => {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       // tslint:disable-next-line: no-console
       console.log("Error sending of diagnostics info with id " + urlActions.id
         + ". Error description: " + error);

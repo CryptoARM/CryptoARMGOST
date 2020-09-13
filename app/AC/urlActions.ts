@@ -250,6 +250,8 @@ export function removeUrlAction() {
   store.dispatch({
     type: REMOVE_URL_ACTION,
   });
+  store.dispatch(finishCurrentUrlCmd());
+  removeWarningMessage();
 }
 
 export async function cancelUrlAction(
@@ -272,8 +274,12 @@ export async function cancelUrlAction(
   postRequest(url, JSON.stringify(data)).then(
     (respData: any) => {
       remote.getCurrentWindow().minimize();
+      store.dispatch(finishCurrentUrlCmd());
+      removeWarningMessage();
     },
     (error) => {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       // tslint:disable-next-line: no-console
       console.log("Error cancel action with id " + id
         + ". Error description: " + error);
@@ -283,9 +289,12 @@ export async function cancelUrlAction(
   store.dispatch({
     type: CANCEL_URL_ACTION,
   });
+  store.dispatch(finishCurrentUrlCmd(false));
+  removeWarningMessage();
 }
 
 function signDocumentsFromURL(action: URLActionType) {
+  console.log("signDocumentsFromURL");
   store.dispatch({
     type: SIGN_DOCUMENTS_FROM_URL + START,
   });
@@ -322,6 +331,7 @@ function signDocumentsFromURL(action: URLActionType) {
         type: SIGN_DOCUMENTS_FROM_URL + SUCCESS,
       });
     } catch (error) {
+      store.dispatch(finishCurrentUrlCmd(false));
       removeWarningMessage();
       store.dispatch({
         type: SIGN_DOCUMENTS_FROM_URL + FAIL,
@@ -357,6 +367,7 @@ function verifyDocumentsFromURL(action: URLActionType) {
         type: VERIFY_DOCUMENTS_FROM_URL + SUCCESS,
       });
     } catch (error) {
+      store.dispatch(finishCurrentUrlCmd(false));
       removeWarningMessage();
       store.dispatch({
         type: VERIFY_DOCUMENTS_FROM_URL + FAIL,

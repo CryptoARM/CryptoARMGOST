@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { addTrustedService, hideModalAddTrustedService } from "../../AC/trustedServicesActions";
-import { dispatchURLCommand, getServiceBaseLinkFromUrl } from "../../AC/urlActions";
+import { dispatchURLCommand, finishCurrentUrlCmd, getServiceBaseLinkFromUrl } from "../../AC/urlActions";
 import { PkiCertToCertInfo } from "../../AC/urlCmdCertInfo";
 import store from "../../store";
 import CertificateChainInfo from "../Certificate/CertificateChainInfo";
@@ -23,6 +23,8 @@ class AddTrustedService extends React.Component<
     locale: PropTypes.string,
     localize: PropTypes.func,
   };
+
+  isCommandAccepted: boolean = false;
 
   constructor(props: IAddTrustedServiceProps) {
     super(props);
@@ -107,6 +109,7 @@ class AddTrustedService extends React.Component<
       store.dispatch(addTrustedService(getServiceBaseLinkFromUrl(urlToCheck), certificateValue));
     }
 
+    this.isCommandAccepted = true;
     store.dispatch(hideModalAddTrustedService());
     dispatchURLCommand(urlCmds);
   }
@@ -118,6 +121,9 @@ class AddTrustedService extends React.Component<
       onCancel();
     }
 
+    if (!this.isCommandAccepted) {
+      store.dispatch(finishCurrentUrlCmd(false));
+    }
     store.dispatch(hideModalAddTrustedService());
   }
 
