@@ -143,20 +143,13 @@ function processCommandForService(
   serviceIsTrusted: boolean,
   cert?: trusted.pki.Certificate,
 ) {
-  const curWindow = remote.getCurrentWindow();
+  store.dispatch(startUrlCmd(command));
   if (serviceIsTrusted) {
-
-    if (curWindow.isMinimized()) {
-      curWindow.restore();
-    }
-
-    curWindow.show();
-    curWindow.focus();
-
     dispatchURLCommand(command);
   } else {
     store.dispatch(showModalAddTrustedService(command.url, cert));
 
+    const curWindow = remote.getCurrentWindow();
     if (curWindow.isMinimized()) {
       curWindow.restore();
     }
@@ -213,7 +206,26 @@ function findServerCert(certs: string[]): trusted.pki.Certificate | undefined {
 export function dispatchURLCommand(
   command: IUrlCommandApiV4Type,
 ) {
-  store.dispatch(startUrlCmd(command));
+  switch (command.command.toLowerCase()) {
+    // Restore window for commands:
+    case "certificates":
+    case "signandencrypt":
+      {
+        const curWindow = window.electron.remote.getCurrentWindow();
+        if (curWindow.isMinimized()) {
+          curWindow.restore();
+        }
+        curWindow.show();
+        curWindow.focus();
+      }
+      break;
+
+    // Do not show window for commands:
+    case "diagnostics":
+    default:
+      break;
+  }
+
   switch (command.command.toLowerCase()) {
     case "certificates":
       handleUrlCommandCertificates(command);
