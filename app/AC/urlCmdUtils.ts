@@ -142,35 +142,9 @@ export function writeCertToTmpFile(certBase64: string): string {
 }
 
 export function displayWarningMessage(command: string, serviceUrl: string, operation?: string) {
-  let toastMessage: string = "";
   const serviceBaseUrl = getServiceBaseLinkFromUrl(serviceUrl);
-  switch (command) {
-    case "certificates":
-      switch (operation) {
-        case "export":
-        case "import":
-        case "information":
-        default:
-          toastMessage = "<div>Загружены документы с <span style='fontWeight: \"bold\"'>"
-            + serviceBaseUrl
-            + "</span></div><div>Нажмите \"Выполнить\" для завершения операции</div>";
-          break;
-      }
-      break;
-
-    case "signandencrypt":
-      toastMessage = "<div>Загружены документы с <span style='fontWeight: \"bold\"'>"
-        + serviceBaseUrl
-        + "</span></div><div>Нажмите \"Выполнить\" для завершения операции</div>";
-      break;
-
-    default:
-      toastMessage = "<div>Выполняем команду \"" + command
-        + "\" для сервиса</div> <span style='fontWeight: \"bold\"'>"
-        + serviceBaseUrl
-        + "</span>";
-      break;
-  }
+  let toastMessage: string = "<div>Команда выполняется для сервиса</div> <span style='fontWeight: \"bold\"'>"
+    + serviceBaseUrl + "</span>";
 
   $(".toast-url-cmd-warning-message").remove();
   const $toastContent = $('<div><div style="float:left">'
