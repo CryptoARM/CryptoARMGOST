@@ -21,7 +21,7 @@ import { showModalAddTrustedService } from "./trustedServicesActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
 import { handleUrlCommandSignAmdEncrypt } from "./urlCmdSignAndEncrypt";
-import { postRequest } from "./urlCmdUtils";
+import { postRequest, removeWarningMessage } from "./urlCmdUtils";
 
 const remote = window.electron.remote;
 
@@ -164,7 +164,6 @@ function processCommandForService(
     curWindow.show();
     curWindow.focus();
 
-    store.dispatch(startUrlCmd(command));
     store.dispatch(push(LOCATION_MAIN));
 
     return;
@@ -214,6 +213,7 @@ function findServerCert(certs: string[]): trusted.pki.Certificate | undefined {
 export function dispatchURLCommand(
   command: IUrlCommandApiV4Type,
 ) {
+  store.dispatch(startUrlCmd(command));
   switch (command.command.toLowerCase()) {
     case "certificates":
       handleUrlCommandCertificates(command);
@@ -250,6 +250,8 @@ export function removeUrlAction() {
   store.dispatch({
     type: REMOVE_URL_ACTION,
   });
+  store.dispatch(finishCurrentUrlCmd());
+  removeWarningMessage();
 }
 
 export async function cancelUrlAction(
@@ -272,8 +274,12 @@ export async function cancelUrlAction(
   postRequest(url, JSON.stringify(data)).then(
     (respData: any) => {
       remote.getCurrentWindow().minimize();
+      store.dispatch(finishCurrentUrlCmd());
+      removeWarningMessage();
     },
     (error) => {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       // tslint:disable-next-line: no-console
       console.log("Error cancel action with id " + id
         + ". Error description: " + error);
@@ -283,9 +289,12 @@ export async function cancelUrlAction(
   store.dispatch({
     type: CANCEL_URL_ACTION,
   });
+  store.dispatch(finishCurrentUrlCmd(false));
+  removeWarningMessage();
 }
 
 function signDocumentsFromURL(action: URLActionType) {
+  console.log("signDocumentsFromURL");
   store.dispatch({
     type: SIGN_DOCUMENTS_FROM_URL + START,
   });
@@ -322,6 +331,8 @@ function signDocumentsFromURL(action: URLActionType) {
         type: SIGN_DOCUMENTS_FROM_URL + SUCCESS,
       });
     } catch (error) {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       store.dispatch({
         type: SIGN_DOCUMENTS_FROM_URL + FAIL,
       });
@@ -356,6 +367,8 @@ function verifyDocumentsFromURL(action: URLActionType) {
         type: VERIFY_DOCUMENTS_FROM_URL + SUCCESS,
       });
     } catch (error) {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       store.dispatch({
         type: VERIFY_DOCUMENTS_FROM_URL + FAIL,
       });
@@ -585,6 +598,12 @@ export const startUrlCmd = (command: any) => {
   return {
     payload: { urlCommand: command },
     type: URL_CMD + START,
+  };
+};
+
+export const finishCurrentUrlCmd = (isSuccessfull: boolean = true) => {
+  return {
+    type: URL_CMD + (isSuccessfull ? SUCCESS : FAIL),
   };
 };
 

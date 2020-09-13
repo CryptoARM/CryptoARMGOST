@@ -2,6 +2,7 @@ import * as fs from "fs";
 import { ADDRESS_BOOK, CA, MY, ROOT, TMP_DIR } from "../constants";
 import history from "../history";
 import localize from "../i18n/localize";
+import { getServiceBaseLinkFromUrl } from "./urlActions";
 
 interface IParamsRequest {
   jsonrpc: "2.0";
@@ -138,4 +139,20 @@ export function writeCertToTmpFile(certBase64: string): string {
   fs.writeFileSync(resultUri, certBase64);
 
   return resultUri;
+}
+
+export function displayWarningMessage(command: string, serviceUrl: string, operation?: string) {
+  const serviceBaseUrl = getServiceBaseLinkFromUrl(serviceUrl);
+  let toastMessage: string = "<div>Команда выполняется для сервиса</div> <span style='fontWeight: \"bold\"'>"
+    + serviceBaseUrl + "</span>";
+
+  $(".toast-url-cmd-warning-message").remove();
+  const $toastContent = $('<div><div style="float:left">'
+    + toastMessage
+    + '</div><a class="btn btn-toast waves-effect waves-light" onClick="$(\'.toast-url-cmd-warning-message\').remove();">Закрыть</a></div>');
+  Materialize.toast($toastContent, undefined, "toast-url-cmd-warning-message");
+}
+
+export function removeWarningMessage() {
+  $(".toast-url-cmd-warning-message").remove();
 }

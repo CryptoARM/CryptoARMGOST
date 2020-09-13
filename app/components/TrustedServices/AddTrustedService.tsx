@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { addTrustedService, hideModalAddTrustedService } from "../../AC/trustedServicesActions";
-import { dispatchURLCommand, getServiceBaseLinkFromUrl } from "../../AC/urlActions";
+import { dispatchURLCommand, finishCurrentUrlCmd, getServiceBaseLinkFromUrl } from "../../AC/urlActions";
 import { PkiCertToCertInfo } from "../../AC/urlCmdCertInfo";
 import store from "../../store";
 import CertificateChainInfo from "../Certificate/CertificateChainInfo";
@@ -23,6 +23,8 @@ class AddTrustedService extends React.Component<
     locale: PropTypes.string,
     localize: PropTypes.func,
   };
+
+  isCommandAccepted: boolean = false;
 
   constructor(props: IAddTrustedServiceProps) {
     super(props);
@@ -52,9 +54,6 @@ class AddTrustedService extends React.Component<
                 {localize("TrustedServices.site", locale)} <span className="cryptoarm-blue" style={{ fontWeight: "bold" }}>{urlToCheck}</span> {localize("TrustedServices.requests_for_cryptoarm", locale)}
               </div>
               <div>
-                <div className="dialog-text">
-                  {localize("TrustedServices.cert_params", locale)}
-                </div>
                 {this.certInfo()}
               </div>
               <div className="row">
@@ -110,6 +109,7 @@ class AddTrustedService extends React.Component<
       store.dispatch(addTrustedService(getServiceBaseLinkFromUrl(urlToCheck), certificateValue));
     }
 
+    this.isCommandAccepted = true;
     store.dispatch(hideModalAddTrustedService());
     dispatchURLCommand(urlCmds);
   }
@@ -121,6 +121,9 @@ class AddTrustedService extends React.Component<
       onCancel();
     }
 
+    if (!this.isCommandAccepted) {
+      store.dispatch(finishCurrentUrlCmd(false));
+    }
     store.dispatch(hideModalAddTrustedService());
   }
 
@@ -137,7 +140,11 @@ class AddTrustedService extends React.Component<
     }
 
     const certInfo = PkiCertToCertInfo(cert.subjectKeyIdentifier, cert, false);
-    return <CertificateChainInfo certificate={certInfo} style="" onClick={() => { return; }} />;
+    return (<React.Fragment>
+      <a className="collection-info chain-info-blue">{localize("Certificate.cert_chain_status", locale)}</a>
+      <div className="collection-info chain-status">{certInfo.status ? localize("Certificate.cert_chain_status_true", locale) : localize("Certificate.cert_chain_status_false", locale)}</div>
+      <CertificateChainInfo certificate={certInfo} style="" onClick={() => { return; }} />
+    </React.Fragment>);
   }
 }
 
