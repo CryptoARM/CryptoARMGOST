@@ -3,7 +3,6 @@ import * as fs from "fs";
 import fetch from "node-fetch";
 import * as path from "path";
 import { push } from "react-router-redux";
-import * as URL from "url";
 import {
   ADD_LICENSE, ADD_REMOTE_FILE, CANCEL_URL_ACTION, DECRYPT,
   DOWNLOAD_REMOTE_FILE, ENCRYPT, ENCRYPTED, FAIL,
@@ -16,13 +15,13 @@ import { IUrlCommandApiV4Type, URLActionType } from "../parse-app-url";
 import store from "../store";
 import { checkLicense } from "../trusted/jwt";
 import * as signs from "../trusted/sign";
-import { extFile, fileExists, md5 } from "../utils";
-import { toggleReverseOperations, toggleSigningOperation } from "./settingsActions";
+import { extFile, fileExists, mapToArr, md5 } from "../utils";
+import { toggleReverseOperations, toggleSaveCopyToDocuments, toggleSigningOperation } from "./settingsActions";
 import { showModalAddTrustedService } from "./trustedServicesActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
 import { handleUrlCommandSignAmdEncrypt } from "./urlCmdSignAndEncrypt";
-import { postRequest } from "./urlCmdUtils";
+import { postRequest, removeWarningMessage } from "./urlCmdUtils";
 
 const remote = window.electron.remote;
 
@@ -64,51 +63,169 @@ export function checkTrustedServiceForCommand(
   const state = store.getState();
   const { trustedServices } = state;
 
-  let serviceIsTrusted = false;
+  const hostToCheck = getServiceBaseLinkFromUrl(command.url);
 
-  if (trustedServices && trustedServices.entities && trustedServices.entities.size) {
-    const hostToCheck = getHostFromUrl(command.url);
-    const findResult = trustedServices.entities.find(
-      (value: any, key: any, iter: any) => {
-        return value.url === hostToCheck;
-      },
-    );
-    serviceIsTrusted = (undefined !== findResult);
-  }
+  const curl = new window.Curl();
+  curl.setOpt("URL", hostToCheck);
 
-  if (serviceIsTrusted) {
-    const curWindow = remote.getCurrentWindow();
+  curl.setOpt("CERTINFO", true);
+  curl.on("end", (status: any) => {
+    let cert: trusted.pki.Certificate | undefined;
+    if (status !== 200) {
+      // throw Error(`Invalid status code: ${status}`)
+    } else {
+      try {
+        const certInfo: string | number | any[] | null = curl.getInfo(Curl.info.CERTINFO);
 
-    if ( curWindow.isMinimized()) {
-      curWindow.restore();
+        if (!certInfo) {
+          throw new Error("Error while recieving certificate info");
+        }
+
+        const certs: string[] = certInfo.filter((itm: string): boolean => itm.search("Cert:") === 0);
+        if (certs.length === 0) {
+          throw new Error("Certificate blob is not found in recieved data");
+        }
+        cert = findServerCert(certs);
+      } catch (e) {
+        // tslint:disable-next-line:no-console
+        console.error("Error loading certificate ", e.message);
+      }
     }
 
-    curWindow.show();
-    curWindow.focus();
+    curl.close();
 
+    let serviceIsTrusted = false;
+
+    if (cert && trustedServices && trustedServices.entities) {
+      const serviceUrlToCheck = getServiceBaseLinkFromUrl(hostToCheck);
+      const findResult = mapToArr(trustedServices.entities).find(
+        (value: any) => {
+          if (value.url !== serviceUrlToCheck) {
+            return false;
+          }
+
+          let curCert: trusted.pki.Certificate;
+          if (value.cert) {
+            try {
+              curCert = new trusted.pki.Certificate();
+              curCert.import(Buffer.from(value.cert), trusted.DataFormat.PEM);
+            } catch (e) {
+              //
+            }
+          }
+
+          if (!curCert) {
+            return false;
+          }
+
+          return curCert.compare(cert) === 0;
+        },
+      );
+
+      serviceIsTrusted = (undefined !== findResult);
+    }
+
+    processCommandForService(command, serviceIsTrusted, cert);
+  });
+
+  curl.on("error", (error: any) => {
+    curl.close();
+    // tslint:disable-next-line:no-console
+    console.error(error);
+    processCommandForService(command, false);
+  });
+
+  curl.perform();
+}
+
+function processCommandForService(
+  command: IUrlCommandApiV4Type,
+  serviceIsTrusted: boolean,
+  cert?: trusted.pki.Certificate,
+) {
+  store.dispatch(startUrlCmd(command));
+  if (serviceIsTrusted) {
     dispatchURLCommand(command);
   } else {
-    store.dispatch(showModalAddTrustedService(command.url));
+    store.dispatch(showModalAddTrustedService(command.url, cert));
 
     const curWindow = remote.getCurrentWindow();
-
-    if ( curWindow.isMinimized()) {
+    if (curWindow.isMinimized()) {
       curWindow.restore();
     }
 
     curWindow.show();
     curWindow.focus();
 
-    store.dispatch(startUrlCmd(command));
     store.dispatch(push(LOCATION_MAIN));
 
     return;
   }
 }
 
+function findServerCert(certs: string[]): trusted.pki.Certificate | undefined {
+  const parsedCerts: trusted.pki.Certificate[] = [];
+  // importing chain certificates to trusted.pki.Certificate objects
+  certs.forEach((certItem: string) => {
+    try {
+      const cert = new trusted.pki.Certificate();
+      cert.import(Buffer.from(certItem.substr(5)), trusted.DataFormat.PEM);
+      parsedCerts.push(cert);
+    } catch (e) {
+      // tslint:disable-next-line:no-console
+      console.error("Error parsing certificate ", e.message);
+    }
+  });
+
+  if (parsedCerts.length === 0) {
+    return undefined;
+  }
+
+  if (parsedCerts.length === 1) {
+    return parsedCerts[0];
+  }
+
+  let result = parsedCerts[0];
+  let nextCert;
+  // Search last certificate in chain
+  do {
+    nextCert = parsedCerts.find((curCert: trusted.pki.Certificate) => {
+      // next cert must be issued by current result
+      // and must not be selfsigned (to avoid infinite loop on root certificate)
+      return (result.subjectName === curCert.issuerName) && (!curCert.isSelfSigned);
+    });
+
+    if (nextCert) {
+      result = nextCert;
+    }
+  } while (nextCert);
+
+  return result;
+}
+
 export function dispatchURLCommand(
   command: IUrlCommandApiV4Type,
 ) {
+  switch (command.command.toLowerCase()) {
+    // Restore window for commands:
+    case "certificates":
+    case "signandencrypt":
+      {
+        const curWindow = window.electron.remote.getCurrentWindow();
+        if (curWindow.isMinimized()) {
+          curWindow.restore();
+        }
+        curWindow.show();
+        curWindow.focus();
+      }
+      break;
+
+    // Do not show window for commands:
+    case "diagnostics":
+    default:
+      break;
+  }
+
   switch (command.command.toLowerCase()) {
     case "certificates":
       handleUrlCommandCertificates(command);
@@ -145,6 +262,8 @@ export function removeUrlAction() {
   store.dispatch({
     type: REMOVE_URL_ACTION,
   });
+  store.dispatch(finishCurrentUrlCmd());
+  removeWarningMessage();
 }
 
 export async function cancelUrlAction(
@@ -167,8 +286,12 @@ export async function cancelUrlAction(
   postRequest(url, JSON.stringify(data)).then(
     (respData: any) => {
       remote.getCurrentWindow().minimize();
+      store.dispatch(finishCurrentUrlCmd());
+      removeWarningMessage();
     },
     (error) => {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       // tslint:disable-next-line: no-console
       console.log("Error cancel action with id " + id
         + ". Error description: " + error);
@@ -178,9 +301,12 @@ export async function cancelUrlAction(
   store.dispatch({
     type: CANCEL_URL_ACTION,
   });
+  store.dispatch(finishCurrentUrlCmd(false));
+  removeWarningMessage();
 }
 
 function signDocumentsFromURL(action: URLActionType) {
+  console.log("signDocumentsFromURL");
   store.dispatch({
     type: SIGN_DOCUMENTS_FROM_URL + START,
   });
@@ -190,7 +316,7 @@ function signDocumentsFromURL(action: URLActionType) {
 
   store.dispatch(toggleReverseOperations(false));
   store.dispatch(toggleSigningOperation(true));
-
+  store.dispatch(toggleSaveCopyToDocuments(false));
   store.dispatch({
     type: SIGN_DOCUMENTS_FROM_URL + START,
   });
@@ -217,6 +343,8 @@ function signDocumentsFromURL(action: URLActionType) {
         type: SIGN_DOCUMENTS_FROM_URL + SUCCESS,
       });
     } catch (error) {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       store.dispatch({
         type: SIGN_DOCUMENTS_FROM_URL + FAIL,
       });
@@ -251,6 +379,8 @@ function verifyDocumentsFromURL(action: URLActionType) {
         type: VERIFY_DOCUMENTS_FROM_URL + SUCCESS,
       });
     } catch (error) {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       store.dispatch({
         type: VERIFY_DOCUMENTS_FROM_URL + FAIL,
       });
@@ -483,7 +613,22 @@ export const startUrlCmd = (command: any) => {
   };
 };
 
-export const getHostFromUrl = (urlValue: string): string => {
-  const parsedUrl = URL.parse(urlValue);
-  return (parsedUrl && parsedUrl.host) ? parsedUrl.host : urlValue;
-}
+export const finishCurrentUrlCmd = (isSuccessfull: boolean = true) => {
+  return {
+    type: URL_CMD + (isSuccessfull ? SUCCESS : FAIL),
+  };
+};
+
+export const getServiceBaseLinkFromUrl = (urlValue: string, includeProtocol: boolean = true): string => {
+  const parsedUrl = new URL(urlValue);
+
+  if (!parsedUrl) {
+    return urlValue;
+  }
+
+  if (includeProtocol && parsedUrl.origin) {
+    return parsedUrl.origin;
+  }
+
+  return (parsedUrl.host) ? parsedUrl.host : urlValue;
+};

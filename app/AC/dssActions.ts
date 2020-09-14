@@ -429,12 +429,12 @@ export function getCertificatesDSS(url: string, dssUserID: string, token: string
       if ( data.certificate !== 0) {
       for (const certificate of data) {
         logger.log({
-          certificate: certificate.subjectName,
+          certificate: certificate.DName,
           level: "info",
           message: "",
           operation: "Импорт сертификата",
           operationObject: {
-            in: "CN=" + certificate.subjectName,
+            in: certificate.DName,
             out: "Null",
           },
           userName: USER_NAME,

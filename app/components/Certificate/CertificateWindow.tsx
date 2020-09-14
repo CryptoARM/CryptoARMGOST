@@ -1515,7 +1515,7 @@ class CertWindow extends React.Component<any, any> {
 
                   {
                     certificate && certificate.category === REQUEST ?
-                      <div style = {{marginRight: '10px'}} className="col s4 waves-effect waves-cryptoarm" onClick={this.handleOpenCSRFolder}>
+                      <div className="col s4 waves-effect waves-cryptoarm" onClick={this.handleOpenCSRFolder}>
                         <div className="col s12 svg_icon">
                           <a data-position="bottom">
                             <i className="material-icons certificate csrfolder" />

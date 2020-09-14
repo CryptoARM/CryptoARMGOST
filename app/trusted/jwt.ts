@@ -17,7 +17,6 @@ const CTLICENSE_R_ERROR_STORE_IS_LOCKED: number = 912;
 export function checkLicense(key?: string): boolean {
   try {
     const res = key ? JSON.parse(LicenseManager.checkLicense(key)).verify : LicenseManager.accessOperations();
-
     return res;
   } catch (err) {
     return false;

@@ -166,7 +166,14 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
       });
 
     }
-
+    if (nextProps.dataLicense && nextProps.lic_format === undefined && nextProps.statusLicense === false && nextProps.verifiedLicense == true && loadingLicense === false) {     
+      this.setState({
+        errors: [...this.state.errors, {
+          important: WARNING,
+          type: NO_CORRECT_CRYPTOARM_LICENSE,
+        }],
+      });
+    }
     if (nextProps.lic_format === "dlv" && nextProps.statusLicense === false && nextProps.verifiedLicense == true && loadingLicense === false) {
 
       this.setState({
@@ -292,8 +299,7 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
         <div>
           <div className="row nobottom">
             <div className="diagnostic-content-item">
-              <div className="col s6 m5 l6 problem-contaner">
-
+              <div className="col s6 m5 l6 problem-contaner"> 
                 <Problems errors={cspErrors.length ? cspErrors : errors} activeError={this.state.activeError} onClick={this.handleClickOnError} />
               </div>
               <div className="col s6 m7 l6 problem-contaner">

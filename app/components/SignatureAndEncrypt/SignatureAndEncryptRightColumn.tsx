@@ -20,8 +20,8 @@ import { multiDirectOperation, multiOperationStart, multiReverseOperation } from
 import {
   activeSetting, changeDefaultSettings, deleteSetting, saveSettings,
 } from "../../AC/settingsActions";
-import { cancelUrlAction, removeUrlAction } from "../../AC/urlActions";
-import { postRequest } from "../../AC/urlCmdUtils";
+import { cancelUrlAction, finishCurrentUrlCmd, removeUrlAction } from "../../AC/urlActions";
+import { postRequest, removeWarningMessage } from "../../AC/urlCmdUtils";
 import {
   ARCHIVATION_OPERATION, ARCHIVE, DECRYPT, DEFAULT_DOCUMENTS_PATH, DSS_ACTIONS, ENCRYPT, ENCRYPTION_OPERATION,
   GOST_28147, GOST_R3412_2015_K,
@@ -697,8 +697,17 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     );
   }
 
+  isGostRecipients(recipients: any) {
+    return recipients.filter(function(recipient: any) {
+      return recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+        && recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+        && recipient.publicKeyAlgorithm !== "1.2.643.2.2.19";
+    }).length === 0;
+  }
+
   checkCertificatesBeforePerformOperation = () => {
     const { setting, signer, recipients } = this.props;
+    const { localize, locale } = this.context;
     const isSignCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
 
     if (isSignCertFromDSS && signer && !signer.status) {
@@ -719,8 +728,21 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       return;
     }
 
-    if (setting.operations.encryption_operation && !setting.changedRecipients) {
+    if (setting.operations.encryption_operation && !setting.changedRecipients && !(this.props.lic_error === 911)) {
+      const isGost = this.isGostRecipients(recipients);
+
       for (const items of recipients) {
+        const isItemGost =
+        items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+          && items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+          && items.publicKeyAlgorithm !== "1.2.643.2.2.19" ?
+           false : true;
+        if (isGost === isItemGost) {
+          $(".toast-ca_req_error").remove();
+          Materialize.toast(
+            localize("Certificate.cert_error_mixed_GOST_RSA", locale), 3000, "toast-ca_req_error");
+          return;
+        }
         if (!items.status) {
           this.handleshowModalWrongCertificate();
           this.setState({ isOnlySignerCertWrong: false });
@@ -1805,8 +1827,12 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               (respData: any) => {
                 const remote = window.electron.remote;
                 remote.getCurrentWindow().minimize();
+                store.dispatch(finishCurrentUrlCmd());
+                removeWarningMessage();
               },
               (error) => {
+                store.dispatch(finishCurrentUrlCmd(false));
+                removeWarningMessage();
                 // tslint:disable-next-line: no-console
                 console.log("Error sending of diagnostics info with id " + operationRemoteAction.id
                   + ". Error description: " + error);

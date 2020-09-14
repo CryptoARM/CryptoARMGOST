@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { filePackageDelete } from "../AC";
+import { getServiceBaseLinkFromUrl } from "../AC/urlActions";
 import {
   LOCATION_ABOUT, LOCATION_ADDRESS_BOOK, LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT,
   LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE,
@@ -93,9 +94,20 @@ class MenuBar extends React.Component<any, IMenuBarState> {
 
   getTitle() {
     const { localize, locale } = this.context;
-    const { isArchiveLog, eventsDateFrom, eventsDateTo } = this.props;
+    const { isArchiveLog, eventsDateFrom, eventsDateTo, urlCmds } = this.props;
     const pathname = this.props.location.pathname;
     const storename = this.props.location.state ? this.props.location.state.head : "";
+
+    if (urlCmds && urlCmds.command && urlCmds.command.length) {
+      const serviceBaseUrl = getServiceBaseLinkFromUrl(urlCmds.url);
+      switch (urlCmds.command) {
+        case "signandencrypt":
+          return `${localize("SignAndEncrypt.sign_and_encrypt", locale)} - ${serviceBaseUrl}`;
+
+        case "certificates":
+          return `${localize("Certificate.certs", locale)} - ${serviceBaseUrl}`;
+      }
+    }
 
     switch (pathname) {
       case LOCATION_ABOUT:
@@ -281,7 +293,7 @@ class MenuBar extends React.Component<any, IMenuBarState> {
         key="showModalAddTrustedService"
         header={localize("TrustedServices.external_resource_request", locale)}
         onClose={this.handleCloseModalAddTrustedService}
-        style={{ width: "500px" }}>
+        style={{ width: "440px" }}>
 
         <AddTrustedService
           onCancel={this.handleCloseModalAddTrustedService}
@@ -315,5 +327,6 @@ export default connect((state, ownProps) => {
     tempContentOfSignedFiles: state.files.tempContentOfSignedFiles,
     trustedServices: state.trustedServices,
     operationIsRemote: state.urlActions.performed || state.urlActions.performing,
+    urlCmds: state.urlCmds,
   };
 }, { filePackageDelete })(MenuBar);
