@@ -12,14 +12,11 @@ import {
   MODAL_EXPORT_CERTIFICATE,
   PROVIDER_CRYPTOPRO, REQUEST, ROOT, USER_NAME,
 } from "../../constants";
-import { filteredCertificatesSelector } from "../../selectors";
 import { filteredTrustedServicesSelector } from "../../selectors/trustedServicesSelector";
 import BlockNotElements from "../BlockNotElements";
 import CertificateChainInfo from "../Certificate/CertificateChainInfo";
-import CertificateDelete from "../Certificate/CertificateDelete";
 import CertificateInfo from "../Certificate/CertificateInfo";
 import CertificateInfoTabs from "../Certificate/CertificateInfoTabs";
-import CertificateList from "../Certificate/CertificateList";
 import Modal from "../Modal";
 import ProgressBars from "../ProgressBars";
 import TrustedServiceDelete from "./TrustedServiceDelete";
@@ -154,13 +151,6 @@ class TrustedServicesWindow extends React.Component<any, any> {
     }
   }
 
-  handleCloseModals = () => {
-    this.setState({
-      showModalDeleteCertifiacte: false,
-      showModalExportCertifiacte: false,
-    });
-  }
-
   handleChangeActiveTab = (certInfoTab: boolean) => {
     this.setState({
       activeCertInfoTab: certInfoTab,
@@ -230,24 +220,6 @@ class TrustedServicesWindow extends React.Component<any, any> {
         </Media>
       </div>
     );
-  }
-
-  getTitle() {
-    const { certificate } = this.state;
-    const { localize, locale } = this.context;
-
-    let title: any = null;
-
-    if (certificate) {
-      title = <div className="cert-title-main">
-        <div className="collection-title cert-title">{certificate.subjectFriendlyName}</div>
-        <div className="collection-info cert-title">{certificate.issuerFriendlyName}</div>
-      </div>;
-    } else {
-      title = <span>{localize("Certificate.cert_info", locale)}</span>;
-    }
-
-    return title;
   }
 
   showModalDeleteCertificate = () => {

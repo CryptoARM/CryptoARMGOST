@@ -3,7 +3,6 @@ import React from "react";
 import Media from "react-media";
 import { connect } from "react-redux";
 import { AutoSizer, Column, Table } from "react-virtualized";
-import { deleteTrustedService } from "../../AC/trustedServicesActions";
 import { filteredTrustedServicesSelector } from "../../selectors/trustedServicesSelector";
 import "../../table.global.css";
 import { mapToArr } from "../../utils";
@@ -20,10 +19,6 @@ interface ITrustedServicesTableProps {
   searchValue?: string;
 }
 
-interface ITrustedServicesTableDispatch {
-  deleteTrustedService: () => void;
-}
-
 interface ITrustedServicesTableState {
   disableHeader: boolean;
   hoveredRowIndex: number;
@@ -34,13 +29,13 @@ interface ITrustedServicesTableState {
   sortedList: any;
 }
 
-class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & ITrustedServicesTableDispatch, ITrustedServicesTableState> {
+class TrustedServicesTable extends React.Component<ITrustedServicesTableProps, ITrustedServicesTableState> {
   static contextTypes = {
     locale: PropTypes.string,
     localize: PropTypes.func,
   };
 
-  constructor(props: ITrustedServicesTableProps & ITrustedServicesTableDispatch) {
+  constructor(props: ITrustedServicesTableProps) {
     super(props);
 
     const sortBy = "timestamp";
@@ -58,14 +53,10 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
     };
   }
 
-  componentDidUpdate(prevProps: ITrustedServicesTableProps & ITrustedServicesTableDispatch) {
+  componentDidUpdate(prevProps: ITrustedServicesTableProps) {
     if (!prevProps.eventsMap.size && this.props.eventsMap && this.props.eventsMap.size ||
       (prevProps.eventsMap.size !== this.props.eventsMap.size)) {
       this.sort(this.state);
-    }
-
-    if (prevProps.searchValue !== this.props.searchValue && this.props.searchValue) {
-      this.search(this.props.searchValue);
     }
 
     if (prevProps.searchValue && !this.props.searchValue) {
@@ -75,14 +66,12 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
 
   render() {
     const { locale, localize } = this.context;
-    const { isLoading, searchValue } = this.props;
-    const { disableHeader, foundEvents, scrollToIndex, sortBy, sortDirection, sortedList } = this.state;
+    const { isLoading } = this.props;
+    const { disableHeader, scrollToIndex, sortBy, sortDirection, sortedList } = this.state;
 
     if (isLoading) {
       return <ProgressBars />;
     }
-
-    const classDisabledNavigation = foundEvents.length && foundEvents.length === 1 ? "disabled" : "";
 
     const rowGetter = ({ index }: { index: number }) => this.getDatum(this.state.sortedList, index);
 
@@ -252,17 +241,6 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
 
           </div>
         </div>
-        {searchValue && foundEvents.length ?
-          <div className="card navigationToolbar valign-wrapper" style={{ right: "50px" }}>
-            <i className={"small material-icons cryptoarm-blue waves-effect " + classDisabledNavigation} onClick={this.handleScrollToFirstOfFoud}>first_page</i>
-            <i className={"small material-icons cryptoarm-blue waves-effect " + classDisabledNavigation} onClick={this.handleScrollToBefore}>navigate_before</i>
-            <div style={{ color: "black" }}>
-              {foundEvents.indexOf(scrollToIndex) + 1}/{foundEvents.length}
-            </div>
-            <i className={"small material-icons cryptoarm-blue waves-effect " + classDisabledNavigation} onClick={this.handleScrollToNext}>navigate_next</i>
-            <i className={"small material-icons cryptoarm-blue waves-effect " + classDisabledNavigation} onClick={this.handleScrollToLastOfFoud}>last_page</i>
-          </div> :
-          null}
       </React.Fragment>
     );
   }
@@ -295,34 +273,6 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
     }
 
     activeCert({ ...rowData, object: pkiCertificate });
-  }
-
-  handleScrollToBefore = () => {
-    const { foundEvents, scrollToIndex } = this.state;
-
-    if (foundEvents.indexOf(scrollToIndex) - 1 >= 0) {
-      this.scrollToRow(foundEvents[foundEvents.indexOf(scrollToIndex) - 1]);
-    }
-  }
-
-  handleScrollToNext = () => {
-    const { foundEvents, scrollToIndex } = this.state;
-
-    if (foundEvents.indexOf(scrollToIndex) + 1 < foundEvents.length) {
-      this.scrollToRow(foundEvents[foundEvents.indexOf(scrollToIndex) + 1]);
-    }
-  }
-
-  handleScrollToFirstOfFoud = () => {
-    const { foundEvents } = this.state;
-
-    this.scrollToRow(foundEvents[0]);
-  }
-
-  handleScrollToLastOfFoud = () => {
-    const { foundEvents } = this.state;
-
-    this.scrollToRow(foundEvents[foundEvents.length - 1]);
   }
 
   getDatum = (list: any, index: number) => {
@@ -363,54 +313,6 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
     const sortedList = this.sortList({ sortBy, sortDirection });
 
     this.setState({ sortBy, sortDirection, sortedList });
-
-    this.search(this.props.searchValue, sortedList);
-  }
-
-  search = (searchValue: string | undefined, list?: any) => {
-    const { locale, localize } = this.context;
-    const { sortedList } = this.state;
-
-    if (!searchValue) {
-      this.setState({ foundEvents: [] });
-      return;
-    }
-
-    const arr = list ? mapToArr(list) : mapToArr(sortedList);
-
-    const foundEvents: number[] = [];
-    const search = searchValue.toLowerCase();
-
-    arr.forEach((event: any, index: number) => {
-      try {
-        if (event.userName.toLowerCase().match(search) ||
-          event.operationObject.in.toLowerCase().match(search) ||
-          event.operationObject.out.toLowerCase().match(search) ||
-          event.level.toLowerCase().match(search) ||
-          (new Date(event.timestamp)).toLocaleDateString(locale, {
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            month: "numeric",
-            year: "numeric",
-          }).toLowerCase().match(search) ||
-          event.operation.toLowerCase().match(search)) {
-
-          foundEvents.push(index);
-        }
-      } catch (e) {
-        //
-      }
-    });
-
-    if (!foundEvents.length) {
-      $(".toast-no_found_events").remove();
-      Materialize.toast(localize("EventsFilters.no_found_events", locale), 2000, "toast-no_found_events");
-    }
-
-    this.scrollToRow(foundEvents[0]);
-
-    this.setState({ foundEvents });
   }
 
   sortList = ({ sortBy, sortDirection }: { sortBy: string, sortDirection: TSortDirection }) => {
