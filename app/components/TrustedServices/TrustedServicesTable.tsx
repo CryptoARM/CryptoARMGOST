@@ -136,10 +136,23 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
                           label={localize("Certificate.subject", locale)}
                         />
                         <Column
+                          cellRenderer={({ cellData, rowData, rowIndex }) => {
+                            return (
+                              <div className="row nobottom valign-wrapper" >
+                                <div className="col s12" >
+                                  <div
+                                    className="collection-title truncate"
+                                    onClick={() => window.electron.shell.openExternal(cellData)}
+                                    style={{ color: "#334294", cursor: "pointer" }}>
+                                    {cellData}
+                                  </div>
+                                </div>
+                              </div>);
+                          }
+                          }
                           dataKey="url"
-                          disableSort={false}
                           headerRenderer={this.headerRenderer}
-                          width={width * 0.4}
+                          width={width * 0.6}
                           label={localize("TrustedServices.site", locale)}
                         />
                       </Table>
@@ -171,7 +184,6 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
                       >
                         <Column
                           cellRenderer={({ cellData, rowData, rowIndex }) => {
-                            console.log("rowData", rowData);
                             return (
                               <div className="row nobottom valign-wrapper">
                                 <div className="col" style={{ width: "40px", paddingLeft: "0px" }}>
@@ -212,8 +224,21 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
                           label={localize("Certificate.cert_valid", locale)}
                         />
                         <Column
+                          cellRenderer={({ cellData, rowData, rowIndex }) => {
+                            return (
+                              <div className="row nobottom valign-wrapper" >
+                                <div className="col s12" >
+                                  <div
+                                    className="collection-title truncate"
+                                    onClick={() => window.electron.shell.openExternal(cellData)}
+                                    style={{ color: "#334294", cursor: "pointer" }}>
+                                    {cellData}
+                                  </div>
+                                </div>
+                              </div>);
+                          }
+                          }
                           dataKey="url"
-                          disableSort={false}
                           headerRenderer={this.headerRenderer}
                           width={width * 0.2}
                           label={localize("TrustedServices.site", locale)}
