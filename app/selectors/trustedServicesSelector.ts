@@ -24,7 +24,17 @@ export const filteredTrustedServicesSelector = createSelector(trustedServicesGet
   const normalized = {};
 
   filtered.map((item) => {
-    normalized[item.url] = {...item.cert, url: item.url};
+    let cert;
+
+    // Если сервис добавили в список и сразу идем в просмотр, то сертификат это immutable объект и надо преобразовать в Object
+    // После открытия прораммы сертификат хранится уже в виде объекта.
+    try {
+      cert = item.cert.toJS();
+    } catch (e) {
+      cert = item.cert;
+    }
+
+    normalized[item.url] = {...cert, url: item.url};
   });
 
   return new Map(normalized);

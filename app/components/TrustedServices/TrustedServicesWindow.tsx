@@ -98,11 +98,7 @@ class TrustedServicesWindow extends React.Component<any, any> {
             </div>
             <div className={"collection " + VIEW}>
               <div style={{ flex: "1 1 auto", height: "calc(100vh - 110px)" }}>
-                {
-                  certificates.size < 1 ?
-                    <BlockNotElements name={"active"} title={localize("Certificate.cert_not_found", locale)} /> :
-                    <TrustedServicesTable searchValue={this.state.searchValue} activeCert={this.handleActiveCert} selectedCert={this.state.certificate} />
-                }
+                <TrustedServicesTable searchValue={this.state.searchValue} activeCert={this.handleActiveCert} selectedCert={this.state.certificate} />
               </div>
             </div>
           </div>
