@@ -904,6 +904,7 @@ export default {
     external_resource_request: "Request from an external site",
     requests_for_cryptoarm: "requests permission for access to CryptoARM GOST for data exchange.",
     site: "The site",
+    trusted_services: "Trusted services",
   },
   Tsp: {
     accuracy: "Accuracy",

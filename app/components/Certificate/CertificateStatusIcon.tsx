@@ -59,7 +59,7 @@ class CertificateStatusIcon extends React.Component<ICertificateStatusIconProps,
 
 export default connect((state, ownProps: any) => {
   return {
-    certificate: ownProps.certificate ? state.certificates.getIn(["entities", ownProps.certificate.id]) : undefined,
+    certificate: ownProps.certificate && !ownProps.trustedServices ? state.certificates.getIn(["entities", ownProps.certificate.id]) : ownProps.certificate ? ownProps.certificate : undefined,
     isCertInfoMode: !state.urlCmdCertInfo.done,
     urlCmdCertInfo: state.urlCmdCertInfo,
   };

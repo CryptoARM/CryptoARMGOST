@@ -247,6 +247,7 @@ export const LOCATION_ABOUT = "/about";
 export const LOCATION_LICENSE = "/license";
 export const LOCATION_EVENTS = "/events";
 export const LOCATION_SERVICES = "/services";
+export const LOCATION_TRUSTED_SERVICES = "/trusted_services";
 export const LOCATION_SETTINGS = "/settings";
 export const LOCATION_SETTINGS_CONFIG = "/settings_config";
 export const LOCATION_SETTINGS_SELECT = "/settings_select";
@@ -320,6 +321,7 @@ export const ADD_TRUSTED_SERVICE = "ADD_TRUSTED_SERVICE";
 export const TRUSTED_SERVICES_JSON = window.TRUSTED_SERVICES_JSON;
 export const SHOW_MODAL_ADD_TRUSTED_SERVICE = "SHOW_MODAL_ADD_TRUSTED_SERVICE";
 export const HIDE_MODAL_ADD_TRUSTED_SERVICE = "HIDE_MODAL_ADD_TRUSTED_SERVICE";
+export const DELETE_TRUSTED_SERVICE = "DELETE_TRUSTED_SERVICE";
 
 export const SERVICE_URL = "https://id.trusted.plus";
 export const SERVICE_TRUSTEDAPP = SERVICE_URL + "/trustedapp";

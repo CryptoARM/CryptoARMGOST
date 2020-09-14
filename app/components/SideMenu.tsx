@@ -7,7 +7,7 @@ import {
   ADDRESS_BOOK, CA, LOCATION_ABOUT,
   LOCATION_ADDRESS_BOOK, LOCATION_CERTIFICATES, LOCATION_CONTAINERS,
   LOCATION_DOCUMENTS, LOCATION_EVENTS, LOCATION_MAIN, LOCATION_RESULTS_MULTI_OPERATIONS,
-  MY, REQUEST, ROOT,
+  LOCATION_TRUSTED_SERVICES, MY, REQUEST, ROOT,
 } from "../constants";
 import { mapToArr } from "../utils";
 
@@ -39,6 +39,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
     $("#dropdown-about").dropdown();
     $("#address-book").dropdown();
     $("#dropdown-exit").dropdown();
+    $("#trusted_services").dropdown();
   }
 
   render() {
@@ -99,6 +100,12 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
           <div className="menu-elements">
             <div className="row nobottom">
               <div className={`row nobottom ${disabledNavigate ? "disabled" : ""}`}>
+                {LOCATION_TRUSTED_SERVICES === pathname ? < div className="side-nav-rectangle" /> : null}
+                <Link id="trusted_services" to={LOCATION_TRUSTED_SERVICES} data-activates="dropdown-trusted-services" data-hover="hover" style={{ padding: "0 10px" }}>
+                  <i className={`material-icons sidevan services ${disabledNavigate ? "disabledIcon" : ""}`} style={{ padding: "0 10px" }}>about</i>
+                </Link>
+              </div>
+              <div className={`row nobottom ${disabledNavigate ? "disabled" : ""}`}>
                 {LOCATION_ABOUT === pathname || LOCATION_EVENTS === pathname ? < div className="side-nav-rectangle" /> : null}
                 <Link id="dropdown-about" to={LOCATION_ABOUT} data-activates="dropdown-about-pages" data-hover="hover" style={{ padding: "0 10px" }}>
                   <i className={`material-icons sidevan about ${disabledNavigate ? "disabledIcon" : ""}`} style={{ padding: "0 10px" }}>about</i>
@@ -123,6 +130,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
         {this.getAddressBookMenu()}
         {this.getAboutMenu()}
         {this.getExitMenu()}
+        {this.getTrustedServicesMenu()}
       </React.Fragment>
     );
   }
@@ -176,6 +184,22 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
             <li>
               <div className="center-align">
                 <a style={{ fontWeight: "bold", color: "#bf3817" }}>ДОКУМЕНТЫ</a>
+              </div>
+            </li>
+          </ul>
+        </Link>
+      </div>
+    );
+  }
+
+  getTrustedServicesMenu = () => {
+    return (
+      <div style={{ display: "none", pointerEvents: "none", cursor: "default" }}>
+        <Link to={LOCATION_TRUSTED_SERVICES}>
+          <ul id="dropdown-trusted-services" className="dropdown-content" style={{ display: "none" }}>
+            <li>
+              <div className="center-align">
+                <a style={{ fontWeight: "bold", color: "#bf3817" }}>СЕРВИСЫ</a>
               </div>
             </li>
           </ul>

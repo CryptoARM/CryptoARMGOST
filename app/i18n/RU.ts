@@ -910,6 +910,7 @@ export default {
     external_resource_request: "Запрос с внешнего сайта",
     requests_for_cryptoarm: "зарпашивает доступ к КриптоАРМ ГОСТ для обмена данными.",
     site: "Внешний сервис",
+    trusted_services: "Список доверенных сервисов",
   },
   Tsp: {
     accuracy: "Точность",
