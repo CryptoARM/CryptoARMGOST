@@ -681,16 +681,21 @@ async function uzipAndWriteSync(file: any, reverseFiles: any, packageResult: IPa
     const encoding = chardet.detect(fileInZip.pathBuffer);
 
     // decode "non-unicode" filename from OEM Cyrillic character set
-    const fileName = isUnicode ? fileInZip.path : il.decode(fileInZip.pathBuffer, encoding && encoding === "UTF-8" ? encoding : "cp866");
+    let fileName = isUnicode ? fileInZip.path : il.decode(fileInZip.pathBuffer, encoding && encoding === "UTF-8" ? encoding : "cp866");
+    let indexFile: number = 1;
+    let outURL = path.join(DEFAULT_TEMP_PATH, path.basename(fileName));
+    const parsed = path.parse(outURL.substring(0, outURL.lastIndexOf(".")));
+    outURL = parsed.dir + "\\" + parsed.name + "_(" + indexFile + ")" + parsed.ext +".sig";
+    indexFile++;
 
     try {
       await new Promise((resolve, reject) => fileInZip.stream()
-        .pipe(fs.createWriteStream(path.join(DEFAULT_TEMP_PATH, fileName)))
+        .pipe(fs.createWriteStream(outURL))
         .on("error", reject)
         .on("finish", resolve),
       );
 
-      const newFileProps = { ...getFileProps(path.join(DEFAULT_TEMP_PATH, fileName)) };
+      const newFileProps = { ...getFileProps(outURL) };
 
       unzipedFiles.push({ ...newFileProps, operation: 2 });
 
