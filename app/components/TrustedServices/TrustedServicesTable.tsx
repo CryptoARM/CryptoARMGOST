@@ -122,7 +122,7 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
                             return (
                               <div className="row nobottom valign-wrapper">
                                 <div className="col" style={{ width: "40px", paddingLeft: "0px" }}>
-                                  <CertificateStatusIcon certificate={rowData} key={rowData.id} trustedServices={true} />
+                                  <CertificateStatusIcon certificate={rowData} key={rowData.url} trustedServices={true} />
                                 </div>
                                 <div className="col s10" style={{ paddingLeft: "0px" }}>
                                   <div className="collection-title truncate">{cellData}</div>

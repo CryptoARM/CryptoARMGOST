@@ -20,8 +20,8 @@ class CertificateStatusIcon extends React.Component<ICertificateStatusIconProps,
     }
 
     this.timerHandle = setTimeout(() => {
-      if (!certificate.verified) {
-        trustedServices ? verifyCertificateForTrustedService(certificate.url) : verifyCertificate(certificate.id);
+      if (certificate && !certificate.verified) {
+        trustedServices ? verifyCertificateForTrustedService(this.props.urlOfTrustedService) : verifyCertificate(certificate.id);
       }
 
       this.timerHandle = null;
@@ -60,8 +60,10 @@ class CertificateStatusIcon extends React.Component<ICertificateStatusIconProps,
 
 export default connect((state, ownProps: any) => {
   return {
-    certificate: ownProps.certificate && !ownProps.trustedServices ? state.certificates.getIn(["entities", ownProps.certificate.id]) : ownProps.certificate ? ownProps.certificate : undefined,
+    certificate: ownProps.certificate && !ownProps.trustedServices ? state.certificates.getIn(["entities", ownProps.certificate.id])
+      : ownProps.trustedServices && ownProps.certificate ? state.trustedServices.getIn(["entities", ownProps.certificate.url, "cert"]) : undefined,
     isCertInfoMode: !state.urlCmdCertInfo.done,
     urlCmdCertInfo: state.urlCmdCertInfo,
+    urlOfTrustedService: ownProps.trustedServices ? ownProps.certificate.url : undefined,
   };
 }, { verifyCertificate, verifyCertificateForTrustedService })(CertificateStatusIcon);
