@@ -132,7 +132,7 @@ export function sendCertificateInfo(cert: trusted.pki.Certificate, cmdUrl: strin
   );
 }
 
-const certificateToPkiItemInfo = (certValue: trusted.pki.Certificate) => {
+export const certificateToPkiItemInfo = (certValue: trusted.pki.Certificate) => {
   if (certValue) {
     let status = false;
     try {

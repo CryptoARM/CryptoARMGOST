@@ -18,7 +18,7 @@ interface IAddTrustedServiceState {
 class AddTrustedService extends React.Component<
   IAddTrustedServiceProps,
   IAddTrustedServiceState
-> {
+  > {
   static contextTypes = {
     locale: PropTypes.string,
     localize: PropTypes.func,

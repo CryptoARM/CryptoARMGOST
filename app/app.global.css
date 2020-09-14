@@ -805,6 +805,10 @@ i.material-icons.sidevan.dss {
   background: url(./resources/image/sidemenu/dss.svg);
 }
 
+i.material-icons.sidevan.services {
+  background: url(./resources/image/sidemenu/services.svg);
+}
+
 /*-------------------------------Стили списка файлов------------------*/
 .add-file-item {
     color: lightgray;
@@ -1211,6 +1215,12 @@ nav .cert-seacrh label i {
   display: block;
 }
 
+#dropdown-trusted-services {
+  margin-left: 100%;
+  min-width: 220px;
+  display: block;
+}
+
 #dropdown-about-pages {
   margin-left: 100%;
   min-width: 220px;
@@ -1221,7 +1231,7 @@ nav .cert-seacrh label i {
   margin-left: 100%;
   min-width: 220px;
   display: block;
-  top: 34px !important;
+  top: 82px !important;
 }
 
 .dropdown-content li {

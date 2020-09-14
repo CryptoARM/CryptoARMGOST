@@ -137,7 +137,7 @@ class CertificateChainInfo extends React.Component<any, any> {
   buildChain = (certItem: any) => {
     let certificate = certItem.object ? certItem.object : null;
     if (certificate === null) {
-      if (certItem.x509 && certItem.dssUserID) {
+      if (certItem.x509) {
         try {
           certificate = trusted.pki.Certificate.import(Buffer.from(certItem.x509), trusted.DataFormat.PEM);
         } catch (e) {

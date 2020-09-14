@@ -107,7 +107,8 @@ if (fileExists(TRUSTED_SERVICES_JSON)) {
       const data = JSON.parse(tservices);
       for (const key of Object.keys(data.trustedServices)) {
         const service = data.trustedServices[key];
-        const mservice = new TrustedServiceModel({ ...service });
+        let mservice = new TrustedServiceModel({ ...service });
+        mservice = mservice.setIn(["cert"], new CertificateModel({ ...service.cert }));
         servicesMap = servicesMap.setIn(["entities", key], mservice);
       }
 

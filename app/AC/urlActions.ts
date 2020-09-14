@@ -105,10 +105,10 @@ export function checkTrustedServiceForCommand(
           }
 
           let curCert: trusted.pki.Certificate;
-          if (value.cert) {
+          if (value.cert && value.cert.x509) {
             try {
               curCert = new trusted.pki.Certificate();
-              curCert.import(Buffer.from(value.cert), trusted.DataFormat.PEM);
+              curCert.import(Buffer.from(value.cert.x509), trusted.DataFormat.PEM);
             } catch (e) {
               //
             }

@@ -10,7 +10,7 @@ import {
   LOCATION_CERTIFICATES, LOCATION_CONTAINERS,
   LOCATION_DOCUMENTS, LOCATION_EVENTS, LOCATION_LICENSE, LOCATION_RESULTS_MULTI_OPERATIONS,
   LOCATION_SERVICES, LOCATION_SETTINGS, LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT,
-  SETTINGS_JSON, TRUSTED_CRYPTO_LOG,
+  LOCATION_TRUSTED_SERVICES, SETTINGS_JSON, TRUSTED_CRYPTO_LOG,
 } from "../constants";
 import { CANCELLED } from "../server/constants";
 import { fileExists, mapToArr } from "../utils";
@@ -128,6 +128,9 @@ class MenuBar extends React.Component<any, IMenuBarState> {
 
       case LOCATION_CONTAINERS:
         return `${localize("About.product_NAME", locale)} - ${localize("Certificate.sidesubmenu_keys", locale)}`;
+
+      case LOCATION_TRUSTED_SERVICES:
+        return `${localize("About.product_NAME", locale)} - ${localize("TrustedServices.trusted_services", locale)}`;
 
       case LOCATION_LICENSE:
         return `${localize("About.product_NAME", locale)} - ${localize("License.license", locale)}`;
