@@ -124,7 +124,7 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
                                 <div className="col" style={{ width: "40px", paddingLeft: "0px" }}>
                                   <CertificateStatusIcon certificate={rowData} key={rowData.id} trustedServices={true} />
                                 </div>
-                                <div className="col s10" style={{ marginLeft: "10px" }}>
+                                <div className="col s10" style={{ paddingLeft: "0px" }}>
                                   <div className="collection-title truncate">{cellData}</div>
                                 </div>
                               </div>);
@@ -189,7 +189,7 @@ class TrustedServicesTable extends React.Component<ITrustedServicesTableProps & 
                                 <div className="col" style={{ width: "40px", paddingLeft: "0px" }}>
                                   <CertificateStatusIcon certificate={rowData} key={rowData.id} trustedServices={true} />
                                 </div>
-                                <div className="col s10" style={{ marginLeft: "10px" }}>
+                                <div className="col s10" style={{ paddingLeft: "5px", marginLeft: "5px" }}>
                                   <div className="collection-title truncate">{cellData}</div>
                                 </div>
                               </div>);
