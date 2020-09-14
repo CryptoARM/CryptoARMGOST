@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { verifyCertificate } from "../../AC";
+import { verifyCertificateForTrustedService } from "../../AC/trustedServicesActions";
 
 interface ICertificateStatusIconProps {
   certificate: any;
@@ -12,7 +13,7 @@ class CertificateStatusIcon extends React.Component<ICertificateStatusIconProps,
   timerHandle: NodeJS.Timer | null;
 
   componentDidMount() {
-    const { certificate, verifyCertificate, isCertInfoMode } = this.props;
+    const { certificate, verifyCertificate, verifyCertificateForTrustedService, isCertInfoMode, trustedServices } = this.props;
 
     if (isCertInfoMode) {
       return;
@@ -20,7 +21,7 @@ class CertificateStatusIcon extends React.Component<ICertificateStatusIconProps,
 
     this.timerHandle = setTimeout(() => {
       if (!certificate.verified) {
-        verifyCertificate(certificate.id);
+        trustedServices ? verifyCertificateForTrustedService(certificate.url) : verifyCertificate(certificate.id);
       }
 
       this.timerHandle = null;
@@ -63,4 +64,4 @@ export default connect((state, ownProps: any) => {
     isCertInfoMode: !state.urlCmdCertInfo.done,
     urlCmdCertInfo: state.urlCmdCertInfo,
   };
-}, { verifyCertificate })(CertificateStatusIcon);
+}, { verifyCertificate, verifyCertificateForTrustedService })(CertificateStatusIcon);

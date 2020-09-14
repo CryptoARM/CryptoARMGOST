@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { OrderedMap, Record } from "immutable";
 import {
-  ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_ADD_TRUSTED_SERVICE, TRUSTED_SERVICES_JSON,
+  ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_ADD_TRUSTED_SERVICE, TRUSTED_SERVICES_JSON, VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE,
 } from "../constants";
 import { CertificateModel } from "./certificates";
 
@@ -39,11 +39,21 @@ export default (trustedServices = new DefaultReducerState(), action) => {
     case HIDE_MODAL_ADD_TRUSTED_SERVICE:
       return trustedServices.set("showModal", false)
         .set("urlToCheck", "");
+
+    case VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE:
+      return trustedServices.setIn(["entities", payload.url, "cert", "status"], payload.certificateStatus)
+      .setIn(["entities", payload.url, "cert", "verified"], true);
   }
 
   if (type === ADD_TRUSTED_SERVICE || type === DELETE_TRUSTED_SERVICE) {
+    const tempTrustedServices = trustedServices.entities.map((value) => {
+      return value
+      .setIn(["cert", "verified"], false)
+      .setIn(["cert", "status"], false);
+    });
+
     const state = {
-      trustedServices: trustedServices.entities,
+      trustedServices: tempTrustedServices,
     };
 
     const sstate = JSON.stringify(state, null, 4);

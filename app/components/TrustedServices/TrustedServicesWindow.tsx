@@ -78,7 +78,7 @@ class TrustedServicesWindow extends React.Component<any, any> {
           <div className="col s8 leftcol">
             <div className="row halfbottom">
               <div className="row halfbottom" />
-              <div className="col" style={{ width: "calc(100% - 60px)" }}>
+              <div className="col s12">
                 <div className="input-field input-field-csr col s12 border_element find_box">
                   <i className="material-icons prefix">search</i>
                   <input
@@ -89,11 +89,6 @@ class TrustedServicesWindow extends React.Component<any, any> {
                     onChange={this.handleSearchValueChange} />
                   <i className="material-icons close" onClick={() => this.props.changeSearchValue("")} style={this.state.searchValue ? { color: "#444" } : {}}>close</i>
                 </div>
-              </div>
-              <div className="col" style={{ width: "40px", marginLeft: "20px" }}>
-                <a onClick={this.handleReloadCertificates}>
-                  <i className="file-setting-item waves-effect material-icons secondary-content">autorenew</i>
-                </a>
               </div>
             </div>
             <div className={"collection " + VIEW}>
@@ -170,21 +165,6 @@ class TrustedServicesWindow extends React.Component<any, any> {
     this.setState({
       activeCertInfoTab: certInfoTab,
     });
-  }
-
-  handleReloadCertificates = () => {
-    // tslint:disable-next-line:no-shadowed-variable
-    const { isLoading, loadAllCertificates, removeAllCertificates } = this.props;
-
-    this.setState({ certificate: null });
-
-    removeAllCertificates();
-
-    if (!isLoading) {
-      loadAllCertificates();
-    }
-
-    this.handleCloseModals();
   }
 
   getCertificateInfo() {
@@ -294,21 +274,6 @@ class TrustedServicesWindow extends React.Component<any, any> {
           onCancel={() => this.handleCloseModalByType(MODAL_DELETE_CERTIFICATE)} />
       </Modal>
     );
-  }
-
-  viewCertificate = async () => {
-    const { certificate } = this.state;
-
-    if (certificate) {
-      const x509: trusted.pki.Certificate = window.PKISTORE.getPkiObject(certificate);
-
-      if (x509) {
-        return new Promise((resolve, reject) => {
-          x509.view();
-          resolve();
-        });
-      }
-    }
   }
 
   handleSearchValueChange = (ev: any) => {

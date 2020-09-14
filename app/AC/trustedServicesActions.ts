@@ -1,4 +1,4 @@
-import { ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_ADD_TRUSTED_SERVICE } from "../constants";
+import { ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_ADD_TRUSTED_SERVICE, VERIFY_CERTIFICATE, VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE } from "../constants";
 import { uuid } from "../utils";
 import { certificateToPkiItemInfo } from "./urlCmdCertInfo";
 
@@ -51,5 +51,36 @@ export function deleteTrustedService(url: string) {
       url,
     },
     type: DELETE_TRUSTED_SERVICE,
+  };
+}
+
+export function verifyCertificateForTrustedService(url: string) {
+  return (dispatch: (action: {}) => void, getState: () => any) => {
+    const { trustedServices } = getState();
+
+    const service = trustedServices.getIn(["entities", url]);
+
+    let tcert: trusted.pki.Certificate | undefined;
+
+    try {
+      tcert = new trusted.pki.Certificate();
+      tcert.import(Buffer.from(service.cert.x509), trusted.DataFormat.PEM);
+    } catch (e) {
+      //
+    }
+
+    const certificate = tcert;
+    let certificateStatus = false;
+
+    try {
+      certificateStatus = trusted.utils.Csp.verifyCertificateChain(certificate);
+    } catch (e) {
+      certificateStatus = false;
+    }
+
+    dispatch({
+      payload: { url, certificateStatus },
+      type: VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE,
+    });
   };
 }
