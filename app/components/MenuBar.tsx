@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { filePackageDelete } from "../AC";
-import { getServiceBaseLinkFromUrl } from "../AC/urlActions";
+import { getServiceBaseLinkFromUrl, cancelUrlAction, removeUrlAction } from "../AC/urlActions";
 import {
   LOCATION_ABOUT, LOCATION_ADDRESS_BOOK, LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT,
   LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE,
@@ -77,7 +77,14 @@ class MenuBar extends React.Component<any, IMenuBarState> {
 
   closeWindow() {
     const { localize, locale } = this.context;
-    const { settings, tempContentOfSignedFiles } = this.props;
+    const { settings, tempContentOfSignedFiles, operationRemoteAction } = this.props;
+
+    if (operationRemoteAction) {
+      this.removeAllFiles();
+      console.log("operationRemoteAction", operationRemoteAction);
+      cancelUrlAction("signAndEncrypt.outDirectResults", operationRemoteAction.url, operationRemoteAction.id);
+      removeUrlAction();
+    };
 
     if (this.isFilesFromSocket()) {
       this.removeAllFiles();
@@ -331,5 +338,6 @@ export default connect((state, ownProps) => {
     trustedServices: state.trustedServices,
     operationIsRemote: state.urlActions.performed || state.urlActions.performing,
     urlCmds: state.urlCmds,
+    operationRemoteAction: state.urlActions.action,
   };
 }, { filePackageDelete })(MenuBar);
