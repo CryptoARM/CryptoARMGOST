@@ -1,6 +1,9 @@
 import FormData from "form-data";
 import * as fs from "fs";
-import fetch from "node-fetch";
+import fetch, { Headers } from "node-fetch";
+import https from "https";
+import tls from "tls";
+import crypto from "crypto";
 import * as path from "path";
 import { push } from "react-router-redux";
 import {
@@ -57,7 +60,7 @@ interface IEncryptRequest {
   controller: string;
 }
 
-export function checkTrustedServiceForCommand(
+export async function checkTrustedServiceForCommand(
   command: IUrlCommandApiV4Type,
 ) {
   const state = store.getState();
@@ -130,12 +133,56 @@ export function checkTrustedServiceForCommand(
 
   curl.on("error", (error: any) => {
     curl.close();
-    // tslint:disable-next-line:no-console
-    console.error(error);
-    processCommandForService(command, false);
+    try {
+      checkTrustedServiceForCommandHttps(command);
+    } catch (error) {
+      console.error(error);
+      processCommandForService(command, false);
+    }
   });
 
   curl.perform();
+}
+
+function checkTrustedServiceForCommandHttps(command: IUrlCommandApiV4Type) {
+  const state = store.getState();
+  const { trustedServices } = state;
+  const certCA = fs.readFileSync("chain.pem");
+  // const hostToCheck = getServiceBaseLinkFromUrl(command.url);
+  const options = {
+    ca: certCA,
+    hostname: "diagnostic.cryptoarm.ru",
+    method: "GET",
+    path: "/",
+    port: 443,
+    checkServerIdentity(host, cert) {
+      curCert = new trusted.pki.Certificate();
+      curCert.import(cert.raw, trusted.DataFormat.DER);
+      processCommandForService(command, false, curCert);
+    },
+  };
+
+  // options.agent = new https.Agent(options);
+  let curCert: trusted.pki.Certificate;
+  const sslConfiguredAgent = new https.Agent(options);
+try  {
+  const response = await fetch (reqUrl,  {
+    headers: Headers,
+    agent: sslConfiguredAgent
+  })
+}
+  // const req = https.request(options, function(res) {
+  //   });
+
+
+  // req.on('error', function (e) {
+  //   console.log('problem with request: ' + e.message);
+  // });
+
+  // // write data to request body
+  // req.write('data\n');
+
+  // req.end();
 }
 
 function processCommandForService(
@@ -143,6 +190,8 @@ function processCommandForService(
   serviceIsTrusted: boolean,
   cert?: trusted.pki.Certificate,
 ) {
+  console.log("next level pls");
+
   store.dispatch(startUrlCmd(command));
   if (serviceIsTrusted) {
     dispatchURLCommand(command);
