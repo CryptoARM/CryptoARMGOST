@@ -61,16 +61,11 @@ interface IEncryptRequest {
 }
 
 export async function checkTrustedServiceForCommand(
-  command: IUrlCommandApiV4Type,
-) {
-  const state = store.getState();
-  const { trustedServices } = state;
-
+  command: IUrlCommandApiV4Type) {
   const hostToCheck = getServiceBaseLinkFromUrl(command.url);
-
   const curl = new window.Curl();
-  curl.setOpt("URL", hostToCheck);
 
+  curl.setOpt("URL", hostToCheck);
   curl.setOpt("CERTINFO", true);
   curl.on("end", (status: any) => {
     let cert: trusted.pki.Certificate | undefined;
@@ -83,7 +78,6 @@ export async function checkTrustedServiceForCommand(
         if (!certInfo) {
           throw new Error("Error while recieving certificate info");
         }
-
         const certs: string[] = certInfo.filter((itm: string): boolean => itm.search("Cert:") === 0);
         if (certs.length === 0) {
           throw new Error("Certificate blob is not found in recieved data");
@@ -94,95 +88,72 @@ export async function checkTrustedServiceForCommand(
         console.error("Error loading certificate ", e.message);
       }
     }
-
     curl.close();
-
-    let serviceIsTrusted = false;
-
-    if (cert && trustedServices && trustedServices.entities) {
-      const serviceUrlToCheck = getServiceBaseLinkFromUrl(hostToCheck);
-      const findResult = mapToArr(trustedServices.entities).find(
-        (value: any) => {
-          if (value.url !== serviceUrlToCheck) {
-            return false;
-          }
-
-          let curCert: trusted.pki.Certificate;
-          if (value.cert && value.cert.x509) {
-            try {
-              curCert = new trusted.pki.Certificate();
-              curCert.import(Buffer.from(value.cert.x509), trusted.DataFormat.PEM);
-            } catch (e) {
-              //
-            }
-          }
-
-          if (!curCert) {
-            return false;
-          }
-
-          return curCert.compare(cert) === 0;
-        },
-      );
-
-      serviceIsTrusted = (undefined !== findResult);
-    }
-
-    processCommandForService(command, serviceIsTrusted, cert);
+    processCommandForService(command, isTrusted (cert, hostToCheck) , cert);
   });
 
+  // 2nd method get certificate if cURL not work
   curl.on("error", (error: any) => {
+    const certCA = fs.readFileSync("/app/resources/chain.pem");
+    const hostName =  hostToCheck
+    // const hostToCheck = getServiceBaseLinkFromUrl(command.url);
+    const options = {
+      ca: certCA,
+      hostname: hostName,
+      method: "GET",
+      path: "/",
+      port: 443,
+      checkServerIdentity(host, cert) {
+        curCert = new trusted.pki.Certificate();
+        curCert.import(cert.raw, trusted.DataFormat.DER);
+        processCommandForService(command, isTrusted (cert, hostToCheck), curCert);
+      },
+    };
     curl.close();
-    try {
-      checkTrustedServiceForCommandHttps(command);
-    } catch (error) {
-      console.error(error);
-      processCommandForService(command, false);
-    }
+    options.agent = new https.Agent(options);
+    let curCert: trusted.pki.Certificate;
+    const req = https.request(options, (res) => {});
+    req.on("error", (e) => {
+      console.log("problem with request: " + e.message);
+    });
+    // write data to request body
+    req.write('data\n');
+    req.end();
+    processCommandForService(command, false);
   });
-
   curl.perform();
 }
 
-function checkTrustedServiceForCommandHttps(command: IUrlCommandApiV4Type) {
+function isTrusted(cert: any, hostToCheck:string): boolean {
   const state = store.getState();
   const { trustedServices } = state;
-  const certCA = fs.readFileSync("chain.pem");
-  // const hostToCheck = getServiceBaseLinkFromUrl(command.url);
-  const options = {
-    ca: certCA,
-    hostname: "diagnostic.cryptoarm.ru",
-    method: "GET",
-    path: "/",
-    port: 443,
-    checkServerIdentity(host, cert) {
-      curCert = new trusted.pki.Certificate();
-      curCert.import(cert.raw, trusted.DataFormat.DER);
-      processCommandForService(command, false, curCert);
-    },
-  };
+  let serviceIsTrusted = false;
 
-  // options.agent = new https.Agent(options);
-  let curCert: trusted.pki.Certificate;
-  const sslConfiguredAgent = new https.Agent(options);
-try  {
-  const response = await fetch (reqUrl,  {
-    headers: Headers,
-    agent: sslConfiguredAgent
-  })
-}
-  // const req = https.request(options, function(res) {
-  //   });
+  if (cert && trustedServices && trustedServices.entities) {
+    const serviceUrlToCheck = getServiceBaseLinkFromUrl(hostToCheck);
+    const findResult = mapToArr(trustedServices.entities).find(
+      (value: any) => {
+        if (value.url !== serviceUrlToCheck) {
+          return false;
+        }
 
-
-  // req.on('error', function (e) {
-  //   console.log('problem with request: ' + e.message);
-  // });
-
-  // // write data to request body
-  // req.write('data\n');
-
-  // req.end();
+        let curCert: trusted.pki.Certificate;
+        if (value.cert && value.cert.x509) {
+          try {
+            curCert = new trusted.pki.Certificate();
+            curCert.import(Buffer.from(value.cert.x509), trusted.DataFormat.PEM);
+          } catch (e) {
+            //
+          }
+        }
+        if (!curCert) {
+          return false;
+        }
+        return curCert.compare(cert) === 0;
+      },
+    );
+    serviceIsTrusted = (undefined !== findResult);
+  }
 }
 
 function processCommandForService(
@@ -190,8 +161,6 @@ function processCommandForService(
   serviceIsTrusted: boolean,
   cert?: trusted.pki.Certificate,
 ) {
-  console.log("next level pls");
-
   store.dispatch(startUrlCmd(command));
   if (serviceIsTrusted) {
     dispatchURLCommand(command);
