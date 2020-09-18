@@ -10,7 +10,7 @@ import {
   LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE, LOCATION_CERTIFICATES,
   LOCATION_CONTAINERS, LOCATION_DOCUMENTS, LOCATION_EVENTS,
   LOCATION_RESULTS_MULTI_OPERATIONS, LOCATION_SERVICES, LOCATION_SETTINGS,
-  LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT,
+  LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT, LOCATION_TRUSTED_SERVICES,
 } from "../constants";
 import history from "../history";
 import localize from "../i18n/localize";
@@ -28,6 +28,7 @@ import MenuBar from "./MenuBar";
 import ResultsWindow from "./MultiOperations/ResultsWindow";
 import ServiceWindow from "./Services/ServiceWindow";
 import SignAndEncryptWindow from "./SignatureAndEncrypt/SignatureAndEncryptWindow";
+import TrustedServicesWindow from "./TrustedServices/TrustedServicesWindow";
 
 interface IAppProps {
   locale: string;
@@ -85,6 +86,7 @@ class App extends React.Component<IAppProps, {}> {
           <Route path={LOCATION_EVENTS} component={EventsWindow} />
           <Route path={LOCATION_SERVICES} component={ServiceWindow} />
           <Route path={LOCATION_RESULTS_MULTI_OPERATIONS} component={ResultsWindow} />
+          <Route path={LOCATION_TRUSTED_SERVICES} component={TrustedServicesWindow} />
         </React.Fragment>
       </Router>
     );

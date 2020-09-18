@@ -24,6 +24,7 @@ interface ICertificateInfo {
   status: boolean;
   serial: string;
   isMynsvyaz?: boolean;
+  object: trusted.pki.Certificate;
 }
 
 function requestCertInfo(id: string, certificate: trusted.pki.Certificate) {
@@ -61,6 +62,7 @@ export function PkiCertToCertInfo(id: string, certificate: trusted.pki.Certifica
     status,
     serial: certificate.serialNumber,
     isMynsvyaz,
+    object: certificate,
   };
 
   return result;
@@ -130,7 +132,7 @@ export function sendCertificateInfo(cert: trusted.pki.Certificate, cmdUrl: strin
   );
 }
 
-const certificateToPkiItemInfo = (certValue: trusted.pki.Certificate) => {
+export const certificateToPkiItemInfo = (certValue: trusted.pki.Certificate) => {
   if (certValue) {
     let status = false;
     try {

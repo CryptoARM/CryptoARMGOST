@@ -51,7 +51,8 @@ export default (license = new DefaultReducerState(), action) => {
         .set("status", false)
         .set("verified", true)
         .set("lic_error", payload.lic_error)
-        .set("lic_format", payload.lic_format);
+        .set("lic_format", payload.lic_format)
+        .set("data", payload.data);
 
     case VERIFY_LICENSE:
       return license

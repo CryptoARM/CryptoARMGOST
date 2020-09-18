@@ -3,13 +3,14 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { filePackageDelete } from "../AC";
+import { getServiceBaseLinkFromUrl, cancelUrlAction, removeUrlAction } from "../AC/urlActions";
 import {
   LOCATION_ABOUT, LOCATION_ADDRESS_BOOK, LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT,
   LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE,
   LOCATION_CERTIFICATES, LOCATION_CONTAINERS,
   LOCATION_DOCUMENTS, LOCATION_EVENTS, LOCATION_LICENSE, LOCATION_RESULTS_MULTI_OPERATIONS,
   LOCATION_SERVICES, LOCATION_SETTINGS, LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT,
-  SETTINGS_JSON, TRUSTED_CRYPTO_LOG,
+  LOCATION_TRUSTED_SERVICES, SETTINGS_JSON, TRUSTED_CRYPTO_LOG,
 } from "../constants";
 import { CANCELLED } from "../server/constants";
 import { fileExists, mapToArr } from "../utils";
@@ -76,7 +77,14 @@ class MenuBar extends React.Component<any, IMenuBarState> {
 
   closeWindow() {
     const { localize, locale } = this.context;
-    const { settings, tempContentOfSignedFiles } = this.props;
+    const { settings, tempContentOfSignedFiles, operationRemoteAction } = this.props;
+
+    if (operationRemoteAction) {
+      this.removeAllFiles();
+      console.log("operationRemoteAction", operationRemoteAction);
+      cancelUrlAction("signAndEncrypt.outDirectResults", operationRemoteAction.url, operationRemoteAction.id);
+      removeUrlAction();
+    };
 
     if (this.isFilesFromSocket()) {
       this.removeAllFiles();
@@ -93,9 +101,20 @@ class MenuBar extends React.Component<any, IMenuBarState> {
 
   getTitle() {
     const { localize, locale } = this.context;
-    const { isArchiveLog, eventsDateFrom, eventsDateTo } = this.props;
+    const { isArchiveLog, eventsDateFrom, eventsDateTo, urlCmds } = this.props;
     const pathname = this.props.location.pathname;
     const storename = this.props.location.state ? this.props.location.state.head : "";
+
+    if (urlCmds && urlCmds.command && urlCmds.command.length) {
+      const serviceBaseUrl = getServiceBaseLinkFromUrl(urlCmds.url);
+      switch (urlCmds.command) {
+        case "signandencrypt":
+          return `${localize("SignAndEncrypt.sign_and_encrypt", locale)} - ${serviceBaseUrl}`;
+
+        case "certificates":
+          return `${localize("Certificate.certs", locale)} - ${serviceBaseUrl}`;
+      }
+    }
 
     switch (pathname) {
       case LOCATION_ABOUT:
@@ -116,6 +135,9 @@ class MenuBar extends React.Component<any, IMenuBarState> {
 
       case LOCATION_CONTAINERS:
         return `${localize("About.product_NAME", locale)} - ${localize("Certificate.sidesubmenu_keys", locale)}`;
+
+      case LOCATION_TRUSTED_SERVICES:
+        return `${localize("About.product_NAME", locale)} - ${localize("TrustedServices.trusted_services", locale)}`;
 
       case LOCATION_LICENSE:
         return `${localize("About.product_NAME", locale)} - ${localize("License.license", locale)}`;
@@ -281,7 +303,7 @@ class MenuBar extends React.Component<any, IMenuBarState> {
         key="showModalAddTrustedService"
         header={localize("TrustedServices.external_resource_request", locale)}
         onClose={this.handleCloseModalAddTrustedService}
-        style={{ width: "380px" }}>
+        style={{ width: "440px" }}>
 
         <AddTrustedService
           onCancel={this.handleCloseModalAddTrustedService}
@@ -315,5 +337,7 @@ export default connect((state, ownProps) => {
     tempContentOfSignedFiles: state.files.tempContentOfSignedFiles,
     trustedServices: state.trustedServices,
     operationIsRemote: state.urlActions.performed || state.urlActions.performing,
+    urlCmds: state.urlCmds,
+    operationRemoteAction: state.urlActions.action,
   };
 }, { filePackageDelete })(MenuBar);

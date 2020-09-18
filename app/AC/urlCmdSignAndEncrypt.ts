@@ -1,6 +1,7 @@
 import { IUrlCommandApiV4Type } from "../parse-app-url";
-import { dispatchURLAction } from "./urlActions";
-import { paramsRequest, postRequest } from "./urlCmdUtils";
+import store from "../store";
+import { dispatchURLAction, finishCurrentUrlCmd } from "./urlActions";
+import { displayWarningMessage, paramsRequest, postRequest, removeWarningMessage } from "./urlCmdUtils";
 
 interface ICertResp {
   jsonrpc: string;
@@ -36,6 +37,8 @@ export function handleUrlCommandSignAmdEncrypt( command: IUrlCommandApiV4Type ) 
       const operation = data.result.operation;
       const props = data.result.props;
 
+      displayWarningMessage(command.command, command.url);
+
       if (operation && operation.includes("SIGN")) {
         return dispatchURLAction({
           name: "sign-documents-from-url",
@@ -55,6 +58,8 @@ export function handleUrlCommandSignAmdEncrypt( command: IUrlCommandApiV4Type ) 
       }
     },
     (error) => {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       $(".toast-url-cmd-cert-params-fail-err-descr").remove();
       Materialize.toast(error, 3000, "toast-url-cmd-cert-params-fail-err-descr");
 
