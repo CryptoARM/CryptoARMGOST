@@ -1,6 +1,6 @@
 import { OrderedMap } from "immutable";
 import {
-  FAIL, LOCATION_CERTIFICATES, START, SUCCESS, URL_CMD_CERT_INFO,
+  FAIL, LOCATION_CERTIFICATES, START, SUCCESS, URL_CMD_CERT_INFO, URL_CMD,
 } from "../constants";
 import history from "../history";
 import localize from "../i18n/localize";
@@ -104,6 +104,7 @@ export function certInfoSuccess() {
   history.goBack();
   navigationUnlock();
   store.dispatch({ type: URL_CMD_CERT_INFO + SUCCESS });
+  store.dispatch({ type: URL_CMD + SUCCESS });
   $(".toast-url-cmd-cert-info-success").remove();
   Materialize.toast(localize("UrlCommand.cert_info_success", window.locale),
     3000, "toast-url-cmd-cert-info-success");
@@ -113,6 +114,7 @@ export function certInfoFail() {
   history.goBack();
   navigationUnlock();
   store.dispatch({ type: URL_CMD_CERT_INFO + FAIL });
+  store.dispatch({ type: URL_CMD + FAIL });
   $(".toast-url-cmd-cert-info-fail").remove();
   Materialize.toast(localize("UrlCommand.cert_info_fail", window.locale),
     3000, "toast-url-cmd-cert-info-fail");

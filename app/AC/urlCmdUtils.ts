@@ -150,7 +150,7 @@ export function displayWarningMessage(command: string, serviceUrl: string, opera
   const $toastContent = $('<div><div style="float:left">'
     + toastMessage
     + '</div><a class="btn btn-toast waves-effect waves-light" onClick="$(\'.toast-url-cmd-warning-message\').remove();">Закрыть</a></div>');
-  Materialize.toast($toastContent, undefined, "toast-url-cmd-warning-message");
+  Materialize.toast($toastContent, 3000, "toast-url-cmd-warning-message");
 }
 
 export function removeWarningMessage() {
