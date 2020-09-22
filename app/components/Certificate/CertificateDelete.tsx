@@ -12,6 +12,7 @@ interface ICertificateDeleteProps {
   onCancel?: () => void;
   reloadCertificates: () => void;
   reloadContainers: () => void;
+  resetCertVerified: () => void;
 }
 
 interface ICertificateDeleteState {
@@ -115,7 +116,7 @@ class CertificateDelete extends React.Component<ICertificateDeleteProps, ICertif
 
   handleDeleteCertificateAndContainer = () => {
     // tslint:disable-next-line:no-shadowed-variable
-    const { certificate, certificates, deleteDssCertificate, reloadCertificates, reloadContainers } = this.props;
+    const { certificate, certificates, deleteDssCertificate, reloadCertificates, reloadContainers, resetCertVerified } = this.props;
     const { container, deleteContainer } = this.state;
     const { localize, locale } = this.context;
 
@@ -181,9 +182,8 @@ class CertificateDelete extends React.Component<ICertificateDeleteProps, ICertif
 
       return;
     }
-
+    resetCertVerified();
     reloadCertificates();
-
     $(".toast-cert_delete_ok").remove();
     Materialize.toast(localize("Certificate.cert_delete_ok", locale), 2000, "toast-cert_delete_ok");
   }

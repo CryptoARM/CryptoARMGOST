@@ -1,3 +1,4 @@
+import store from "../../store";
 import { execFile } from "child_process";
 import fs from "fs";
 import * as os from "os";
@@ -18,7 +19,7 @@ import {
   MODAL_BEST_STORE, MODAL_CERTIFICATE_IMPORT_DSS, MODAL_CERTIFICATE_REQUEST, MODAL_CERTIFICATE_REQUEST_CA,
   MODAL_CLOUD_CSP, MODAL_DELETE_CERTIFICATE, MODAL_DELETE_CRL, MODAL_DELETE_REQUEST_CA,
   MODAL_EXPORT_CERTIFICATE, MODAL_EXPORT_CRL, MODAL_EXPORT_REQUEST_CA, MY, PFX, PROVIDER_CRYPTOPRO, REQUEST,
-  ROOT, URL_CMD_CERTIFICATES_IMPORT, USER_NAME,
+  ROOT, URL_CMD_CERTIFICATES_IMPORT, USER_NAME, RESET_DSS_CERTIFICATES_VERIFIED,
 } from "../../constants";
 import { filteredCertificatesSelector } from "../../selectors";
 import { filteredCrlsSelector } from "../../selectors/crlsSelectors";
@@ -624,7 +625,7 @@ class CertWindow extends React.Component<any, any> {
           Materialize.toast(localize("Certificate.cert_import_failed", locale), 2000, "toast-cert_import_error");
         } else {
           removeAllCertificates();
-
+          this.resetCertVerified();
           if (!isLoading) {
             loadAllCertificates();
           }
@@ -705,6 +706,18 @@ class CertWindow extends React.Component<any, any> {
         }
       });
     }
+  }
+
+  resetCertVerified = () => {
+    const { certificatesMap } = this.props
+
+    const dssCert = certificatesMap.filter((i: any) => i.dssUserID !== null)
+    dssCert.map((k: any) => {
+      store.dispatch({
+        payload: k.id,
+        type: RESET_DSS_CERTIFICATES_VERIFIED,
+      })
+    })
   }
 
   crlImport = (crl: trusted.pki.CRL, crlFilePath?: string) => {
@@ -1045,7 +1058,8 @@ class CertWindow extends React.Component<any, any> {
           certificate={certificate}
           onCancel={() => this.handleCloseModalByType(MODAL_DELETE_CERTIFICATE)}
           reloadCertificates={this.handleReloadCertificates}
-          reloadContainers={this.handleReloadContainers} />
+          reloadContainers={this.handleReloadContainers}
+          resetCertVerified={this.resetCertVerified}/>
       </Modal>
     );
   }
@@ -1801,6 +1815,7 @@ export default connect((state) => {
     urlCmdProps: state.urlCmdCertificates,
     urlCmdCertInfo: state.urlCmdCertInfo,
     isCertInfoMode: !state.urlCmdCertInfo.done,
+    certificatesMap: state.certificates.entities,
   };
 }, {
   changeSearchValue, deleteRequestCA, loadAllCertificates, loadAllContainers,
