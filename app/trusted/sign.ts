@@ -443,13 +443,20 @@ export function unSign(uri: string, folderOut: string, logOperation = true): any
   if (folderOut && folderOut.length > 0) {
     outURI = path.join(folderOut, path.basename(uri));
     outURI = outURI.substring(0, outURI.lastIndexOf("."));
-    let parsed = path.parse(outURI);
-    if ( parsed.name.substr(-4,4) === "_(1)" ) {
-      outURI = path.join(parsed.dir, parsed.name.substring( 0, parsed.name.length - 4 ) + parsed.ext) 
-    }
   } else {
     outURI = uri.substring(0, uri.lastIndexOf("."));
   }
+
+  let indexFile: number = 1;
+  let newOutUri: string = outURI;
+  while (fileExists(newOutUri)) {
+    const parsed = path.parse(outURI);
+
+    newOutUri = path.join(parsed.dir, parsed.name + "_(" + indexFile + ")" + parsed.ext);
+    indexFile++;
+  }
+
+  outURI = newOutUri;
 
   try {
     let cms: trusted.cms.SignedData = loadSign(uri);

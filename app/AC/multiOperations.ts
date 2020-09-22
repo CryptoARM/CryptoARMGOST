@@ -681,21 +681,27 @@ async function uzipAndWriteSync(file: any, reverseFiles: any, packageResult: IPa
     const encoding = chardet.detect(fileInZip.pathBuffer);
 
     // decode "non-unicode" filename from OEM Cyrillic character set
-    let fileName = isUnicode ? fileInZip.path : il.decode(fileInZip.pathBuffer, encoding && encoding === "UTF-8" ? encoding : "cp866");
+    const fileName = isUnicode ? fileInZip.path : il.decode(fileInZip.pathBuffer, encoding && encoding === "UTF-8" ? encoding : "cp866");
+    
+    let outURI: string = path.join(DEFAULT_TEMP_PATH, fileName);
     let indexFile: number = 1;
-    let outURL = path.join(DEFAULT_TEMP_PATH, path.basename(fileName));
-    const parsed = path.parse(outURL.substring(0, outURL.lastIndexOf(".")));
-    outURL = parsed.dir + "\\" + parsed.name + "_(" + indexFile + ")" + parsed.ext +".sig";
-    indexFile++;
+    let newOutUri: string = outURI;
+    while (fileExists(newOutUri)) {
+      const parsed = path.parse(outURI);
+      const parsedName = path.parse(parsed.name)
+      newOutUri = path.join(parsed.dir, parsedName.name + "_(" + indexFile + ")" + parsedName.ext + parsed.ext);
+      indexFile++;
+    }
+    outURI = newOutUri;
 
     try {
       await new Promise((resolve, reject) => fileInZip.stream()
-        .pipe(fs.createWriteStream(outURL))
+        .pipe(fs.createWriteStream(outURI))
         .on("error", reject)
         .on("finish", resolve),
       );
 
-      const newFileProps = { ...getFileProps(outURL) };
+      const newFileProps = { ...getFileProps(outURI) };
 
       unzipedFiles.push({ ...newFileProps, operation: 2 });
 
