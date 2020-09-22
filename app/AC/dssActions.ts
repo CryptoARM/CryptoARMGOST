@@ -173,8 +173,9 @@ export function dssAuthIssue(user: IUserDSS) {
     body = {
       Resource: "urn:cryptopro:dss:signserver:signserver",
     };
+    const version = await dssCheckApiVersion2(user.dssUrl);
     return dispatch(
-      dssPostMFAUser(user.authUrl.replace("/oauth", "/confirmation"), headerfield, body, user.id, POST_AUTHORIZATION_USER_DSS),
+      dssPostMFAUser(user.authUrl.replace("/oauth", (version === 2) ? "/v2.0/confirmation" : "/confirmation"), headerfield, body, user.id, POST_AUTHORIZATION_USER_DSS),
     );
   };
 }
@@ -602,4 +603,16 @@ export function dssPerformOperation(url: string, token: string, body?: IDocument
       throw new Error(e);
     }
   };
+}
+
+export const dssCheckApiVersion2 = async (dssUrl: string) => {
+  const url = dssUrl + "/api/apiversion";
+  try {
+    const response: any = await getApi(url, []);
+    return response;
+  } catch (error) {
+    console.log(error.message);
+  }
+
+  return 1;
 }

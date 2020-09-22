@@ -1,7 +1,7 @@
 import PropTypes, { any } from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
-import { dssPostMFAUser } from "../../AC/dssActions";
+import { dssCheckApiVersion2, dssPostMFAUser } from "../../AC/dssActions";
 import { POST_OPERATION_CONFIRMATION } from "../../constants";
 
 const auth_token = "auth_token";
@@ -185,14 +185,16 @@ class ConfirmTransaction extends React.Component<IConfirmTransactionProps, IConf
 
     this.setState({ field_value: "" });
 
-    dssPostMFAUser(
-      user.authUrl.replace("/oauth", "/confirmation"),
-      dssResponse.Headerfield,
-      body,
-      dssUserID,
-      POST_OPERATION_CONFIRMATION,
-      challengeResponse,
-    ).then((data2) => console.log(data2));
+    dssCheckApiVersion2(user.dssUrl).then(function(version) {
+      dssPostMFAUser(
+        user.authUrl.replace("/oauth", (version === 2) ? "/v2.0/confirmation" : "/confirmation"),
+        dssResponse.Headerfield,
+        body,
+        dssUserID,
+        POST_OPERATION_CONFIRMATION,
+        challengeResponse,
+      ).then((data2) => console.log(data2));
+    });
   }
 
   handleCancel = () => {

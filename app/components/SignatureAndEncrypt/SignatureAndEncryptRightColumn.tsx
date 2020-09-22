@@ -15,7 +15,7 @@ import {
 } from "../../AC";
 import { IFile } from "../../AC";
 import { documentsReviewed } from "../../AC/documentsActions";
-import { createTransactionDSS, dssOperationConfirmation, dssPerformOperation } from "../../AC/dssActions";
+import { createTransactionDSS, dssCheckApiVersion2, dssOperationConfirmation, dssPerformOperation } from "../../AC/dssActions";
 import { multiDirectOperation, multiOperationStart, multiReverseOperation } from "../../AC/multiOperations";
 import {
   activeSetting, changeDefaultSettings, deleteSetting, saveSettings,
@@ -1095,80 +1095,92 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                 $(".toast-transaction_created_successful").remove();
                 Materialize.toast(localize("DSS.transaction_created_successful", locale), 3000, "toast-transaction_created_successful");
 
-                this.props.dssOperationConfirmation(
-                  user.authUrl.replace("/oauth", "/confirmation"),
-                  tokenAuth.access_token,
-                  data,
-                  user.id)
-                  .then(
-                    (data2) => {
-                      this.props.dssPerformOperation(
-                        user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
-                        data2.AccessToken, pinCode ? { Signature: { PinCode: pinCode } } : undefined)
-                        .then(
-                          (dataCMS: any) => {
-                            let i: number = 0;
-                            const outURIList: string[] = [];
+                dssCheckApiVersion2(user.dssUrl).then((version: number) => {
+                  this.props.dssOperationConfirmation(
+                    user.authUrl.replace("/oauth", (version === 2) ? "/v2.0/confirmation" : "/confirmation"),
+                    tokenAuth.access_token,
+                    data,
+                    user.id)
+                    .then(
+                      (data2) => {
+                        this.props.dssPerformOperation(
+                          user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
+                          data2.AccessToken, pinCode ? { Signature: { PinCode: pinCode } } : undefined)
+                          .then(
+                            (dataCMS: any) => {
+                              let i: number = 0;
+                              const outURIList: string[] = [];
 
-                            const directResult: any = {};
-                            directResult.results = [];
-                            directResult.operations = setting.operations.toJS();
-                            const directFiles: any = {};
-                            files.forEach((file: any) => {
-                              directFiles[file.id] = { original: { ...file.toJS(), operation: 4 } };
-                            });
-
-                            files.forEach((file) => {
-                              const outURI = fileNameForSign(folderOut, file);
-                              const tcms: trusted.cms.SignedData = new trusted.cms.SignedData();
-                              const contextCMS = isSignPackage ? dataCMS.Results[i] : dataCMS;
-                              tcms.import(Buffer.from("-----BEGIN CMS-----" + "\n" + contextCMS + "\n" + "-----END CMS-----"), trusted.DataFormat.PEM);
-                              tcms.save(outURI, format);
-                              outURIList.push(outURI);
-                              i++;
-
-                              const newFileProps = this.getFileProps(outURI);
-                              directResult.results.push({
-                                id: Date.now() + Math.random(),
-                                in: {
-                                  ...file.toJS(),
-                                },
-                                operation: SIGNING_OPERATION,
-                                out: {
-                                  ...newFileProps,
-                                  operation: 3,
-                                },
-                                result: true,
+                              const directResult: any = {};
+                              directResult.results = [];
+                              directResult.operations = setting.operations.toJS();
+                              const directFiles: any = {};
+                              files.forEach((file: any) => {
+                                directFiles[file.id] = { original: { ...file.toJS(), operation: 4 } };
                               });
 
-                              directFiles[file.id] = {
-                                ...directFiles[file.id],
-                                signing_operation: {
+                              files.forEach((file) => {
+                                const outURI = fileNameForSign(folderOut, file);
+                                const tcms: trusted.cms.SignedData = new trusted.cms.SignedData();
+                                const contextCMS = isSignPackage ? dataCMS.Results[i] : dataCMS;
+                                tcms.import(Buffer.from("-----BEGIN CMS-----" + "\n" + contextCMS + "\n" + "-----END CMS-----"), trusted.DataFormat.PEM);
+                                tcms.save(outURI, format);
+                                outURIList.push(outURI);
+                                i++;
+
+                                const newFileProps = this.getFileProps(outURI);
+                                directResult.results.push({
+                                  id: Date.now() + Math.random(),
+                                  in: {
+                                    ...file.toJS(),
+                                  },
+                                  operation: SIGNING_OPERATION,
                                   out: {
                                     ...newFileProps,
                                     operation: 3,
                                   },
                                   result: true,
-                                },
-                              };
-                            });
-                            directResult.files = directFiles;
+                                });
 
-                            packageSign(files, cert, policies, null, format, folderOut, outURIList, directResult);
-                          },
-                          (error: any) => {
-                            if (uploader) {
-                              this.dispatchSignInterrupt();
-                            } else {
-                              this.dispatchSignInDssFail(files, setting.operations.toJS(), error);
-                            }
+                                directFiles[file.id] = {
+                                  ...directFiles[file.id],
+                                  signing_operation: {
+                                    out: {
+                                      ...newFileProps,
+                                      operation: 3,
+                                    },
+                                    result: true,
+                                  },
+                                };
+                              });
+                              directResult.files = directFiles;
 
-                            $(".toast-dssPerformOperation_failed").remove();
-                            Materialize.toast(error, 3000, "toast-dssPerformOperation_failed");
-                          },
-                        );
-                    },
-                    (error) => {
+                              packageSign(files, cert, policies, null, format, folderOut, outURIList, directResult);
+                            },
+                            (error: any) => {
+                              if (uploader) {
+                                this.dispatchSignInterrupt();
+                              } else {
+                                this.dispatchSignInDssFail(files, setting.operations.toJS(), error);
+                              }
+
+                              $(".toast-dssPerformOperation_failed").remove();
+                              Materialize.toast(error, 3000, "toast-dssPerformOperation_failed");
+                            },
+                          );
+                      },
+                      (error) => {
+                        if (uploader) {
+                          this.dispatchSignInterrupt();
+                        } else {
+                          this.dispatchSignInDssFail(files, setting.operations.toJS(), error);
+                        }
+
+                        $(".toast-dssOperationConfirmation_failed").remove();
+                        Materialize.toast(error, 3000, "toast-dssOperationConfirmation_failed");
+                      },
+                    )
+                    .catch((error) => {
                       if (uploader) {
                         this.dispatchSignInterrupt();
                       } else {
@@ -1177,18 +1189,8 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
                       $(".toast-dssOperationConfirmation_failed").remove();
                       Materialize.toast(error, 3000, "toast-dssOperationConfirmation_failed");
-                    },
-                  )
-                  .catch((error) => {
-                    if (uploader) {
-                      this.dispatchSignInterrupt();
-                    } else {
-                      this.dispatchSignInDssFail(files, setting.operations.toJS(), error);
-                    }
-
-                    $(".toast-dssOperationConfirmation_failed").remove();
-                    Materialize.toast(error, 3000, "toast-dssOperationConfirmation_failed");
-                  });
+                    });
+                });
               },
               (error) => {
                 $(".toast-transaction_created_failed").remove();
@@ -1355,7 +1357,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   resignDss = (filesAtt: IFilePackage, filesDet: IFilePackage, setting: any, cert: any,
-               multipackage: boolean = false) => {
+    multipackage: boolean = false) => {
     const { signer, tokensAuth, users, policyDSS, uploader,
       createTransactionDSS, packageReSign } = this.props;
     const { pinCode } = this.state;
@@ -1391,102 +1393,103 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
             $(".toast-transaction_created_successful").remove();
             Materialize.toast(localize("DSS.transaction_created_successful", locale), 3000, "toast-transaction_created_successful");
 
-            this.props.dssOperationConfirmation(
-              user.authUrl.replace("/oauth", "/confirmation"),
-              tokenAuth.access_token,
-              data1,
-              user.id)
-              .then(
-                (data2) => {
-                  this.props.dssPerformOperation(
-                    user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
-                    data2.AccessToken, pinCode ? { Signature: { PinCode: pinCode } } : undefined)
-                    .then(
-                      (dataCMS: any) => {
-                        let i: number = 0;
-                        const outURIList: string[] = [];
+            dssCheckApiVersion2(user.dssUrl).then((version: number) => {
+              this.props.dssOperationConfirmation(
+                user.authUrl.replace("/oauth", (version === 2) ? "/v2.0/confirmation" : "/confirmation"),
+                tokenAuth.access_token,
+                data1,
+                user.id)
+                .then(
+                  (data2) => {
+                    this.props.dssPerformOperation(
+                      user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
+                      data2.AccessToken, pinCode ? { Signature: { PinCode: pinCode } } : undefined)
+                      .then(
+                        (dataCMS: any) => {
+                          let i: number = 0;
+                          const outURIList: string[] = [];
 
-                        const directResult: any = {};
-                        directResult.results = [];
-                        directResult.operations = setting.operations.toJS();
-                        const directFiles: any = {};
-                        files.forEach((file: any) => {
-                          directFiles[file.id] = { original: { ...file.toJS(), operation: 4 } };
-                        });
-
-                        files.forEach((file) => {
-                          const outURI = fileNameForResign(folderOut, file);
-                          const tcms: trusted.cms.SignedData = new trusted.cms.SignedData();
-                          const contextCMS = isSignPackage ? dataCMS.Results[i] : dataCMS;
-                          tcms.import(Buffer.from("-----BEGIN CMS-----" + "\n" + contextCMS + "\n" + "-----END CMS-----"), trusted.DataFormat.PEM);
-                          tcms.save(outURI, format);
-                          outURIList.push(outURI);
-                          i++;
-
-                          const newFileProps = this.getFileProps(outURI);
-                          directResult.results.push({
-                            id: Date.now() + Math.random(),
-                            in: {
-                              ...file.toJS(),
-                            },
-                            operation: SIGNING_OPERATION,
-                            out: {
-                              ...newFileProps,
-                              operation: 3,
-                            },
-                            result: true,
+                          const directResult: any = {};
+                          directResult.results = [];
+                          directResult.operations = setting.operations.toJS();
+                          const directFiles: any = {};
+                          files.forEach((file: any) => {
+                            directFiles[file.id] = { original: { ...file.toJS(), operation: 4 } };
                           });
 
-                          directFiles[file.id] = {
-                            ...directFiles[file.id],
-                            signing_operation: {
+                          files.forEach((file) => {
+                            const outURI = fileNameForResign(folderOut, file);
+                            const tcms: trusted.cms.SignedData = new trusted.cms.SignedData();
+                            const contextCMS = isSignPackage ? dataCMS.Results[i] : dataCMS;
+                            tcms.import(Buffer.from("-----BEGIN CMS-----" + "\n" + contextCMS + "\n" + "-----END CMS-----"), trusted.DataFormat.PEM);
+                            tcms.save(outURI, format);
+                            outURIList.push(outURI);
+                            i++;
+
+                            const newFileProps = this.getFileProps(outURI);
+                            directResult.results.push({
+                              id: Date.now() + Math.random(),
+                              in: {
+                                ...file.toJS(),
+                              },
+                              operation: SIGNING_OPERATION,
                               out: {
                                 ...newFileProps,
                                 operation: 3,
                               },
                               result: true,
-                            },
-                          };
-                        });
-                        directResult.files = directFiles;
-                        const isNeedToSignSecondPackage = !signsIsDetached && filesDet;
-                        packageReSign(files, cert, policies, format, folderOut, outURIList,
-                          directResult, isNeedToSignSecondPackage || multipackage,
-                          isNeedToSignSecondPackage);
-                        if (isNeedToSignSecondPackage) {
-                          this.resignDss(null, filesDet, setting, cert, true);
-                        } else {
+                            });
+
+                            directFiles[file.id] = {
+                              ...directFiles[file.id],
+                              signing_operation: {
+                                out: {
+                                  ...newFileProps,
+                                  operation: 3,
+                                },
+                                result: true,
+                              },
+                            };
+                          });
+                          directResult.files = directFiles;
+                          const isNeedToSignSecondPackage = !signsIsDetached && filesDet;
+                          packageReSign(files, cert, policies, format, folderOut, outURIList,
+                            directResult, isNeedToSignSecondPackage || multipackage,
+                            isNeedToSignSecondPackage);
+                          if (isNeedToSignSecondPackage) {
+                            this.resignDss(null, filesDet, setting, cert, true);
+                          } else {
+                            this.setState({ pinCode: "" });
+                          }
+                        },
+                        (error) => {
+                          if (uploader) {
+                            this.dispatchSignInterrupt();
+                          } else {
+                            this.dispatchSignInDssFail(files, setting.operations.toJS(), error);
+                          }
+
+                          $(".toast-dssPerformOperation_failed").remove();
+                          Materialize.toast(error, 3000, "toast-dssPerformOperation_failed");
+
                           this.setState({ pinCode: "" });
-                        }
-                      },
-                      (error) => {
-                        if (uploader) {
-                          this.dispatchSignInterrupt();
-                        } else {
-                          this.dispatchSignInDssFail(files, setting.operations.toJS(), error);
-                        }
+                        },
+                      );
+                  },
+                  (error) => {
+                    if (uploader) {
+                      this.dispatchSignInterrupt();
+                    } else {
+                      this.dispatchSignInDssFail(files, setting.operations.toJS(), error);
+                    }
 
-                        $(".toast-dssPerformOperation_failed").remove();
-                        Materialize.toast(error, 3000, "toast-dssPerformOperation_failed");
+                    $(".toast-dssOperationConfirmation_failed").remove();
+                    Materialize.toast(error, 3000, "toast-dssOperationConfirmation_failed");
 
-                        this.setState({ pinCode: "" });
-                      },
-                    );
-                },
-                (error) => {
-                  if (uploader) {
-                    this.dispatchSignInterrupt();
-                  } else {
-                    this.dispatchSignInDssFail(files, setting.operations.toJS(), error);
-                  }
-
-                  $(".toast-dssOperationConfirmation_failed").remove();
-                  Materialize.toast(error, 3000, "toast-dssOperationConfirmation_failed");
-
-                  this.setState({ pinCode: "" });
-                },
-              )
-              .catch((error) => {
+                    this.setState({ pinCode: "" });
+                  },
+                )
+                .catch((error) => {
                 if (uploader) {
                   this.dispatchSignInterrupt();
                 } else {
@@ -1498,6 +1501,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
                 this.setState({ pinCode: "" });
               });
+            });
           },
           (error) => {
             if (uploader) {
@@ -2374,81 +2378,94 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                 $(".toast-transaction_created_successful").remove();
                 Materialize.toast(localize("DSS.transaction_created_successful", locale), 3000, "toast-transaction_created_successful");
 
-                this.props.dssOperationConfirmation(
-                  user.authUrl.replace("/oauth", "/confirmation"),
-                  tokenAuth.access_token,
-                  data,
-                  user.id)
-                  .then(
-                    (data2) => {
-                      this.props.dssPerformOperation(
-                        user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
-                        data2.AccessToken, pinCode ? { Signature: { PinCode: pinCode } } : undefined)
-                        .then(
-                          (dataCMS: any) => {
-                            let i: number = 0;
-                            const outURIList: string[] = [];
+                dssCheckApiVersion2(user.dssUrl).then((version: number) => {
+                  this.props.dssOperationConfirmation(
+                    user.authUrl.replace("/oauth", (version === 2) ? "/v2.0/confirmation" : "/confirmation"),
+                    tokenAuth.access_token,
+                    data,
+                    user.id)
+                    .then(
+                      (data2) => {
+                        this.props.dssPerformOperation(
+                          user.dssUrl + (isSignPackage ? "/api/documents/packagesignature" : "/api/documents"),
+                          data2.AccessToken, pinCode ? { Signature: { PinCode: pinCode } } : undefined)
+                          .then(
+                            (dataCMS: any) => {
+                              let i: number = 0;
+                              const outURIList: string[] = [];
 
-                            const directResult: any = {};
-                            directResult.results = [];
-                            directResult.operations = setting.operations.toJS();
-                            const directFiles: any = {};
-                            filesSign.forEach((file: any) => {
-                              directFiles[file.id] = { original: { ...file.toJS(), operation: 4 } };
-                            });
-
-                            filesSign.forEach((file) => {
-                              const outURI = fileNameForSign(folderOut, file);
-                              const tcms: trusted.cms.SignedData = new trusted.cms.SignedData();
-                              const contextCMS = isSignPackage ? dataCMS.Results[i] : dataCMS;
-                              tcms.import(Buffer.from("-----BEGIN CMS-----" + "\n" + contextCMS + "\n" + "-----END CMS-----"), trusted.DataFormat.PEM);
-                              tcms.save(outURI, format);
-                              outURIList.push(outURI);
-                              i++;
-
-                              const newFileProps = this.getFileProps(outURI);
-                              directResult.results.push({
-                                id: Date.now() + Math.random(),
-                                in: {
-                                  ...file.toJS(),
-                                },
-                                operation: SIGNING_OPERATION,
-                                out: {
-                                  ...newFileProps,
-                                  operation: 3,
-                                },
-                                result: true,
+                              const directResult: any = {};
+                              directResult.results = [];
+                              directResult.operations = setting.operations.toJS();
+                              const directFiles: any = {};
+                              filesSign.forEach((file: any) => {
+                                directFiles[file.id] = { original: { ...file.toJS(), operation: 4 } };
                               });
 
-                              directFiles[file.id] = {
-                                ...directFiles[file.id],
-                                signing_operation: {
+                              filesSign.forEach((file) => {
+                                const outURI = fileNameForSign(folderOut, file);
+                                const tcms: trusted.cms.SignedData = new trusted.cms.SignedData();
+                                const contextCMS = isSignPackage ? dataCMS.Results[i] : dataCMS;
+                                tcms.import(Buffer.from("-----BEGIN CMS-----" + "\n" + contextCMS + "\n" + "-----END CMS-----"), trusted.DataFormat.PEM);
+                                tcms.save(outURI, format);
+                                outURIList.push(outURI);
+                                i++;
+
+                                const newFileProps = this.getFileProps(outURI);
+                                directResult.results.push({
+                                  id: Date.now() + Math.random(),
+                                  in: {
+                                    ...file.toJS(),
+                                  },
+                                  operation: SIGNING_OPERATION,
                                   out: {
                                     ...newFileProps,
                                     operation: 3,
                                   },
                                   result: true,
-                                },
-                              };
-                            });
-                            directResult.files = directFiles;
-                            packageSign(filesSign, cert, policies, null, format, folderOut, outURIList, directResult, true);
-                            this.resign(filesReSign, cert, true);
-                          },
-                          (error) => {
-                            if (uploader) {
-                              this.dispatchSignInterrupt();
-                            } else {
-                              this.dispatchSignInDssFail(filesSign, setting.operations.toJS(), error);
-                            }
+                                });
 
-                            $(".toast-dssPerformOperation_failed").remove();
-                            Materialize.toast(error, 3000, "toast-dssPerformOperation_failed");
-                            this.setState({ pinCode: "" });
-                          },
-                        );
-                    },
-                    (error) => {
+                                directFiles[file.id] = {
+                                  ...directFiles[file.id],
+                                  signing_operation: {
+                                    out: {
+                                      ...newFileProps,
+                                      operation: 3,
+                                    },
+                                    result: true,
+                                  },
+                                };
+                              });
+                              directResult.files = directFiles;
+                              packageSign(filesSign, cert, policies, null, format, folderOut, outURIList, directResult, true);
+                              this.resign(filesReSign, cert, true);
+                            },
+                            (error) => {
+                              if (uploader) {
+                                this.dispatchSignInterrupt();
+                              } else {
+                                this.dispatchSignInDssFail(filesSign, setting.operations.toJS(), error);
+                              }
+
+                              $(".toast-dssPerformOperation_failed").remove();
+                              Materialize.toast(error, 3000, "toast-dssPerformOperation_failed");
+                              this.setState({ pinCode: "" });
+                            },
+                          );
+                      },
+                      (error) => {
+                        if (uploader) {
+                          this.dispatchSignInterrupt();
+                        } else {
+                          this.dispatchSignInDssFail(filesSign, setting.operations.toJS(), error);
+                        }
+
+                        $(".toast-dssOperationConfirmation_failed").remove();
+                        Materialize.toast(error, 3000, "toast-dssOperationConfirmation_failed");
+                        this.setState({ pinCode: "" });
+                      },
+                    )
+                    .catch((error) => {
                       if (uploader) {
                         this.dispatchSignInterrupt();
                       } else {
@@ -2458,19 +2475,8 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                       $(".toast-dssOperationConfirmation_failed").remove();
                       Materialize.toast(error, 3000, "toast-dssOperationConfirmation_failed");
                       this.setState({ pinCode: "" });
-                    },
-                  )
-                  .catch((error) => {
-                    if (uploader) {
-                      this.dispatchSignInterrupt();
-                    } else {
-                      this.dispatchSignInDssFail(filesSign, setting.operations.toJS(), error);
-                    }
-
-                    $(".toast-dssOperationConfirmation_failed").remove();
-                    Materialize.toast(error, 3000, "toast-dssOperationConfirmation_failed");
-                    this.setState({ pinCode: "" });
-                  });
+                    });
+                });
               },
               (error) => {
                 $(".toast-transaction_created_failed").remove();
