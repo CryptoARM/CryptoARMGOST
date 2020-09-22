@@ -8,8 +8,9 @@ import { CertificateModel } from "../reducer/certificates";
 import store from "../store";
 import { arrayToMap } from "../utils";
 import { navigationLock, navigationUnlock } from "./globalLocks";
+import { finishCurrentUrlCmd } from "./urlActions";
 import { converCertToPlainBase64 } from "./urlCmdCertificates";
-import { openWindow, postRequest } from "./urlCmdUtils";
+import { openWindow, postRequest, removeWarningMessage } from "./urlCmdUtils";
 
 interface ICertificateInfo {
   certificateBase64?: string;
@@ -104,7 +105,8 @@ export function certInfoSuccess() {
   history.goBack();
   navigationUnlock();
   store.dispatch({ type: URL_CMD_CERT_INFO + SUCCESS });
-  store.dispatch({ type: URL_CMD + SUCCESS });
+  store.dispatch(finishCurrentUrlCmd());
+  removeWarningMessage();
   $(".toast-url-cmd-cert-info-success").remove();
   Materialize.toast(localize("UrlCommand.cert_info_success", window.locale),
     3000, "toast-url-cmd-cert-info-success");
@@ -114,7 +116,8 @@ export function certInfoFail() {
   history.goBack();
   navigationUnlock();
   store.dispatch({ type: URL_CMD_CERT_INFO + FAIL });
-  store.dispatch({ type: URL_CMD + FAIL });
+  store.dispatch(finishCurrentUrlCmd(false));
+  removeWarningMessage();
   $(".toast-url-cmd-cert-info-fail").remove();
   Materialize.toast(localize("UrlCommand.cert_info_fail", window.locale),
     3000, "toast-url-cmd-cert-info-fail");
