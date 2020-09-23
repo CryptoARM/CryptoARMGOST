@@ -1,4 +1,6 @@
 import * as fs from "fs";
+import https from "https";
+import fetch from "node-fetch";
 import { ADDRESS_BOOK, CA, MY, ROOT, TMP_DIR } from "../constants";
 import history from "../history";
 import localize from "../i18n/localize";
@@ -63,8 +65,12 @@ export async function postRequest(url: string, requestData: string|Buffer) {
           throw new Error(`${data.error.message} (${data.error.code})`);
         }
       } catch (error) {
-        reject(error.message);
-        return;
+        try {
+          postRequestFetch (url, requestData);
+        } catch (error) {
+          reject();
+          return;
+        }
       } finally {
         curl.close();
       }
@@ -74,10 +80,44 @@ export async function postRequest(url: string, requestData: string|Buffer) {
 
     curl.on("error", (error: { message: any; }) => {
       curl.close();
-      reject(new Error(`Cannot load data by url ${url}, error: ${error.message ? error.message : error}`));
+      try {
+       const data = postRequestFetch (url, requestData);
+       resolve (data);
+      } catch (error) {
+              reject(new Error(`Cannot load data by url ${url}, error: ${error.message ? error.message : error}`));
+      }
+
     });
 
     curl.perform();
+  });
+}
+
+async function postRequestFetch(url: string, requestData: string | Buffer) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      ca: fs.readFileSync("chain.pem"),
+      keepAlive: true,
+    };
+    const sslConfiguredAgent = new https.Agent(options);
+    fetch(url, {
+      agent: sslConfiguredAgent,
+      body: requestData.toString(),
+      headers: {
+        "Accept": "application/json",
+        "Content-Length": String(Buffer.byteLength(requestData)),
+        "Content-Type": "application/json",
+      },
+      method: "post",
+    })
+      .then((res: any) => {
+        if (res.status >= 200 && res.status < 300) {
+          return resolve(res.json());
+        } else {
+          const error = new Error(res.statusText);
+          reject(error);
+        }
+      });
   });
 }
 

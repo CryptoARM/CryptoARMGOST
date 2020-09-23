@@ -94,8 +94,11 @@ export async function checkTrustedServiceForCommand(
 
   // 2nd method get certificate if cURL not work
   curl.on("error", (error: any) => {
-    const certCA = fs.readFileSync("/app/resources/chain.pem");
-    const hostName =  hostToCheck
+    const certCA = fs.readFileSync("chain.pem");
+    const url = new URL (command.url);
+
+    const hostName = url.host;
+
     // const hostToCheck = getServiceBaseLinkFromUrl(command.url);
     const options = {
       ca: certCA,
