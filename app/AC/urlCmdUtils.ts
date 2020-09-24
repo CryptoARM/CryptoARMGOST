@@ -66,7 +66,9 @@ export async function postRequest(url: string, requestData: string|Buffer) {
         }
       } catch (error) {
         try {
-          postRequestFetch (url, requestData);
+          postRequestFetch (url, requestData).then (
+            (respData: any) => resolve (respData),
+          );
         } catch (error) {
           reject();
           return;
@@ -74,21 +76,22 @@ export async function postRequest(url: string, requestData: string|Buffer) {
       } finally {
         curl.close();
       }
-
       resolve(data);
     });
 
     curl.on("error", (error: { message: any; }) => {
       curl.close();
       try {
-       const data = postRequestFetch (url, requestData);
-       resolve (data);
+        postRequestFetch (url, requestData)
+        .then(
+         (respData: any) => {
+           resolve (respData);
+         }).catch ((err: any) => reject (err),
+       );
       } catch (error) {
               reject(new Error(`Cannot load data by url ${url}, error: ${error.message ? error.message : error}`));
       }
-
     });
-
     curl.perform();
   });
 }
@@ -109,15 +112,21 @@ async function postRequestFetch(url: string, requestData: string | Buffer) {
         "Content-Type": "application/json",
       },
       method: "post",
-    })
-      .then((res: any) => {
-        if (res.status >= 200 && res.status < 300) {
-          return resolve(res.json());
-        } else {
-          const error = new Error(res.statusText);
-          reject(error);
-        }
-      });
+    }).then((res: any) => {
+      if (!res || (res.toString().length === 0)) {
+        resolve();
+      } else {
+        res.json().
+          then((data: any) => {
+            resolve(data);
+          }).catch((error: any) => {
+            resolve();
+          });
+
+      }
+    }).catch ((error) => {
+      reject ("");
+    });
   });
 }
 
