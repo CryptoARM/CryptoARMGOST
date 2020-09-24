@@ -1,0 +1,8 @@
+{
+    "jsonrpc":"2.0",
+    "result": {
+      "uiView": "CERTIFICATES_MY",
+      "description": "Личные сертификаты"
+    },
+    "id": "7d8df97a-abc6-42b8-bc2a-f7a354600fd2"
+}

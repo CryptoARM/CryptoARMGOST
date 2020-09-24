@@ -21,6 +21,7 @@ import { showModalAddTrustedService } from "./trustedServicesActions";
 import { handleUrlCommandCertificates } from "./urlCmdCertificates";
 import { handleUrlCommandDiagnostics } from "./urlCmdDiagnostic";
 import { handleUrlCommandSignAmdEncrypt } from "./urlCmdSignAndEncrypt";
+import { handleUrlCommandStartView } from "./urlCmdStartView";
 import { postRequest, removeWarningMessage } from "./urlCmdUtils";
 
 const remote = window.electron.remote;
@@ -210,6 +211,7 @@ export function dispatchURLCommand(
     // Restore window for commands:
     case "certificates":
     case "signandencrypt":
+    case "startview":
       {
         const curWindow = window.electron.remote.getCurrentWindow();
         if (curWindow.isMinimized()) {
@@ -237,6 +239,10 @@ export function dispatchURLCommand(
 
     case "signandencrypt":
       handleUrlCommandSignAmdEncrypt(command);
+      break;
+
+    case "startview":
+      handleUrlCommandStartView(command);
       break;
 
     default:

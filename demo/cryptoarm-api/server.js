@@ -33,6 +33,7 @@ app.post('/json', function (req, res) {
     || req.body.method === "certificateInfo.parameters"
     || req.body.method === "diagnostics.parameters"
     || req.body.method === "signAndEncrypt.parameters"
+    || req.body.method === "startView.parameters"
   ) {
     if (id !== req.body.id) {
       console.log("Error! Id from URL and ID from request is not match! (" + id + " and " + req.body.id + ")");
@@ -97,6 +98,11 @@ app.post('/json', function (req, res) {
 
         case "dd528a4f-da00-40fe-b807-76d9bf7eb535":
           res.sendFile(__dirname + '/public/json/diagnostics/diagnostics-params.json');
+          break;
+
+        // Start view
+        case "7d8df97a-abc6-42b8-bc2a-f7a354600fd2":
+          res.sendFile(__dirname + '/public/json/start-view/certificates-my.json');
           break;
 
         default:
