@@ -42,6 +42,7 @@ class AddTrustedService extends React.Component<
     const { saveService } = this.state;
     const { localize, locale } = this.context;
     const { trustedServices } = this.props;
+    const { cert } = this.props.trustedServices;
 
     const urlToCheck = trustedServices && trustedServices.urlToCheck ? getServiceBaseLinkFromUrl(trustedServices.urlToCheck, false) : "Unknown URL";
 
@@ -59,6 +60,7 @@ class AddTrustedService extends React.Component<
               <div className="row">
                 <div className="dialog-text">
                   <input
+                    disabled={!cert ? true : false}
                     name="groupDelCont"
                     type="checkbox"
                     id="delCont"
@@ -87,7 +89,7 @@ class AddTrustedService extends React.Component<
             </div>
             <div style={{ display: "inline-block", margin: "10px" }}>
               <a
-                className="btn btn-outlined waves-effect waves-light modal-close"
+                className={`btn btn-outlined waves-effect waves-light modal-close ${cert ? "" : "disabled"}`}
                 onClick={this.handleProcessCommandWithService}
               >
                 {localize("Common.allow", locale)}
