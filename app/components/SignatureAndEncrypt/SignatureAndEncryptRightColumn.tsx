@@ -1387,7 +1387,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         documentsId)
         .then(
           (data1: any) => {
-            this.resign(packageReSign, cert);
+          //resign
             $(".toast-transaction_created_successful").remove();
             Materialize.toast(localize("DSS.transaction_created_successful", locale), 3000, "toast-transaction_created_successful");
 
