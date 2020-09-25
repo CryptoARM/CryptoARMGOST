@@ -12,7 +12,7 @@ interface IParamsRequest {
   id: string;
 }
 
-export async function postRequest(url: string, requestData: string|Buffer) {
+export async function postRequest(url: string, requestData: string | Buffer) {
   return new Promise((resolve, reject) => {
     const curl = new window.Curl();
 
@@ -192,7 +192,7 @@ export function writeCertToTmpFile(certBase64: string): string {
 
 export function displayWarningMessage(command: string, serviceUrl: string, operation?: string) {
   const serviceBaseUrl = getServiceBaseLinkFromUrl(serviceUrl);
-  let toastMessage: string = "<div>Команда выполняется для сервиса</div> <span style='fontWeight: \"bold\"'>"
+  const toastMessage: string = "<div>Команда выполняется для сервиса</div> <span style='fontWeight: \"bold\"'>"
     + serviceBaseUrl + "</span>";
 
   $(".toast-url-cmd-warning-message").remove();
