@@ -137,8 +137,6 @@ class SignatureStatus extends React.Component<ISignatureStatusProps, ISignatureS
                         </React.Fragment>
                     }
 
-                    <div className="collection-title">{signerCert.issuerFriendlyName}</div>
-                    <div className="collection-info">{localize("Certificate.issuer", locale)}</div>
                   </div>
 
                   <div className="collection-item certs-collection certificate-info">
