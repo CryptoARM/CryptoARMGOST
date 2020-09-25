@@ -1,3 +1,4 @@
+import { showModalHTTPErr } from "../AC/trustedServicesActions";
 import { ipcRenderer, remote } from "electron";
 import PropTypes from "prop-types";
 import React from "react";
@@ -49,6 +50,15 @@ ipcRenderer.on(
     console.log("url-command", command.command);
 
     checkTrustedServiceForCommand(command);
+  },
+);
+
+ipcRenderer.on(
+  "url-http",
+  (event: Electron.IpcRendererEvent, { command }: { command: any }) => {
+    console.log("url-http", command.command);
+
+    showModalHTTPErr();
   },
 );
 

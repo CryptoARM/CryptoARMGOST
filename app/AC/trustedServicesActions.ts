@@ -1,6 +1,8 @@
-import { ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_ADD_TRUSTED_SERVICE, VERIFY_CERTIFICATE, VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE } from "../constants";
+import store from "../store";
+import { ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_MODAL_ADD_TRUSTED_SERVICE, HIDE_MODAL_HTTP_ERROR, SHOW_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_HTTP_ERROR, VERIFY_CERTIFICATE, VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE } from "../constants";
 import { uuid } from "../utils";
 import { certificateToPkiItemInfo } from "./urlCmdCertInfo";
+import { finishCurrentUrlCmd } from "./urlActions";
 
 export function addTrustedService(service: string, cert: string) {
   const pkiCertificate = new trusted.pki.Certificate();
@@ -52,6 +54,21 @@ export function deleteTrustedService(url: string) {
     },
     type: DELETE_TRUSTED_SERVICE,
   };
+}
+
+export function showModalHTTPErr() {
+  store.dispatch({
+    type: SHOW_MODAL_HTTP_ERROR,
+  })
+}
+
+export function hideModalHTTPErr() {
+  const remote = window.electron.remote;
+  remote.getCurrentWindow().minimize();
+  store.dispatch(finishCurrentUrlCmd(false))
+  store.dispatch({
+    type: HIDE_MODAL_HTTP_ERROR,
+  })
 }
 
 export function verifyCertificateForTrustedService(url: string) {
