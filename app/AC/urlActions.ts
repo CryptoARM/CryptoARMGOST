@@ -1,9 +1,7 @@
 import FormData from "form-data";
 import * as fs from "fs";
-import fetch, { Headers } from "node-fetch";
 import https from "https";
-import tls from "tls";
-import crypto from "crypto";
+import fetch, { Headers } from "node-fetch";
 import * as path from "path";
 import { push } from "react-router-redux";
 import {
@@ -104,9 +102,15 @@ export async function checkTrustedServiceForCommand(
       path: "/",
       port: 443,
       checkServerIdentity(host, cert) {
-        curCert = new trusted.pki.Certificate();
-        curCert.import(cert.raw, trusted.DataFormat.DER);
-        processCommandForService(command, isTrusted (cert, hostToCheck), curCert);
+        try {
+          curCert = new trusted.pki.Certificate();
+          curCert.import(cert.raw, trusted.DataFormat.DER);
+          processCommandForService(command, isTrusted (curCert, hostToCheck), curCert);
+        } catch (e) {
+          // tslint:disable-next-line:no-console
+          console.error("Error while importing service certificate:", e);
+          processCommandForService(command, false);
+        }
       },
     };
     curl.close();
@@ -114,17 +118,16 @@ export async function checkTrustedServiceForCommand(
     let curCert: trusted.pki.Certificate;
     const req = https.request(options, (res) => {});
     req.on("error", (e) => {
+      // tslint:disable-next-line:no-console
       console.log("problem with request: " + e.message);
+      processCommandForService(command, false);
     });
-    // write data to request body
-    req.write('data\n');
     req.end();
-    processCommandForService(command, false);
   });
   curl.perform();
 }
 
-function isTrusted(cert: any, hostToCheck:string): boolean {
+function isTrusted(cert: any, hostToCheck: string): boolean {
   const state = store.getState();
   const { trustedServices } = state;
   let serviceIsTrusted = false;
@@ -154,6 +157,8 @@ function isTrusted(cert: any, hostToCheck:string): boolean {
     );
     serviceIsTrusted = (undefined !== findResult);
   }
+
+  return serviceIsTrusted;
 }
 
 function processCommandForService(
