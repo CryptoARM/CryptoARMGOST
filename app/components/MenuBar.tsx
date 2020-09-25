@@ -1,3 +1,4 @@
+import { hideModalHTTPErr } from "../AC/trustedServicesActions";
 import * as fs from "fs";
 import PropTypes from "prop-types";
 import React from "react";
@@ -35,6 +36,7 @@ interface IMenuBarState {
   isMaximized: boolean;
   showModalAskSaveSetting: boolean;
   showModalAddTrustedService: boolean;
+  showModalHTTPErr: boolean;
 }
 
 class MenuBar extends React.Component<any, IMenuBarState> {
@@ -49,6 +51,7 @@ class MenuBar extends React.Component<any, IMenuBarState> {
       isMaximized: false,
       showModalAddTrustedService: false,
       showModalAskSaveSetting: false,
+      showModalHTTPErr: false,
     });
   }
 
@@ -61,6 +64,16 @@ class MenuBar extends React.Component<any, IMenuBarState> {
     if (prevProps.trustedServices.showModal === true
       && this.props.trustedServices.showModal === false) {
       this.handleCloseModalAddTrustedService();
+    }
+
+    if (prevProps.trustedServices.showErrModal === false
+      && this.props.trustedServices.showErrModal === true) {
+      this.handleShowModalHTTPErr();
+    }
+
+    if (prevProps.trustedServices.showErrModal === true
+      && this.props.trustedServices.showErrModal === false) {
+      this.handleCloseModalHTTPErr();
     }
   }
 
@@ -228,6 +241,7 @@ class MenuBar extends React.Component<any, IMenuBarState> {
         </nav>
         {this.props.children}
         <Diagnostic />
+        {this.showModalHTTPErr()}
         {this.showModalAddTrustedService()}
         {this.showModalAskSaveSetting()}
       </React.Fragment>
@@ -319,6 +333,51 @@ class MenuBar extends React.Component<any, IMenuBarState> {
   handleCloseModalAddTrustedService = () => {
     this.setState({ showModalAddTrustedService: false });
   }
+
+  showModalHTTPErr = () => {
+    const { localize, locale } = this.context;
+    const { showModalHTTPErr } = this.state;
+
+    if (!showModalHTTPErr) {
+      return;
+    }
+
+    return (
+      <Modal
+        isOpen={showModalHTTPErr}
+        onClose={hideModalHTTPErr}
+        header={localize("Settings.warning", locale)}
+        style={{ width: "380px" }}>
+          <div className="row halftop">
+            <div className="dialog-text">
+            Сервис использует незащищённое соединение.<br/>
+            В целях безопасности команда не будет выполнена.
+            </div>
+          </div>
+          <div className="row halfbottom" style={{ marginBottom: "0px" }}>
+            <div style={{ float: "right" }}>
+              <div style={{ display: "inline-block", margin: "4px"}}>
+              <a
+                className="btn btn-text waves-effect waves-light modal-close"
+                onClick={hideModalHTTPErr}
+                >
+                  {localize("Common.cancel", locale)}
+              </a>
+              </div>
+            </div>
+          </div>
+      </Modal>
+    )
+  }
+
+  handleShowModalHTTPErr = () => {
+    this.setState({ showModalHTTPErr: true });
+  }
+
+  handleCloseModalHTTPErr = () => {
+    this.setState({ showModalHTTPErr: false });
+  }
+
 }
 
 export default connect((state, ownProps) => {

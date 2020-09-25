@@ -361,6 +361,10 @@ const installExtensions = async () => {
 function handleAppURL(url) {
   const parsedCommand = parseUrlCommandApiV7(url);
   if (parsedCommand.command !== "not supported") {
+    if (parsedCommand.command == "http error") {
+      mainWindow.webContents.send('url-http', { command: parsedCommand });
+      return
+    }
     mainWindow.webContents.send('url-command', { command: parsedCommand });
     return;
   }
