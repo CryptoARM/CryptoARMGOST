@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import https from "https";
 import fetch from "node-fetch";
-import { ADDRESS_BOOK, CA, MY, ROOT, TMP_DIR } from "../constants";
+import { ADDRESS_BOOK, CA, MY, ROOT, SERVICE_CHAIN, TMP_DIR } from "../constants";
 import history from "../history";
 import localize from "../i18n/localize";
 import { getServiceBaseLinkFromUrl } from "./urlActions";
@@ -99,7 +99,7 @@ export async function postRequest(url: string, requestData: string | Buffer) {
 async function postRequestFetch(url: string, requestData: string | Buffer) {
   return new Promise((resolve, reject) => {
     const options = {
-      ca: fs.readFileSync("chain.pem"),
+      ca: SERVICE_CHAIN,
       keepAlive: true,
     };
     const sslConfiguredAgent = new https.Agent(options);

@@ -6,11 +6,11 @@ import * as path from "path";
 import { push } from "react-router-redux";
 import {
   ADD_LICENSE, ADD_REMOTE_FILE, CANCEL_URL_ACTION, DECRYPT,
-  DOWNLOAD_REMOTE_FILE, ENCRYPT, ENCRYPTED, FAIL,
-  LOCATION_MAIN, PACKAGE_SELECT_FILE, REMOVE_ALL_FILES,
-  REMOVE_ALL_REMOTE_FILES, REMOVE_URL_ACTION, SET_REMOTE_FILES_PARAMS,
-  SIGN, SIGN_DOCUMENTS_FROM_URL, START, SUCCESS,
-  TMP_DIR, URL_CMD, VERIFY, VERIFY_DOCUMENTS_FROM_URL, VERIFY_SIGNATURE,
+  DOWNLOAD_REMOTE_FILE, ENCRYPT, FAIL, LOCATION_MAIN, PACKAGE_SELECT_FILE,
+  REMOVE_ALL_FILES, REMOVE_ALL_REMOTE_FILES, REMOVE_URL_ACTION,
+  SERVICE_CHAIN, SET_REMOTE_FILES_PARAMS, SIGN, SIGN_DOCUMENTS_FROM_URL,
+  START, SUCCESS, TMP_DIR, URL_CMD, VERIFY, VERIFY_DOCUMENTS_FROM_URL,
+  VERIFY_SIGNATURE,
 } from "../constants";
 import { IUrlCommandApiV4Type, URLActionType } from "../parse-app-url";
 import store from "../store";
@@ -92,14 +92,11 @@ export async function checkTrustedServiceForCommand(
 
   // 2nd method get certificate if cURL not work
   curl.on("error", (error: any) => {
-    const certCA = fs.readFileSync("chain.pem");
     const url = new URL (command.url);
 
     const hostName = url.host;
-
-    // const hostToCheck = getServiceBaseLinkFromUrl(command.url);
     const options = {
-      ca: certCA,
+      ca: SERVICE_CHAIN,
       hostname: hostName,
       method: "GET",
       path: "/",
