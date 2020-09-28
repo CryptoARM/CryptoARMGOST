@@ -565,6 +565,7 @@ export function verifyCertificate(certificateId: string) {
     const { certificates } = getState();
 
     const certItem = certificates.getIn(["entities", certificateId]);
+    
     let certificate = certItem.object ? certItem.object : null;
     if (certificate === null) {
       if (certItem.x509) {
