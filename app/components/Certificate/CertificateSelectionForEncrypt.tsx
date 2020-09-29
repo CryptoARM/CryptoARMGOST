@@ -296,6 +296,8 @@ class CertificateSelectionForEncrypt extends React.Component<any, any> {
     const { addRecipientCertificate } = this.props;
     const { selectedRecipients } = this.state;
     const { urlCmdProps } = this.props;
+    const isGost = isGostRecipients (selectedRecipients);
+    const defaultAlg = getDefaultEncryptionAlg (isGost);
 
     if (urlCmdProps && !urlCmdProps.done
       && (urlCmdProps.operation == URL_CMD_CERTIFICATES_EXPORT)
@@ -313,6 +315,7 @@ class CertificateSelectionForEncrypt extends React.Component<any, any> {
 
       for (const recipient of selectedRecipients) {
         addRecipientCertificate(recipient.id);
+        this.props.changeEncryptionAlgorithm(defaultAlg);
       }
 
     }
@@ -336,7 +339,7 @@ class CertificateSelectionForEncrypt extends React.Component<any, any> {
     // tslint:disable-next-line:no-shadowed-variable
     const { deleteRecipient, recipients } = this.props;
 
-    recipients.forEach((recipient) => deleteRecipient(recipient.id));
+    recipients.forEach((recipient: any) => deleteRecipient(recipient.id));
   }
 
   handleCleanStateList = () => {
