@@ -217,6 +217,7 @@ if (fileExists(CERTIFICATES_DSS_JSON)) {
       for (const key1 of Object.keys(data.certificatesDSS)) {
         for (const key2 of Object.keys(data.certificatesDSS[key1])) {
           const cert = data.certificatesDSS[key1][key2];
+          cert.verified = false;
           certificateDSSMap = certificateDSSMap.setIn(["entities", key1, key2], new CertificateDSSModel({ ...cert }));
           certificateMap = certificateMap.setIn(["entities", cert.id], new CertificateModel({ ...cert }));
         }
