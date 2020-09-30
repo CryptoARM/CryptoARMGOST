@@ -96,6 +96,7 @@ class AllSettings extends React.Component<any, {}> {
 
     const disabled = this.getDisabled();
     const isCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
+    const isCertFromRSA = (signer && this.isNotRSA(signer.publicKeyAlgorithm)) ? true : false;
 
     const signatureStandard = settings.sign.standard;
     const classDisabledTspAndOcsp = (signatureStandard === SignatureStandard.CADES && !isCertFromDSS) ? "" : "disabled";
@@ -121,7 +122,7 @@ class AllSettings extends React.Component<any, {}> {
                   <SignatureStandardSelector
                     value={signatureStandard}
                     handleChange={this.handleSignatureStandardChange}
-                    disabled={disabled || isCertFromDSS || !(TSP_OCSP_ENABLED)} />
+                    disabled={disabled || isCertFromDSS || !(TSP_OCSP_ENABLED) || !isCertFromRSA} />
 
                   <SignatureTypeSelector
                     detached={isDetached}
@@ -135,14 +136,14 @@ class AllSettings extends React.Component<any, {}> {
 
                 <div className="col s12">
                   <CheckBoxWithLabel
-                    disabled={!(TSP_OCSP_ENABLED) || signatureStandard === SignatureStandard.CADES || isCertFromDSS}
+                    disabled={!(TSP_OCSP_ENABLED) || signatureStandard === SignatureStandard.CADES || isCertFromDSS || !isCertFromRSA}
                     onClickCheckBox={this.handleTimestampOnSignClick}
                     isChecked={signatureStandard === SignatureStandard.CADES ? true : settings.sign.timestamp_on_sign}
                     elementId="set_timestamp_on_sign"
                     title={localize("Cades.set_timestamp_on_sign", locale)} />
 
                   <CheckBoxWithLabel onClickCheckBox={this.handleTimestampClick}
-                    disabled={!(TSP_OCSP_ENABLED) || signatureStandard === SignatureStandard.CADES || isCertFromDSS}
+                    disabled={!(TSP_OCSP_ENABLED) || signatureStandard === SignatureStandard.CADES || isCertFromDSS || !isCertFromRSA}
                     isChecked={signatureStandard === SignatureStandard.CADES ? false : settings.sign.timestamp_on_data}
                     elementId="set_timestamp_on_data"
                     title={localize("Cades.set_timestamp_on_data", locale)} />
@@ -217,6 +218,10 @@ class AllSettings extends React.Component<any, {}> {
 
       </div>
     );
+  }
+
+  isNotRSA = (publicKeyAlgorithm: string) => {
+    return publicKeyAlgorithm === "1.2.643.7.1.1.1.1" || publicKeyAlgorithm === "1.2.643.7.1.1.1.2" || publicKeyAlgorithm === "1.2.643.2.2.19"
   }
 
   getDisabled = () => {
