@@ -122,6 +122,7 @@ class MenuBar extends React.Component<any, IMenuBarState> {
     const { isArchiveLog, eventsDateFrom, eventsDateTo, urlCmds } = this.props;
     const pathname = this.props.location.pathname;
     const storename = this.props.location.state ? this.props.location.state.head : "";
+    const nameVersion = localize("About.product_NAME", locale) + " " + localize("About.version", locale);
 
     if (urlCmds && urlCmds.command && urlCmds.command.length) {
       const serviceBaseUrl = getServiceBaseLinkFromUrl(urlCmds.url);
@@ -136,47 +137,47 @@ class MenuBar extends React.Component<any, IMenuBarState> {
 
     switch (pathname) {
       case LOCATION_ABOUT:
-        return `${localize("About.product_NAME", locale)} - ${localize("About.about", locale)}`;
+        return `${nameVersion} - ${localize("About.about", locale)}`;
 
       case LOCATION_ADDRESS_BOOK:
-        return `${localize("About.product_NAME", locale)} - ${localize("AddressBook.address_book", locale)}`;
+        return `${nameVersion} - ${localize("AddressBook.address_book", locale)}`;
 
       case LOCATION_CERTIFICATE_SELECTION_FOR_ENCRYPT:
-        return `${localize("About.product_NAME", locale)} - ${localize("Certificate.certificate_selection_for_encrypt", locale)}`;
+        return `${nameVersion} - ${localize("Certificate.certificate_selection_for_encrypt", locale)}`;
 
       case LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE:
-        return `${localize("About.product_NAME", locale)} - ${localize("Certificate.certificate_selection_for_signature", locale)}`;
+        return `${nameVersion} - ${localize("Certificate.certificate_selection_for_signature", locale)}`;
 
       case LOCATION_CERTIFICATES:
         const head = storename ? storename : localize("Certificate.certs", locale);
-        return `${localize("About.product_NAME", locale)} - ${head}`;
+        return `${nameVersion} - ${head}`;
 
       case LOCATION_CONTAINERS:
-        return `${localize("About.product_NAME", locale)} - ${localize("Certificate.sidesubmenu_keys", locale)}`;
+        return `${nameVersion} - ${localize("Certificate.sidesubmenu_keys", locale)}`;
 
       case LOCATION_TRUSTED_SERVICES:
-        return `${localize("About.product_NAME", locale)} - ${localize("TrustedServices.trusted_services", locale)}`;
+        return `${nameVersion} - ${localize("TrustedServices.trusted_services", locale)}`;
 
       case LOCATION_LICENSE:
-        return `${localize("About.product_NAME", locale)} - ${localize("License.license", locale)}`;
+        return `${nameVersion} - ${localize("License.license", locale)}`;
 
       case LOCATION_SETTINGS:
-        return `${localize("About.product_NAME", locale)} - ${localize("Settings.settings", locale)}`;
+        return `${nameVersion} - ${localize("Settings.settings", locale)}`;
 
       case LOCATION_SETTINGS_CONFIG:
-        return `${localize("About.product_NAME", locale)} - ${localize("Settings.settings_config", locale)}`;
+        return `${nameVersion} - ${localize("Settings.settings_config", locale)}`;
 
       case LOCATION_SETTINGS_SELECT:
-        return `${localize("About.product_NAME", locale)} - ${localize("Settings.settings_select", locale)}`;
+        return `${nameVersion} - ${localize("Settings.settings_select", locale)}`;
 
       case LOCATION_DOCUMENTS:
-        return `${localize("About.product_NAME", locale)} - ${localize("Documents.documents", locale)}`;
+        return `${nameVersion} - ${localize("Documents.documents", locale)}`;
 
       case LOCATION_RESULTS_MULTI_OPERATIONS:
-        return `${localize("About.product_NAME", locale)} - ${localize("Operations.results", locale)}`;
+        return `${nameVersion} - ${localize("Operations.results", locale)}`;
 
       case LOCATION_EVENTS:
-        let title = `${localize("About.product_NAME", locale)} - ${localize("Events.operations_log", locale)}`;
+        let title = `${nameVersion} - ${localize("Events.operations_log", locale)}`;
 
         if (isArchiveLog && eventsDateFrom && eventsDateTo) {
           title = localize("Events.operations_log", locale) + " [" +
@@ -193,15 +194,15 @@ class MenuBar extends React.Component<any, IMenuBarState> {
               minute: "numeric",
               month: "numeric",
               year: "numeric",
-            }) + "] - " + localize("About.product_NAME", locale);
+            }) + "] - " + nameVersion;
         }
         return title;
 
       case LOCATION_SERVICES:
-        return `${localize("About.product_NAME", locale)} - ${localize("Services.services", locale)}`;
+        return `${nameVersion} - ${localize("Services.services", locale)}`;
 
       default:
-        return `${localize("About.product_NAME", locale)} - ${localize("SignAndEncrypt.sign_and_encrypt", locale)}`;
+        return `${nameVersion} - ${localize("SignAndEncrypt.sign_and_encrypt", locale)}`;
     }
   }
 
