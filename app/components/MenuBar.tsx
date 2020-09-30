@@ -21,6 +21,7 @@ import AskSaveSetting from "./Settings/AskSaveSetting";
 import LocaleSelect from "./Settings/LocaleSelect";
 import SideMenu from "./SideMenu";
 import AddTrustedService from "./TrustedServices/AddTrustedService";
+import { removeSearchValue } from "../AC/searchActions";
 
 const remote = window.electron.remote;
 if (remote.getGlobal("sharedObject").logcrypto) {
@@ -74,6 +75,10 @@ class MenuBar extends React.Component<any, IMenuBarState> {
     if (prevProps.trustedServices.showErrModal === true
       && this.props.trustedServices.showErrModal === false) {
       this.handleCloseModalHTTPErr();
+    }
+
+    if (this.props.location.pathname !== prevProps.location.pathname && this.props.searchValue){
+        removeSearchValue();
     }
   }
 
@@ -398,5 +403,6 @@ export default connect((state, ownProps) => {
     operationIsRemote: state.urlActions.performed || state.urlActions.performing,
     urlCmds: state.urlCmds,
     operationRemoteAction: state.urlActions.action,
+    searchValue: state.filters.searchValue,
   };
 }, { filePackageDelete })(MenuBar);
