@@ -623,6 +623,28 @@ div::-webkit-scrollbar-thumb {
   letter-spacing: 0.10204081632rem;
 }
 
+.btn-toast {
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0 15px 0 15px;
+  border-width: 1px;
+  overflow: hidden;
+  vertical-align: middle;
+  border-radius: 4px;
+  color: #e4dedc;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: bold;
+  letter-spacing: 0.10204081632rem;
+}
+
+.btn-toast:hover, .btn-text:hover  {
+  background-color: #464341;
+  box-shadow: none;
+}
+
 .btn-outlined {
   background-color: transparent;
   border-style: solid;
@@ -781,6 +803,10 @@ i.material-icons.sidevan.sign_and_encrypt {
 
 i.material-icons.sidevan.dss {
   background: url(./resources/image/sidemenu/dss.svg);
+}
+
+i.material-icons.sidevan.services {
+  background: url(./resources/image/sidemenu/services.svg);
 }
 
 /*-------------------------------Стили списка файлов------------------*/
@@ -1189,6 +1215,12 @@ nav .cert-seacrh label i {
   display: block;
 }
 
+#dropdown-trusted-services {
+  margin-left: 100%;
+  min-width: 220px;
+  display: block;
+}
+
 #dropdown-about-pages {
   margin-left: 100%;
   min-width: 220px;
@@ -1199,7 +1231,7 @@ nav .cert-seacrh label i {
   margin-left: 100%;
   min-width: 220px;
   display: block;
-  top: 34px !important;
+  top: 82px !important;
 }
 
 .dropdown-content li {

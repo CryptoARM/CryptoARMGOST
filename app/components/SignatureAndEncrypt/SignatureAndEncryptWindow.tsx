@@ -74,8 +74,10 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
     const { localize, locale } = this.context;
 
     if (this.props.method === SIGN && prevProps.activeFilesArr && prevProps.activeFilesArr.length && (!this.props.activeFilesArr || !this.props.activeFilesArr.length)) {
-      this.props.removeAllRemoteFiles();
+      this.props.removeAllRemoteFiles(); 
+      setTimeout( () => {
       remote.getCurrentWindow().close();
+    }, 3000)
 
       this.props.deleteAllTemporyLicenses();
     }

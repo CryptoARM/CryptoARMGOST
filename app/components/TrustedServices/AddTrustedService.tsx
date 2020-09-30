@@ -2,8 +2,10 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { addTrustedService, hideModalAddTrustedService } from "../../AC/trustedServicesActions";
+import { dispatchURLCommand, finishCurrentUrlCmd, getServiceBaseLinkFromUrl } from "../../AC/urlActions";
+import { PkiCertToCertInfo } from "../../AC/urlCmdCertInfo";
 import store from "../../store";
-import { dispatchURLCommand, getHostFromUrl } from "../../AC/urlActions";
+import CertificateChainInfo from "../Certificate/CertificateChainInfo";
 
 interface IAddTrustedServiceProps {
   onCancel?: () => void;
@@ -16,11 +18,13 @@ interface IAddTrustedServiceState {
 class AddTrustedService extends React.Component<
   IAddTrustedServiceProps,
   IAddTrustedServiceState
-> {
+  > {
   static contextTypes = {
     locale: PropTypes.string,
     localize: PropTypes.func,
   };
+
+  isCommandAccepted: boolean = false;
 
   constructor(props: IAddTrustedServiceProps) {
     super(props);
@@ -37,9 +41,10 @@ class AddTrustedService extends React.Component<
   render() {
     const { saveService } = this.state;
     const { localize, locale } = this.context;
-    const { trustedServices, urlCmds } = this.props;
+    const { trustedServices } = this.props;
+    const { cert } = this.props.trustedServices;
 
-    const urlToCheck = trustedServices && trustedServices.urlToCheck ? getHostFromUrl(trustedServices.urlToCheck) : "Unknown URL";
+    const urlToCheck = trustedServices && trustedServices.urlToCheck ? getServiceBaseLinkFromUrl(trustedServices.urlToCheck, false) : "Unknown URL";
 
     return (
       <React.Fragment>
@@ -49,9 +54,13 @@ class AddTrustedService extends React.Component<
               <div className="dialog-text">
                 {localize("TrustedServices.site", locale)} <span className="cryptoarm-blue" style={{ fontWeight: "bold" }}>{urlToCheck}</span> {localize("TrustedServices.requests_for_cryptoarm", locale)}
               </div>
+              <div>
+                {this.certInfo()}
+              </div>
               <div className="row">
-                <div className="input-field col">
+                <div className="dialog-text">
                   <input
+                    disabled={!cert ? true : false}
                     name="groupDelCont"
                     type="checkbox"
                     id="delCont"
@@ -80,7 +89,7 @@ class AddTrustedService extends React.Component<
             </div>
             <div style={{ display: "inline-block", margin: "10px" }}>
               <a
-                className="btn btn-outlined waves-effect waves-light modal-close"
+                className={`btn btn-outlined waves-effect waves-light modal-close ${cert ? "" : "disabled"}`}
                 onClick={this.handleProcessCommandWithService}
               >
                 {localize("Common.allow", locale)}
@@ -98,9 +107,11 @@ class AddTrustedService extends React.Component<
     const urlToCheck = (trustedServices && trustedServices.urlToCheck) ? trustedServices.urlToCheck : "'Unknown resource'";
 
     if (this.state.saveService) {
-      store.dispatch(addTrustedService(getHostFromUrl(urlToCheck)));
+      const certificateValue = trustedServices.cert.export(trusted.DataFormat.PEM).toString();
+      store.dispatch(addTrustedService(getServiceBaseLinkFromUrl(urlToCheck), certificateValue));
     }
 
+    this.isCommandAccepted = true;
     store.dispatch(hideModalAddTrustedService());
     dispatchURLCommand(urlCmds);
   }
@@ -112,11 +123,30 @@ class AddTrustedService extends React.Component<
       onCancel();
     }
 
+    if (!this.isCommandAccepted) {
+      store.dispatch(finishCurrentUrlCmd(false));
+    }
     store.dispatch(hideModalAddTrustedService());
   }
 
   toggleSaveService = () => {
     this.setState({ saveService: !this.state.saveService });
+  }
+
+  certInfo = () => {
+    const { cert } = this.props.trustedServices;
+    const { localize, locale } = this.context;
+
+    if (!cert) {
+      return <div className="dialog-text">{localize("TrustedServices.error_load_cert", locale)}</div>;
+    }
+
+    const certInfo = PkiCertToCertInfo(cert.subjectKeyIdentifier, cert, false);
+    return (<React.Fragment>
+      <a className="collection-info chain-info-blue">{localize("Certificate.cert_chain_status", locale)}</a>
+      <div className="collection-info chain-status">{certInfo.status ? localize("Certificate.cert_chain_status_true", locale) : localize("Certificate.cert_chain_status_false", locale)}</div>
+      <CertificateChainInfo certificate={certInfo} style="" onClick={() => { return; }} />
+    </React.Fragment>);
   }
 }
 

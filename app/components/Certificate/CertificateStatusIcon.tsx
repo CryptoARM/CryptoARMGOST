@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { verifyCertificate } from "../../AC";
+import { verifyCertificateForTrustedService } from "../../AC/trustedServicesActions";
 
 interface ICertificateStatusIconProps {
   certificate: any;
@@ -12,15 +13,15 @@ class CertificateStatusIcon extends React.Component<ICertificateStatusIconProps,
   timerHandle: NodeJS.Timer | null;
 
   componentDidMount() {
-    const { certificate, verifyCertificate, isCertInfoMode } = this.props;
+    const { certificate, verifyCertificate, verifyCertificateForTrustedService, isCertInfoMode, trustedServices } = this.props;
 
     if (isCertInfoMode) {
       return;
     }
 
     this.timerHandle = setTimeout(() => {
-      if (!certificate.verified) {
-        verifyCertificate(certificate.id);
+      if (certificate && !certificate.verified) {
+        trustedServices ? verifyCertificateForTrustedService(this.props.urlOfTrustedService) : verifyCertificate(certificate.id);
       }
 
       this.timerHandle = null;
@@ -59,8 +60,10 @@ class CertificateStatusIcon extends React.Component<ICertificateStatusIconProps,
 
 export default connect((state, ownProps: any) => {
   return {
-    certificate: ownProps.certificate ? state.certificates.getIn(["entities", ownProps.certificate.id]) : undefined,
+    certificate: ownProps.certificate && !ownProps.trustedServices ? state.certificates.getIn(["entities", ownProps.certificate.id])
+      : ownProps.trustedServices && ownProps.certificate ? state.trustedServices.getIn(["entities", ownProps.certificate.url, "cert"]) : undefined,
     isCertInfoMode: !state.urlCmdCertInfo.done,
     urlCmdCertInfo: state.urlCmdCertInfo,
+    urlOfTrustedService: ownProps.trustedServices ? ownProps.certificate.url : undefined,
   };
-}, { verifyCertificate })(CertificateStatusIcon);
+}, { verifyCertificate, verifyCertificateForTrustedService })(CertificateStatusIcon);

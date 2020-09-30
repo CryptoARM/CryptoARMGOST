@@ -20,8 +20,8 @@ import { multiDirectOperation, multiOperationStart, multiReverseOperation } from
 import {
   activeSetting, changeDefaultSettings, deleteSetting, saveSettings,
 } from "../../AC/settingsActions";
-import { cancelUrlAction, removeUrlAction } from "../../AC/urlActions";
-import { postRequest } from "../../AC/urlCmdUtils";
+import { cancelUrlAction, finishCurrentUrlCmd, removeUrlAction } from "../../AC/urlActions";
+import { postRequest, removeWarningMessage } from "../../AC/urlCmdUtils";
 import {
   ARCHIVATION_OPERATION, ARCHIVE, DECRYPT, DEFAULT_DOCUMENTS_PATH, DSS_ACTIONS, ENCRYPT, ENCRYPTION_OPERATION,
   GOST_28147, GOST_R3412_2015_K,
@@ -1387,7 +1387,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         documentsId)
         .then(
           (data1: any) => {
-            this.resign(packageReSign, cert);
+          //resign
             $(".toast-transaction_created_successful").remove();
             Materialize.toast(localize("DSS.transaction_created_successful", locale), 3000, "toast-transaction_created_successful");
 
@@ -1827,8 +1827,12 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               (respData: any) => {
                 const remote = window.electron.remote;
                 remote.getCurrentWindow().minimize();
+                store.dispatch(finishCurrentUrlCmd());
+                removeWarningMessage();
               },
               (error) => {
+                store.dispatch(finishCurrentUrlCmd(false));
+                removeWarningMessage();
                 // tslint:disable-next-line: no-console
                 console.log("Error sending of diagnostics info with id " + operationRemoteAction.id
                   + ". Error description: " + error);

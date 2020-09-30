@@ -85,14 +85,18 @@ export default class CertificateInfo extends React.Component<ICertificateInfoPro
           <NameInfo name={certificate.subjectName} />
         </div>
         <div className="collection-item certs-collection certificate-info">
-          <div className="caption-text">{localize("Certificate.issuer_name", locale)}</div>
-          <div className="collection-title selectable-text">{certificate.issuerFriendlyName}</div>
           {
             this.isMinsvyazRoot() ?
-              <React.Fragment>               
-                <div className="collection-title selectable-text valid">{localize("Certificate.accredited", locale)}</div>
+              <React.Fragment>
+                <div className="caption-text">{localize("Certificate.issuer_name", locale)}</div>
+                <div className="collection-title selectable-text">{certificate.issuerFriendlyName}</div>
+                <div className="collection-title selectable-text valid">выдан аккредитованным УЦ</div>
               </React.Fragment>
-            :null
+              :
+              <React.Fragment>
+                <div className="caption-text">{localize("Certificate.issuer_name", locale)}</div>
+                <div className="collection-title selectable-text">{certificate.issuerFriendlyName}</div>
+              </React.Fragment>
           }
         </div>
         <div className="collection-item certs-collection certificate-info">
@@ -113,13 +117,14 @@ export default class CertificateInfo extends React.Component<ICertificateInfoPro
           <div className="caption-text">{localize("Sign.alg", locale)}</div>
           <div className="collection-title selectable-text">{signatureAlgorithm ? signatureAlgorithm : certificate.signatureAlgorithm}</div>
         </div>
-        <div className="collection-item certs-collection certificate-info">
-          <div className="caption-text">{localize("Certificate.signature_digest_algorithm", locale)}</div>
-          <div className="collection-title selectable-text">{signatureDigestAlgorithm ? signatureDigestAlgorithm : certificate.signatureDigestAlgorithm}</div>
-        </div>
+
         <div className="collection-item certs-collection certificate-info">
           <div className="caption-text">{localize("Certificate.public_key_algorithm", locale)}</div>
           <div className="collection-title selectable-text">{publicKeyAlgorithm ? publicKeyAlgorithm : certificate.publicKeyAlgorithm}</div>
+        </div>
+        <div className="collection-item certs-collection certificate-info">
+          <div className="caption-text">{localize("Certificate.signature_digest_algorithm", locale)}</div>
+          <div className="collection-title selectable-text">{signatureDigestAlgorithm ? signatureDigestAlgorithm : certificate.signatureDigestAlgorithm}</div>
         </div>
         <div className="collection-item certs-collection certificate-info">
           <div className="caption-text">{localize("Certificate.thumbprint", locale)}</div>

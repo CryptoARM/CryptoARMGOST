@@ -126,6 +126,7 @@ export function parseUrlCommandApiV7(urlWithCommand: string): IUrlCommandApiV4Ty
     case "certificates":
     case "diagnostics":
     case "signandencrypt":
+    case "startview":
       break;
     default:
       // tslint:disable-next-line: no-console
@@ -147,6 +148,10 @@ export function parseUrlCommandApiV7(urlWithCommand: string): IUrlCommandApiV4Ty
 
   // enable only https
   if (URL.parse(parsedPath, true).protocol !== "https:") {
+    if (URL.parse(parsedPath, true).protocol === "http:"){
+      result.command = "http error"
+      return result
+    }
      return result;
   }
 

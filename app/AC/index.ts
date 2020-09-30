@@ -31,7 +31,10 @@ import { ERROR, SIGNED, UPLOADED, VERIFIED } from "../server/constants";
 import * as signs from "../trusted/sign";
 import { Store } from "../trusted/store";
 import { extFile, fileCoding, fileExists, md5 } from "../utils";
-import { postRequest } from "./urlCmdUtils";
+import { postRequest, removeWarningMessage } from "./urlCmdUtils";
+import store from "../store";
+import { finishCurrentUrlCmd } from "./urlActions";
+
 
 export function changeLocation(location: string) {
   return (dispatch: (action: {}) => void) => {
@@ -184,10 +187,16 @@ function uploadFiles(
 
   postRequest(uploader, JSON.stringify(infoRequest)).then(
     (respData: any) => {
+      setTimeout( () => {    
       const remote = window.electron.remote;
       remote.getCurrentWindow().minimize();
+      store.dispatch(finishCurrentUrlCmd());
+      removeWarningMessage();
+    }, 3000)
     },
     (error) => {
+      store.dispatch(finishCurrentUrlCmd(false));
+      removeWarningMessage();
       // tslint:disable-next-line: no-console
       console.log("Error sending of diagnostics info with id " + urlActions.id
         + ". Error description: " + error);
@@ -262,19 +271,34 @@ export function packageSign(
         type: PACKAGE_SIGN + SUCCESS,
       });
 
-      files.forEach((file) => {
-        logger.log({
-          certificate: cert.subjectName,
-          level: "info",
-          message: "",
-          operation: "Подпись",
-          operationObject: {
-            in: path.basename(file.fullpath),
-            out: path.basename(folderOut),
-          },
-          userName: USER_NAME,
-        });
-      });
+      if (folderOutDSS) {
+        for (const outDSS of folderOutDSS)  {
+            for (const file of files) {
+            logger.log({          
+              certificate: cert.subjectName,
+              level: "info",
+              message: "",
+              operation: "Подпись",
+              operationObject: {
+                in: path.basename(file.fullpath),
+                out: path.basename(outDSS),
+              },
+              userName: USER_NAME,
+            });
+          }}
+        } else files.forEach((file) => {
+          logger.log({
+            certificate: cert.subjectName,
+            level: "info",
+            message: "",
+            operation: "Подпись",
+            operationObject: {
+              in: path.basename(file.fullpath),
+              out: path.basename(folderOut),
+            },
+            userName: USER_NAME,
+            });
+          });
 
       if (multiResult) {
         dispatch({
@@ -293,17 +317,18 @@ export function packageSign(
                 fs.copyFileSync(file.fullpath, copyUriOriginalFile); } // копирую оригинальный файл
           }
         }
-        if (policies.includes("detached")) {
-          for (const file of files) {
-            const copyUriOriginalFile = path.join(folderOut, path.basename(file.fullpath));
-            fs.copyFileSync(file.fullpath, copyUriOriginalFile);
-          }
-        }
-
-        dispatch(filePackageDelete(signedFileIdPackage));
         if (!remoteFiles.uploader && !multipackage) {
           dispatch(push(LOCATION_RESULTS_MULTI_OPERATIONS));
         }
+        if (policies.includes("detached")) {
+          for (const file of files) {
+            const copyUriOriginalFile = path.join(folderOut, path.basename(file.fullpath));
+            if (!fileExists(copyUriOriginalFile)) {
+               fs.copyFileSync(file.fullpath, copyUriOriginalFile);
+            }
+          }
+        }
+        dispatch(filePackageDelete(signedFileIdPackage));
       } else {
         dispatch(filePackageSelect(signedFilePackage));
         dispatch(filePackageDelete(signedFileIdPackage));
@@ -378,8 +403,23 @@ export function packageReSign(
           type: MULTI_DIRECT_OPERATION + (doNotFinalizeOperation ? PART_SUCCESS : SUCCESS),
         });
         dispatch(filePackageDelete(signedFileIdPackage));
-        if (!remoteFiles.uploader && !doNotFinalizeOperation) {
-          files.forEach((file) => {
+
+        if (folderOutDSS) {
+          for (const outDSS of folderOutDSS)  {
+              for (const file of files) {
+              logger.log({          
+                certificate: cert.subjectName,
+                level: "info",
+                message: "",
+                operation: "Подпись",
+                operationObject: {
+                  in: path.basename(file.fullpath),
+                  out: path.basename(outDSS),
+                },
+                userName: USER_NAME,
+              });
+            }}
+          } else files.forEach((file) => {
             logger.log({
               certificate: cert.subjectName,
               level: "info",
@@ -390,8 +430,10 @@ export function packageReSign(
                 out: path.basename(folderOut),
               },
               userName: USER_NAME,
+              });
             });
-          });
+
+        if (!remoteFiles.uploader && !doNotFinalizeOperation) {
           dispatch(push(LOCATION_RESULTS_MULTI_OPERATIONS));
         }
       } else {
