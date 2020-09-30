@@ -139,7 +139,7 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
     const disabledNavigate = this.isFilesFromSocket();
     const classDisabled = disabledNavigate ? "disabled" : "";
 
-    if (operationsPerforming && signer && !signer.dssUserID) {
+    if (operationsPerforming) {
       return <ProgressBars />;
     }
 
