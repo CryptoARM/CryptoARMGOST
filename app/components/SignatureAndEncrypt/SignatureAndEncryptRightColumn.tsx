@@ -737,7 +737,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           && items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
           && items.publicKeyAlgorithm !== "1.2.643.2.2.19" ?
            false : true;
-        if (isGost === isItemGost) {
+        if (isGost !== isItemGost) {
           $(".toast-ca_req_error").remove();
           Materialize.toast(
             localize("Certificate.cert_error_mixed_GOST_RSA", locale), 3000, "toast-ca_req_error");
