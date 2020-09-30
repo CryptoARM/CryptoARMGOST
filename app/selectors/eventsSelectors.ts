@@ -13,9 +13,9 @@ export const filteredEventsSelector = createSelector(eventsGetter, filtersGetter
 
   return events.filter((event: any) => {
     try {
-      return event.userName.match(userName) &&
-        event.operationObject && typeof event.operationObject.in === "string" && event.operationObject.in.match(operationObjectIn) &&
-        event.operationObject.out.match(operationObjectOut) &&
+      return event.userName.toLowerCase().match(userName.toLowerCase()) &&
+        event.operationObject && typeof event.operationObject.in === "string" && event.operationObject.in.toLowerCase().match(operationObjectIn.toLowerCase()) &&
+        event.operationObject.out.toLowerCase().match(operationObjectOut.toLowerCase()) &&
         (level === "all" ? true : event.level.match(level)) &&
         (dateFrom ? (new Date(event.timestamp)).getTime() >= (new Date(dateFrom)).getTime() : true) &&
         (dateTo ? (new Date(event.timestamp)).getTime() <= (new Date(dateTo.setHours(23, 59, 59, 999))).getTime() : true) &&

@@ -89,7 +89,7 @@ export const filteredFilesSelector = createSelector(filesGetter, filtersGetter, 
   const { dateFrom, dateTo, filename, sizeFrom, sizeTo, types } = filters.documents;
 
   return files.filter((file: any) => {
-    return file.fullpath.match(filename) &&
+    return file.fullpath.toLowerCase().match(filename.toLowerCase()) &&
       (sizeFrom ? file.filesize >= sizeFrom : true) &&
       (sizeTo ? file.filesize <= sizeTo : true) &&
       (dateFrom ? (new Date(file.mtime)).getTime() >= (new Date(dateFrom)).getTime() : true) &&
