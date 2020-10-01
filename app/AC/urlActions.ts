@@ -62,70 +62,84 @@ interface IEncryptRequest {
 export async function checkTrustedServiceForCommand(
   command: IUrlCommandApiV4Type) {
   const hostToCheck = getServiceBaseLinkFromUrl(command.url);
+
   const curl = new window.Curl();
-
-  curl.setOpt("URL", hostToCheck);
-  curl.setOpt("CERTINFO", true);
-  curl.on("end", (status: any) => {
-    let cert: trusted.pki.Certificate | undefined;
-    if (status !== 200) {
-      // throw Error(`Invalid status code: ${status}`)
-    } else {
-      try {
-        const certInfo: string | number | any[] | null = curl.getInfo(Curl.info.CERTINFO);
-
-        if (!certInfo) {
-          throw new Error("Error while recieving certificate info");
-        }
-        const certs: string[] = certInfo.filter((itm: string): boolean => itm.search("Cert:") === 0);
-        if (certs.length === 0) {
-          throw new Error("Certificate blob is not found in recieved data");
-        }
-        cert = findServerCert(certs);
-      } catch (e) {
-        // tslint:disable-next-line:no-console
-        console.error("Error loading certificate ", e.message);
-      }
-    }
-    curl.close();
-    processCommandForService(command, isTrusted (cert, hostToCheck) , cert);
-  });
-
-  // 2nd method get certificate if cURL not work
-  curl.on("error", (error: any) => {
-    const url = new URL (command.url);
-
-    const hostName = url.host;
-    const options = {
-      ca: SERVICE_CHAIN,
-      hostname: hostName,
-      method: "GET",
-      path: "/",
-      port: 443,
-      checkServerIdentity(host, cert) {
+  try {
+    curl.setOpt("URL", hostToCheck);
+    curl.setOpt("CERTINFO", true);
+    curl.on("end", (status: any) => {
+      let cert: trusted.pki.Certificate | undefined;
+      if (status !== 200) {
+        // throw Error(`Invalid status code: ${status}`)
+      } else {
         try {
-          curCert = new trusted.pki.Certificate();
-          curCert.import(cert.raw, trusted.DataFormat.DER);
-          processCommandForService(command, isTrusted (curCert, hostToCheck), curCert);
+          const certInfo: string | number | any[] | null = curl.getInfo(Curl.info.CERTINFO);
+
+          if (!certInfo) {
+            throw new Error("Error while recieving certificate info");
+          }
+          const certs: string[] = certInfo.filter((itm: string): boolean => itm.search("Cert:") === 0);
+          if (certs.length === 0) {
+            throw new Error("Certificate blob is not found in recieved data");
+          }
+          cert = findServerCert(certs);
         } catch (e) {
           // tslint:disable-next-line:no-console
-          console.error("Error while importing service certificate:", e);
-          processCommandForService(command, false);
+          console.error("Error loading certificate ", e.message);
         }
-      },
-    };
-    curl.close();
-    options.agent = new https.Agent(options);
-    let curCert: trusted.pki.Certificate;
-    const req = https.request(options, (res) => {});
-    req.on("error", (e) => {
-      // tslint:disable-next-line:no-console
-      console.log("problem with request: " + e.message);
-      processCommandForService(command, false);
+      }
+      curl.close();
+      processCommandForService(command, isTrusted (cert, hostToCheck) , cert);
     });
-    req.end();
+
+    // 2nd method to get certificate if cURL not work
+    curl.on("error", (error: any) => {
+      obtainCertWithHttps(command, hostToCheck);
+    });
+    curl.perform();
+  } catch (e) {
+    // tslint:disable-next-line:no-console
+    console.error("Error with CURL:", e);
+
+    if (curl) {
+      curl.close();
+    }
+    obtainCertWithHttps(command, hostToCheck);
+    return;
+  }
+}
+
+function obtainCertWithHttps(command: IUrlCommandApiV4Type, hostToCheck: string) {
+  const url = new URL (command.url);
+
+  const hostName = url.host;
+  const options = {
+    ca: SERVICE_CHAIN,
+    hostname: hostName,
+    method: "GET",
+    path: "/",
+    port: 443,
+    checkServerIdentity(host: any, cert: any) {
+      try {
+        curCert = new trusted.pki.Certificate();
+        curCert.import(cert.raw, trusted.DataFormat.DER);
+        processCommandForService(command, isTrusted (curCert, hostToCheck), curCert);
+      } catch (e) {
+        // tslint:disable-next-line:no-console
+        console.error("Error while importing service certificate:", e);
+        processCommandForService(command, false);
+      }
+    },
+  };
+  options.agent = new https.Agent(options);
+  let curCert: trusted.pki.Certificate;
+  const req = https.request(options, (res) => { /*...*/ });
+  req.on("error", (e) => {
+    // tslint:disable-next-line:no-console
+    console.log("problem with request: " + e.message);
+    processCommandForService(command, false);
   });
-  curl.perform();
+  req.end();
 }
 
 function isTrusted(cert: any, hostToCheck: string): boolean {
