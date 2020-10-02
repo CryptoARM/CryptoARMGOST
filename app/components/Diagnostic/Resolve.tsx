@@ -68,7 +68,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
             <p className="help_paragraf">{localize("Problems.resolve_1_1", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_1_2", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_1_3", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://www.cryptopro.ru/")}> www.cryptopro.ru</a>
+              <a className="hlink" onClick={(event) => this.gotoLink("https://diagnostic.cryptoarm.ru/")}> https://diagnostic.cryptoarm.ru/</a>
             </p>
             <p className="help_paragraf">{localize("Problems.resolve_1_4", locale)}
               <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/upload/docs/userguide-cryptoarm-gost.pdf")}>
@@ -107,7 +107,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
             <p className="help_paragraf">{localize("Problems.resolve_1_1", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_1_2", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_1_3", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://www.cryptopro.ru/")}> www.cryptopro.ru</a>
+              <a className="hlink" onClick={(event) => this.gotoLink("https://diagnostic.cryptoarm.ru/")}> https://diagnostic.cryptoarm.ru/</a>
             </p>
             <p className="help_paragraf">
               {localize("Problems.resolve_1_4", locale)}

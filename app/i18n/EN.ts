@@ -719,7 +719,7 @@ export default {
     problem_9_1: "Selected certificate is invalid. Continue the operation?",
     resolve_1_1: "The system does not have the cryptoPro CSP crypto provider installed. The further operation of the application is impossible and the application will be closed.",
     resolve_1_2: "To solve this problem, install CryptoPro CSP version 5.0 and run the application again.",
-    resolve_1_3: "Distribution of the crypto provider CryptoPro CSP can be downloaded from the official CryptoPro website",
+    resolve_1_3: "To install SKZI CryptoPro CSP follow the link: ",
     resolve_1_4: "Detailed instructions for installing CryptoPRO CSP on various platforms can be found in the product documentation, which is available at the link",
     resolve_2_1: "The system does not have the correct license for CryptoPro CSP, which is necessary for full-function operation of the application.",
     resolve_2_2: "To solve this problem, you can purchase a license for the product in the online store, accessible by reference ",
