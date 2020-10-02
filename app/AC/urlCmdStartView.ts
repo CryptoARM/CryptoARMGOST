@@ -8,7 +8,7 @@ export interface IStartViewParameters {
 }
 
 function paramsRequestDiag(id: string) {
-  return JSON.stringify(paramsRequest("startView.parameters", id));
+  return JSON.stringify(paramsRequest("startView.parameters", id, false));
 }
 
 export function handleUrlCommandStartView(command: IUrlCommandApiV4Type) {

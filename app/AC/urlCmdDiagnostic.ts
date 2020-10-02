@@ -70,7 +70,7 @@ interface ICertificateInfo {
 }
 
 function paramsRequestDiag(id: string) {
-  return JSON.stringify(paramsRequest("diagnostics.parameters", id));
+  return JSON.stringify(paramsRequest("diagnostics.parameters", id, true));
 }
 
 export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
@@ -127,7 +127,7 @@ export function handleUrlCommandDiagnostics(command: IUrlCommandApiV4Type) {
   );
 }
 
-function collectDiagnosticInfo(
+export function collectDiagnosticInfo(
   id: string,
   diagOperations: string[],
 ): IDiagnosticsInformation {
