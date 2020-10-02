@@ -187,7 +187,7 @@ function uploadFiles(
 
   postRequest(uploader, JSON.stringify(infoRequest)).then(
     (respData: any) => {
-      setTimeout( () => {    
+      setTimeout( () => {
       const remote = window.electron.remote;
       remote.getCurrentWindow().minimize();
       store.dispatch(finishCurrentUrlCmd());
@@ -274,7 +274,7 @@ export function packageSign(
       if (folderOutDSS) {
         for (const outDSS of folderOutDSS)  {
             for (const file of files) {
-            logger.log({          
+            logger.log({
               certificate: cert.subjectName,
               level: "info",
               message: "",
@@ -407,7 +407,7 @@ export function packageReSign(
         if (folderOutDSS) {
           for (const outDSS of folderOutDSS)  {
               for (const file of files) {
-              logger.log({          
+              logger.log({
                 certificate: cert.subjectName,
                 level: "info",
                 message: "",
@@ -565,7 +565,19 @@ export function verifyCertificate(certificateId: string) {
     const { certificates } = getState();
 
     const certItem = certificates.getIn(["entities", certificateId]);
-    const certificate = window.PKISTORE.getPkiObject(certItem);
+    
+    let certificate = certItem.object ? certItem.object : null;
+    if (certificate === null) {
+      if (certItem.x509) {
+        try {
+          certificate = trusted.pki.Certificate.import(Buffer.from(certItem.x509), trusted.DataFormat.PEM);
+        } catch (e) {
+          return null;
+        }
+      } else {
+        certificate = window.PKISTORE.getPkiObject(certItem);
+      }
+    }
     let certificateStatus = false;
 
     try {
