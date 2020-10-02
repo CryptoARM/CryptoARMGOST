@@ -1,7 +1,7 @@
 import { OrderedMap, Record } from "immutable";
 import {
   ADD_SERVICE_CERTIFICATE, DELETE_CERTIFICATE, DELETE_SERVICE, LOAD_ALL_CERTIFICATES,
-  REMOVE_ALL_CERTIFICATES, START, SUCCESS, VERIFY_CERTIFICATE, GET_CERTIFICATES_DSS,
+  REMOVE_ALL_CERTIFICATES, START, SUCCESS, VERIFY_CERTIFICATE, GET_CERTIFICATES_DSS, RESET_DSS_CERTIFICATES_VERIFIED
 } from "../constants";
 import { arrayToMap } from "../utils";
 
@@ -64,6 +64,10 @@ export default (certificates = new DefaultReducerState(), action) => {
     case REMOVE_ALL_CERTIFICATES:
       const allServicesCerts = certificates.get("entities").filter((certificate: any) => certificate.dssUserID !== null);
       return certificates = new DefaultReducerState().setIn(["entities"], allServicesCerts);
+
+    case RESET_DSS_CERTIFICATES_VERIFIED:
+      return certificates
+      .setIn(["entities", payload, "verified"], false);
 
     case ADD_SERVICE_CERTIFICATE:
       return certificates
