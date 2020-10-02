@@ -24,7 +24,7 @@ class EncryptionAlgorithmSelector extends React.Component<IEncryptionAlgorithmSe
     $(document).ready(() => {
       $("select").material_select();
     });
-    $(ReactDOM.findDOMNode(this.refs.EncryptionAlgorithmSelector)).on("change", self.changeEncryption);
+    $(ReactDOM.findDOMNode(this.refs.EncryptionAlgorithmSelector)).on("change", this.changeEncryption);
   }
 
   componentDidUpdate() {
