@@ -28,7 +28,7 @@ interface ICertToExport {
 }
 
 function paramsRequestSignAndEncrypt(id: string) {
-  return JSON.stringify(paramsRequest("signAndEncrypt.parameters", id));
+  return JSON.stringify(paramsRequest("signAndEncrypt.parameters", id, false));
 }
 
 export function handleUrlCommandSignAmdEncrypt( command: IUrlCommandApiV4Type ) {

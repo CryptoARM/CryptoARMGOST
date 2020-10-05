@@ -5,11 +5,13 @@ import { ADDRESS_BOOK, CA, MY, ROOT, SERVICE_CHAIN, TMP_DIR } from "../constants
 import history from "../history";
 import localize from "../i18n/localize";
 import { getServiceBaseLinkFromUrl } from "./urlActions";
+import { collectDiagnosticInfo } from "./urlCmdDiagnostic";
 
 interface IParamsRequest {
   jsonrpc: "2.0";
   method: string;
   id: string;
+  diagnostic?: any;
 }
 
 export async function postRequest(url: string, requestData: string | Buffer) {
@@ -130,12 +132,20 @@ async function postRequestFetch(url: string, requestData: string | Buffer) {
   });
 }
 
-export function paramsRequest(method: string, id: string): IParamsRequest {
+function fromDiagnosticInfo(id: string, isDiagnostic: boolean) {
+  const diagOperations: string[] = ["SYSTEMINFORMATION", "CSP_ENABLED", "CADES_ENABLED", "VERSIONS", "PROVIDERS", "LICENSES", "PERSONALCERTIFICATES"]
+  if (isDiagnostic) {
+    return ""
+  } else return collectDiagnosticInfo(id, diagOperations)
+}
+
+export function paramsRequest(method: string, id: string, isDiagnostic: boolean): IParamsRequest {
   return {
     jsonrpc: "2.0",
     method,
     // tslint:disable-next-line: object-literal-sort-keys
     id,
+    diagnostic: fromDiagnosticInfo(id, isDiagnostic),
   };
 }
 

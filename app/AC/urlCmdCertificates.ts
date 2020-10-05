@@ -39,7 +39,7 @@ interface ICertToExport {
 }
 
 function paramsRequestCerts(id: string) {
-  return JSON.stringify(paramsRequest("certificates.parameters", id));
+  return JSON.stringify(paramsRequest("certificates.parameters", id, false));
 }
 
 function sendCertReq(id: string, certificate: string, friendlyName: string) {
