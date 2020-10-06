@@ -25,7 +25,7 @@ interface IDiagnosticsInformation {
   VERSIONS?: IVersions;
   PROVIDERS?: IProviders;
   LICENSES?: ILicenses;
-  PERSONALCERTIFICATES?: ICertificateInfo[];
+  PERSONALCERTIFICATES?: ICertificateId[];
 }
 
 interface ISystemInformation {
@@ -56,17 +56,11 @@ interface ILicenseInfo {
   expiration?: string;
 }
 
-interface ICertificateInfo {
-  id: string;
+interface ICertificateId {
   hash: string;
-  issuerFriendlyName: string;
-  issuerName: string;
-  notAfter: string;
-  notBefore: string;
-  subjectFriendlyName: string;
-  subjectName: string;
+  rootCAMinComSvyaz: boolean;
   status: boolean;
-  serial: string;
+  pubKeyAlg: string;
 }
 
 function paramsRequestDiag(id: string) {
@@ -274,45 +268,31 @@ function collectDiagnosticInfo(
   }
 
   if (diagOperations.includes("PERSONALCERTIFICATES")) {
-    const certificateStore = new Store();
-
+    const certInfos: ICertificateId[] = [];
+    const fullState: any = store.getState();
     const certs: trusted.pki.Certificate[] = [];
-
-    for (const item of certificateStore.items) {
-      if (item.category === "MY") {
-        certs.push(certificateStore.getPkiObject(item));
-      }
-    }
-
-    if (fileExists(CERTIFICATES_DSS_JSON)) {
-      const certificatesDSS = fs.readFileSync(CERTIFICATES_DSS_JSON, "utf8");
-
-      if (certificatesDSS) {
-        try {
-          const data = JSON.parse(certificatesDSS);
-
-          for (const key1 of Object.keys(data.certificatesDSS)) {
-            for (const key2 of Object.keys(data.certificatesDSS[key1])) {
-              const cert = data.certificatesDSS[key1][key2];
-              if (cert.category === "MY") {
-                certs.push(certificateStore.getPkiObject(cert));
-              }
-            }
-          }
-        } catch (e) {
-          //
-        }
-      }
-    }
-
-    const certInfos: ICertificateInfo[] = [];
     let isMynsvyaz: boolean = false;
+
+    for (const item of fullState.certificates.get("entities")) {
+      if (item[1].get("category") === "MY") {
+        certs.push(item[1])
+      }
+    }
+
     for (const cert of certs) {
+      const certificateCheck = window.PKISTORE.getPkiObject(cert);
+
+      let certificateStatus = false;
       if (cert) {
-        const chain = trusted.utils.Csp.buildChain(cert);
+        try {
+          certificateStatus = trusted.utils.Csp.verifyCertificateChain(certificateCheck);
+        } catch (e) {
+          certificateStatus = false;
+        }
+
+        const chain = trusted.utils.Csp.buildChain(certificateCheck);
         if (chain && chain.length) {
           const rootCertInChain = chain.items(chain.length - 1);
-
           if (
             rootCertInChain &&
             rootCertInChain.thumbprint.toLowerCase() ===
@@ -325,11 +305,15 @@ function collectDiagnosticInfo(
         } else {
           isMynsvyaz = false;
         }
-
-        certInfos.push(PkiCertToCertInfo(id, cert, isMynsvyaz));
       }
+      const certificateResult: ICertificateId = {
+        hash: certificateCheck.hash(),
+        rootCAMinComSvyaz: isMynsvyaz,
+        status: certificateStatus,
+        pubKeyAlg: certificateCheck.publicKeyAlgorithm,
+      }
+      certInfos.push(certificateResult)
     }
-
     result.PERSONALCERTIFICATES = certInfos;
   }
 
