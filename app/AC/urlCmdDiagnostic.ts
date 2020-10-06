@@ -6,7 +6,7 @@ import {
   LICENSE_PATH,
   LicenseManager,
   START,
-  TSP_OCSP_ENABLED,
+  TSP_OCSP_ENABLED, VERIFY_CERTIFICATE
 } from "../constants";
 import localize from "../i18n/localize";
 import { IUrlCommandApiV4Type } from "../parse-app-url";
@@ -25,7 +25,7 @@ interface IDiagnosticsInformation {
   VERSIONS?: IVersions;
   PROVIDERS?: IProviders;
   LICENSES?: ILicenses;
-  PERSONALCERTIFICATES?: ICertificateInfo[];
+  PERSONALCERTIFICATES?: ICertificateId[];
 }
 
 interface ISystemInformation {
@@ -56,17 +56,11 @@ interface ILicenseInfo {
   expiration?: string;
 }
 
-interface ICertificateInfo {
-  id: string;
+interface ICertificateId {
   hash: string;
-  issuerFriendlyName: string;
-  issuerName: string;
-  notAfter: string;
-  notBefore: string;
-  subjectFriendlyName: string;
-  subjectName: string;
+  rootCAMinComSvyaz: boolean;
   status: boolean;
-  serial: string;
+  pubKeyAlg: string;
 }
 
 function paramsRequestDiag(id: string) {
@@ -274,62 +268,54 @@ export function collectDiagnosticInfo(
   }
 
   if (diagOperations.includes("PERSONALCERTIFICATES")) {
-    const certificateStore = new Store();
-
-    const certs: trusted.pki.Certificate[] = [];
-
-    for (const item of certificateStore.items) {
-      if (item.category === "MY") {
-        certs.push(certificateStore.getPkiObject(item));
-      }
-    }
-
-    if (fileExists(CERTIFICATES_DSS_JSON)) {
-      const certificatesDSS = fs.readFileSync(CERTIFICATES_DSS_JSON, "utf8");
-
-      if (certificatesDSS) {
-        try {
-          const data = JSON.parse(certificatesDSS);
-
-          for (const key1 of Object.keys(data.certificatesDSS)) {
-            for (const key2 of Object.keys(data.certificatesDSS[key1])) {
-              const cert = data.certificatesDSS[key1][key2];
-              if (cert.category === "MY") {
-                certs.push(certificateStore.getPkiObject(cert));
-              }
-            }
-          }
-        } catch (e) {
-          //
-        }
-      }
-    }
-
-    const certInfos: ICertificateInfo[] = [];
+    const certInfos: ICertificateId[] = [];
+    const fullState: any = store.getState();
     let isMynsvyaz: boolean = false;
-    for (const cert of certs) {
-      if (cert) {
-        const chain = trusted.utils.Csp.buildChain(cert);
-        if (chain && chain.length) {
-          const rootCertInChain = chain.items(chain.length - 1);
+    let certificateStatus: boolean = false;
 
-          if (
-            rootCertInChain &&
-            rootCertInChain.thumbprint.toLowerCase() ===
-              "4BC6DC14D97010C41A26E058AD851F81C842415A".toLowerCase()
-          ) {
-            isMynsvyaz = true;
+    for (const item of fullState.certificates.get("entities")) {
+      if (item[1].get("category") === "MY") {
+        const certificateCheck = window.PKISTORE.getPkiObject(item[1]);
+        if (certificateCheck) {
+          if (!item[1].get("verified")){
+            try {
+              certificateStatus = trusted.utils.Csp.verifyCertificateChain(certificateCheck);
+            } catch (e) {
+              certificateStatus = false;
+            }
+            const certificateId = item[1].get("id");
+            store.dispatch({
+              payload: { certificateId, certificateStatus },
+              type: VERIFY_CERTIFICATE,
+            });
+          } else {
+            certificateStatus = item[1].get("status")
+          }
+          const chain = trusted.utils.Csp.buildChain(certificateCheck);
+          if (chain && chain.length) {
+            const rootCertInChain = chain.items(chain.length - 1);
+            if (
+              rootCertInChain &&
+              rootCertInChain.thumbprint.toLowerCase() ===
+                "4BC6DC14D97010C41A26E058AD851F81C842415A".toLowerCase()
+            ) {
+              isMynsvyaz = true;
+            } else {
+              isMynsvyaz = false;
+            }
           } else {
             isMynsvyaz = false;
           }
-        } else {
-          isMynsvyaz = false;
         }
-
-        certInfos.push(PkiCertToCertInfo(id, cert, isMynsvyaz));
+        const certificateResult: ICertificateId = {
+          hash: certificateCheck.hash(),
+          rootCAMinComSvyaz: isMynsvyaz,
+          status: certificateStatus,
+          pubKeyAlg: certificateCheck.publicKeyAlgorithm,
+        }
+        certInfos.push(certificateResult)
       }
     }
-
     result.PERSONALCERTIFICATES = certInfos;
   }
 
