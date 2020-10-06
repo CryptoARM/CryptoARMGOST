@@ -6,7 +6,7 @@ import {
   LICENSE_PATH,
   LicenseManager,
   START,
-  TSP_OCSP_ENABLED,
+  TSP_OCSP_ENABLED, VERIFY_CERTIFICATE
 } from "../constants";
 import localize from "../i18n/localize";
 import { IUrlCommandApiV4Type } from "../parse-app-url";
@@ -270,49 +270,51 @@ function collectDiagnosticInfo(
   if (diagOperations.includes("PERSONALCERTIFICATES")) {
     const certInfos: ICertificateId[] = [];
     const fullState: any = store.getState();
-    const certs: trusted.pki.Certificate[] = [];
     let isMynsvyaz: boolean = false;
+    let certificateStatus: boolean = false;
 
     for (const item of fullState.certificates.get("entities")) {
       if (item[1].get("category") === "MY") {
-        certs.push(item[1])
-      }
-    }
-
-    for (const cert of certs) {
-      const certificateCheck = window.PKISTORE.getPkiObject(cert);
-
-      let certificateStatus = false;
-      if (cert) {
-        try {
-          certificateStatus = trusted.utils.Csp.verifyCertificateChain(certificateCheck);
-        } catch (e) {
-          certificateStatus = false;
-        }
-
-        const chain = trusted.utils.Csp.buildChain(certificateCheck);
-        if (chain && chain.length) {
-          const rootCertInChain = chain.items(chain.length - 1);
-          if (
-            rootCertInChain &&
-            rootCertInChain.thumbprint.toLowerCase() ===
-              "4BC6DC14D97010C41A26E058AD851F81C842415A".toLowerCase()
-          ) {
-            isMynsvyaz = true;
+        const certificateCheck = window.PKISTORE.getPkiObject(item[1]);
+        if (certificateCheck) {
+          if (!item[1].get("verified")){
+            try {
+              certificateStatus = trusted.utils.Csp.verifyCertificateChain(certificateCheck);
+            } catch (e) {
+              certificateStatus = false;
+            }
+            const certificateId = item[1].get("id");
+            store.dispatch({
+              payload: { certificateId, certificateStatus },
+              type: VERIFY_CERTIFICATE,
+            });
+          } else {
+            certificateStatus = item[1].get("status")
+          }
+          const chain = trusted.utils.Csp.buildChain(certificateCheck);
+          if (chain && chain.length) {
+            const rootCertInChain = chain.items(chain.length - 1);
+            if (
+              rootCertInChain &&
+              rootCertInChain.thumbprint.toLowerCase() ===
+                "4BC6DC14D97010C41A26E058AD851F81C842415A".toLowerCase()
+            ) {
+              isMynsvyaz = true;
+            } else {
+              isMynsvyaz = false;
+            }
           } else {
             isMynsvyaz = false;
           }
-        } else {
-          isMynsvyaz = false;
         }
+        const certificateResult: ICertificateId = {
+          hash: certificateCheck.hash(),
+          rootCAMinComSvyaz: isMynsvyaz,
+          status: certificateStatus,
+          pubKeyAlg: certificateCheck.publicKeyAlgorithm,
+        }
+        certInfos.push(certificateResult)
       }
-      const certificateResult: ICertificateId = {
-        hash: certificateCheck.hash(),
-        rootCAMinComSvyaz: isMynsvyaz,
-        status: certificateStatus,
-        pubKeyAlg: certificateCheck.publicKeyAlgorithm,
-      }
-      certInfos.push(certificateResult)
     }
     result.PERSONALCERTIFICATES = certInfos;
   }
