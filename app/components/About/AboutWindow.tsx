@@ -7,12 +7,14 @@ import LicenseOCSPSetup from "../License/LicenseOCSPSetup";
 import LicenseSetupModal from "../License/LicenseSetupModal";
 import LicenseTSPSetup from "../License/LicenseTSPSetup";
 import Modal from "../Modal";
+import DiagnosticInfo from "./DiagnosticInfo";
 
 interface ILicenseInfoCSPState {
   showModalLicenseCSPSetup: boolean;
   showModalLicenseTSPSetup: boolean;
   showModalLicenseOCSPSetup: boolean;
   showModalLicenseSetup: boolean;
+  showModalDiagnosticInfo: boolean;
 }
 
 class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
@@ -29,6 +31,7 @@ class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
       showModalLicenseOCSPSetup: false,
       showModalLicenseSetup: false,
       showModalLicenseTSPSetup: false,
+      showModalDiagnosticInfo: false,
     });
   }
 
@@ -212,12 +215,28 @@ class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
                 </div>
               </div>
             </div>
+
+            <div className="col s12">
+              <div className="primary-text">{localize("DiagnosticInfo.information_about_system", locale)}</div>
+              <hr />
+              <div className="row" >
+                <div className="col s6 waves-effect waves-cryptoarm hover_outline" onClick={this.showModalDiagnosticInfo}>
+                  <div className="col s12 svg_icon">
+                    <a data-position="bottom">
+                      <i className="material-icons license copy" />
+                    </a>
+                  </div>
+                  <div className="col s12 svg_icon_text">{localize("DiagnosticInfo.information_about_system", locale)}</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         {this.getModalLicenseCSPSetup()}
         {this.getModalLicenseTSPSetup()}
         {this.getModalLicenseOCSPSetup()}
         {this.getModalLicenseSetup()}
+        {this.getModalDiagnosticInfo()}
       </div>
     );
   }
@@ -352,6 +371,35 @@ class AboutWindow extends React.Component<{}, ILicenseInfoCSPState> {
         <LicenseSetupModal text_info={localize("License.entered_the_key", locale)} icon="" onCancel={this.closeModalLicenseSetup} />
       </Modal>
     );
+  }
+
+  getModalDiagnosticInfo = () => {
+    const { localize, locale } = this.context;
+    const { showModalDiagnosticInfo } = this.state
+
+    if (!showModalDiagnosticInfo){
+      return;
+    }
+
+    return (
+      <Modal
+        isOpen={showModalDiagnosticInfo}
+        key="showModalDiagnosticInfo"
+        header={localize("DiagnosticInfo.information_about_system", locale)}
+        style={{ width: "700px" }}
+        onClose={this.closeModalDiagnosticInfo}
+        >
+          <DiagnosticInfo onCancel={this.closeModalDiagnosticInfo}/>
+      </Modal>
+    )
+  }
+
+  showModalDiagnosticInfo = () => {
+    this.setState({ showModalDiagnosticInfo: true });
+  }
+
+  closeModalDiagnosticInfo = () => {
+    this.setState({ showModalDiagnosticInfo: false });
   }
 
   showModalLicenseCSPSetup = () => {

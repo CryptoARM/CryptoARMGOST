@@ -3040,6 +3040,13 @@ svg:hover {
     height: 40px;
   }
 
+  i.material-icons.license.copy {
+    background: url(./resources/image/operations/copy.svg);
+    background-size: 40px 40px;
+    width: 40px;
+    height: 40px;
+  }
+
   i.material-icons.certificate {
     background-size: 36px 36px !important;
     width: 36px;
@@ -3216,4 +3223,16 @@ svg:hover {
 
 .ca_service_status.unknown {
   background: url(./resources/image/ca/service_status_unknown.svg);
+}
+
+.diagnostic_table tbody tr td {
+  padding: 0;
+}
+
+.diagnostic_info {
+  width: 680px;
+  margin-left: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
