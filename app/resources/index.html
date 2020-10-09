@@ -108,6 +108,7 @@
     window.PLATFORM = process.platform;
     LICENSE_DIR = (PLATFORM == 'win32') ? process.env['LOCALAPPDATA'] : "/etc/opt";
     window.LICENSE_PATH = path.join(LICENSE_DIR, "/Trusted/CryptoARM GOST/license.lic");
+    window.LICENSE_REGISTRY_PATH = "HKLM\\SOFTWARE\\Trusted\\CryptoARM GOST";
     window.SETTINGS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "settings.json");
     window.SERVICES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "services.json");
     window.TRUSTED_SERVICES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "trustedServices.json");

@@ -69,6 +69,7 @@ interface Window {
     CERTIFICATES_DSS_JSON: string,
     POLICY_DSS_JSON: string,
     LICENSE_PATH: string;
+    LICENSE_REGISTRY_PATH: string;
     LICENSE_MNG: any;
     PLATFORM: string;
     SETTINGS_JSON: string;
