@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import {
-  DELETE_ALL_TEMPORY_LICENSES, FAIL, LICENSE_PATH, LicenseManager,
-  LOAD_LICENSE, START, SUCCESS, VERIFY_LICENSE,
+  DELETE_ALL_TEMPORY_LICENSES, FAIL, LICENSE_PATH, LICENSE_REGISTRY_PATH,
+  LicenseManager, LOAD_LICENSE, START, SUCCESS, VERIFY_LICENSE,
 } from "../constants";
 import { checkLicense } from "../trusted/jwt";
 import { toBase64 } from "../utils";
@@ -37,6 +37,32 @@ export function verifyLicense(license?: string) {
   };
 }
 
+function readRegistryLicense(): string {
+  const { execSync } = require("child_process");
+
+  let cmdResult = undefined;
+  try {
+    const dummyStdio: any[] = [];
+    cmdResult = execSync("REG QUERY \"" + LICENSE_REGISTRY_PATH + "\" /v license", {
+      stdio: dummyStdio,
+      timeout: 60000,
+      windowsHide: true,
+    }).toString();
+  } catch (e) {
+    // License is not found in registry
+    return "";
+  }
+
+  const searchResult = cmdResult.match(/[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}/);
+
+  if (null === searchResult) {
+    // License is not match format
+    return "";
+  }
+
+  return searchResult[0];
+}
+
 export function loadLicense(license?: string) {
   return (dispatch: (action: {}) => void) => {
     dispatch({ type: LOAD_LICENSE + START });
@@ -62,8 +88,18 @@ export function loadLicense(license?: string) {
       
       if (license && license.length) {
         data = license;
-      } else if (fs.existsSync(LICENSE_PATH)) {
-        data = fs.readFileSync(LICENSE_PATH, "utf8");
+      } else {
+        let result: any | undefined = undefined;
+        try {
+          data = readRegistryLicense();
+          result = JSON.parse(LicenseManager.checkLicense(data));
+        } catch(e) {
+          //
+        }
+
+        if ((!result || !result.verify) && fs.existsSync(LICENSE_PATH)) {
+          data = fs.readFileSync(LICENSE_PATH, "utf8");
+        }
       }
       
       data = data.replace(/(\r\n|\n|\r)/gm, "");

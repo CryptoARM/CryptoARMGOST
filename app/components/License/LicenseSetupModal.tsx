@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { loadLicense } from "../../AC/licenseActions";
-import { DEFAULT_PATH, LICENSE_PATH, LicenseManager, PLATFORM } from "../../constants";
+import { DEFAULT_PATH, LICENSE_PATH, LICENSE_REGISTRY_PATH, LicenseManager, PLATFORM } from "../../constants";
 import * as jwt from "../../trusted/jwt";
 import HeaderWorkspaceBlock from "../HeaderWorkspaceBlock";
 const dialog = window.electron.remote.dialog;
@@ -66,10 +66,6 @@ class LicenseSetupModal extends React.Component<ILicenseSetupModalProps, ILicens
     if (PLATFORM !== "win32") {
       command = "sh -c " + "\"";
       command = command + "mkdir -p " + "'" + path + "'" + " && ";
-    } else {
-      if (!fs.existsSync(path)) {
-        command = command + " mkdir " + '"' + path + '"' + " && ";
-      }
     }
 
     let key;
@@ -96,7 +92,7 @@ class LicenseSetupModal extends React.Component<ILicenseSetupModalProps, ILicens
     } else {
       if (jwt.checkLicense(key)) {
         if (PLATFORM === "win32") {
-          command = command + "echo " + key.trim() + " > " + '"' + LICENSE_PATH + '"';
+          command = "reg add \"" + LICENSE_REGISTRY_PATH + "\" /v license /t REG_SZ /f /d " + key.trim();
         } else {
           command = command + " printf " + key.trim() + " > " + "'" + LICENSE_PATH + "'" + " && ";
           command = command + " chmod 777 " + "'" + LICENSE_PATH + "'" + "\"";

@@ -196,6 +196,7 @@ export const RESOURCES_PATH: string = window.RESOURCES_PATH;
 export const PLATFORM: string = window.PLATFORM;
 export const TMP_DIR: string = window.TMP_DIR;
 export const LICENSE_PATH = window.LICENSE_PATH;
+export const LICENSE_REGISTRY_PATH = window.LICENSE_REGISTRY_PATH;
 export const SETTINGS_JSON = window.SETTINGS_JSON;
 export const SERVICES_JSON = window.SERVICES_JSON;
 export const TRUSTED_CRYPTO_LOG = window.TRUSTED_CRYPTO_LOG;
