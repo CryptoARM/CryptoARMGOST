@@ -34,6 +34,7 @@ interface ISignatureAndEncryptWindowProps {
   removeAllRemoteFiles: () => void;
   signatures: any;
   signedPackage: any;
+  dssOperationIsActive: boolean;
 }
 
 interface ISignatureAndEncryptWindowState {
@@ -133,13 +134,13 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
   render() {
     const { localize, locale } = this.context;
     const { fileSignatures, file, showSignatureInfo } = this.state;
-    const { isDefaultFilters, operationsPerforming, signer } = this.props;
+    const { isDefaultFilters, dssOperationIsActive, operationsPerforming } = this.props;
 
     const classDefaultFilters = isDefaultFilters ? "filter_off" : "filter_on";
     const disabledNavigate = this.isFilesFromSocket();
     const classDisabled = disabledNavigate ? "disabled" : "";
 
-    if (operationsPerforming) {
+    if (operationsPerforming && !dssOperationIsActive) {
       return <ProgressBars />;
     }
 
@@ -336,6 +337,7 @@ export default connect((state) => {
     activeFilesArr: mapToArr(activeFilesSelector(state, { active: true })),
     connectedList: connectedSelector(state, { connected: true }),
     connections: state.connections,
+    dssOperationIsActive: state.dssResponses.entities && state.dssResponses.size,
     files: mapToArr(state.files.entities),
     filesFilteredArr: mapToArr(filteredFilesSelector(state)),
     filesInTransactionList: filesInTransactionsSelector(state),
