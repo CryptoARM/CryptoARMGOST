@@ -15,6 +15,8 @@ import { filteredCertificatesSelector } from "../../selectors";
 import DiagnosticModal from "../Diagnostic/DiagnosticModal";
 import Problems from "../Diagnostic/Problems";
 import Resolve from "../Diagnostic/Resolve";
+import { collectDiagnosticInfo } from "../../AC/urlCmdDiagnostic";
+import localize from "../../i18n/localize";
 
 interface IError {
   important?: string;
@@ -239,7 +241,14 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
       );
     } else {
       return (
-        <a className="btn btn-outlined waves-effect waves-light modal-close" onClick={this.handleMaybeCloseApp}>{localize("Diagnostic.close", locale)}</a>
+        <div style={{width: "762px", display: "flex", justifyContent: "space-between"}}>
+          <div>
+            <a className="btn btn-text waves-effect waves-light" onClick={copyDiagnosticInfo}>{localize("DiagnosticInfo.information_about_system", locale)}</a>
+          </div>
+          <div>
+            <a className="btn btn-outlined waves-effect waves-light" onClick={this.handleMaybeCloseApp}>{localize("Diagnostic.close", locale)}</a>
+          </div>
+        </div>
       );
     }
 
@@ -347,6 +356,60 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
       </React.Fragment>
     );
   }
+}
+
+export function copyDiagnosticInfo () {
+  let diagnosticInfo: string = "";
+  let isTrusted: boolean;
+
+  const diagOperations = ["SYSTEMINFORMATION", "CSP_ENABLED", "CADES_ENABLED", "VERSIONS", "PROVIDERS", "LICENSES"];
+  const result = collectDiagnosticInfo("fromSideMenu", diagOperations)
+
+  try {
+    trusted.utils.Csp.isGost2012_256CSPAvailable();
+    isTrusted = true;
+   } catch(e) {
+     try {
+      trusted.utils.Csp.getCPCSPVersion();
+      isTrusted = true;
+     } catch(e){
+        isTrusted = false;
+     }
+   }
+
+  if (result.SYSTEMINFORMATION !== undefined) {
+    diagnosticInfo = `Информация о системе: архитектура - ${result.SYSTEMINFORMATION.arch}, тип - ${result.SYSTEMINFORMATION.packageType}, платформа - ${result.SYSTEMINFORMATION.platform}, тип ОС - ${result.SYSTEMINFORMATION.type};\n`
+  }
+
+  if (result.CSP_ENABLED !== undefined && isTrusted) {
+    diagnosticInfo += `Криптопровайдер КриптоПро CSP: ${result.CSP_ENABLED ? "установлен" : "не установлен"};\n`
+  }
+
+  if (result.CADES_ENABLED !== undefined) {
+    diagnosticInfo += `Модуль "Усовершенственная подпись": ${result.CADES_ENABLED ? "установлен" : "не установлен"};\n`
+  }
+
+  if (result.VERSIONS !== undefined) {
+    diagnosticInfo += `Версии: криптоАРМ - ${result.VERSIONS.cryptoarm}${isTrusted ? (", криптоПро - " + (result.VERSIONS.csp ? result.VERSIONS.csp : "не установлен") + ";\n") : ";\nМодуль trusted-crypto: не загружен;\n"}`
+  }
+
+  if (result.PROVIDERS !== undefined) {
+    diagnosticInfo += `Провайдеры: криптопровайдер ГОСТ 2012-256 - ${result.PROVIDERS.GOST2012_256 ? "установлен" : "не установлен"}, криптопровайдер ГОСТ 2012-512 - ${result.PROVIDERS.GOST2012_512 ? "установлен" : "не установлен"};\n`
+  }
+
+  if (result.LICENSES !== undefined) {
+    let lic
+    if (result.LICENSES.cryptoarm.type === "temporary") {
+        lic = "временная"
+    } else if (result.LICENSES.cryptoarm.type === "permament") {
+        lic = "бессрочная"
+    } else {lic = "отсутствует"}
+    diagnosticInfo += `Лизензии: КриптоАРМ - ${lic}, статус лизензии КриптоАРМ - ${result.LICENSES.cryptoarm.status ? "действительна" : "недействительна"}, статус лизензии КриптоПро CSP - ${result.LICENSES.csp.status ? "действительна" : "недействительна"};\n`
+  }
+  
+  const { clipboard } = require('electron')
+  clipboard.writeText(diagnosticInfo, 'selection')
+  Materialize.toast(localize("DiagnosticInfo.copy_text", window.locale), 3000);
 }
 
 export default connect((state) => {
