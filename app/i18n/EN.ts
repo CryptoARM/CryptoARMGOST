@@ -41,9 +41,9 @@ export default {
     send: "Send",
     support: "Support",
     username: "Name",
-    version: "2.5.6",
+    version: "2.5.7",
     version_app: "Application version",
-    version_full: "Version: 2.5.6",
+    version_full: "Version: 2.5.7",
   },
   AddressBook: {
     address_book: "Address book",
