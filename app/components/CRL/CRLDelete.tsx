@@ -71,7 +71,7 @@ class CRLDelete extends React.Component<ICRLDeleteProps, {}> {
     if (!window.PKISTORE.deleteCrl(crl)) {
       $(".toast-crl_delete_failed").remove();
       Materialize.toast(localize("CRL.crl_delete_failed", locale), 2000, "toast-crl_delete_failed");
-
+      this.handelCancel();
       return;
     }
 

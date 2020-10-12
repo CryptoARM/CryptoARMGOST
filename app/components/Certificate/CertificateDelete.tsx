@@ -159,6 +159,7 @@ class CertificateDelete extends React.Component<ICertificateDeleteProps, ICertif
           },
           userName: USER_NAME,
         });
+        this.handelCancel();
       }
     }
 
@@ -179,7 +180,7 @@ class CertificateDelete extends React.Component<ICertificateDeleteProps, ICertif
     } else if (!window.PKISTORE.deleteCertificate(certificate)) {
       $(".toast-cert_delete_failed").remove();
       Materialize.toast(localize("Certificate.cert_delete_failed", locale), 2000, "toast-cert_delete_failed");
-
+      this.handelCancel();
       return;
     }
     resetCertVerified();
