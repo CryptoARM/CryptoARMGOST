@@ -57,7 +57,7 @@ class CertificateSelectionForEncrypt extends React.Component<any, any> {
 
   componentDidUpdate(prevProps, prevState) {
     const { isLoading } = this.props;
-    const { certificate } = this.state;
+    const { certificate, selectedRecipients } = this.state;
 
     if ((!prevState.certificate && certificate)) {
       $(".nav-small-btn").dropdown();
@@ -165,7 +165,7 @@ class CertificateSelectionForEncrypt extends React.Component<any, any> {
                       </a>
                   </div>
                   <div className="col s2">
-                    <a className="btn btn-outlined waves-effect waves-light" onClick={this.handleChooseRecipients}>
+                    <a className={`btn btn-outlined waves-effect waves-light ${(selectedRecipients && selectedRecipients.length !== 0) ? "" : "disabled"}`} onClick={this.handleChooseRecipients}>
                       {localize("Settings.Choose", locale)}
                     </a>
                   </div>
