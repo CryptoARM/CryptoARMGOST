@@ -212,6 +212,7 @@ export default {
     cert_add_is_GOST_or_RSA: "Select certificates with one algorithm (only GOST or only RSA)",
     cert_error_mixed_GOST_RSA: "Error. At the same time, you can select only GOST or RSA encryption certificates",
     cert_import_from_file: "Import from file",
+    cert_import_from_container: "Install from container",
     cert_import_ok: "The certificate is successfully imported",
     cert_imported: "The certificate is already imported",
     cert_info: "Certificate information",
