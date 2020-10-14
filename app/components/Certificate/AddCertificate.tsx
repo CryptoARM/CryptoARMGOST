@@ -1,8 +1,9 @@
 import PropTypes from "prop-types";
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   ADDRESS_BOOK, CA, CRL, MODAL_CERTIFICATE_IMPORT_DSS,
-  MODAL_CERTIFICATE_REQUEST, MODAL_CERTIFICATE_REQUEST_CA, MY, REQUEST, ROOT, MODAL_ADD_SERVICE_CA,
+  MODAL_CERTIFICATE_REQUEST, MODAL_CERTIFICATE_REQUEST_CA, MY, REQUEST, ROOT, MODAL_ADD_SERVICE_CA, LOCATION_CONTAINERS
 } from "../../constants";
 
 interface IAddCertificateProps {
@@ -71,6 +72,7 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
             {this.getImportFromDss()}
             {this.getCreateRequest()}
             {this.getCreateRequestCA()}
+            {this.getContainer()}
           </React.Fragment>
         );
 
@@ -107,6 +109,29 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
           </React.Fragment>
         );
     }
+  }
+
+  getContainer = () => {
+    const { localize, locale } = this.context;
+
+    return (
+      <div
+      className="collection-item avatar certs-collection col s12 valign-wrapper"
+      onMouseOver={() => this.handleOnRowMouseOver("cert_import_from_container")}>
+      <div className="col" style={{ width: "40px" }}>
+        <a data-position="bottom">
+          <i className="material-icons certificate container" />
+        </a>
+      </div>
+      <div className="col s11">
+        <div className="collection-title">
+          <Link to={LOCATION_CONTAINERS} style={{color: "#000"}}>
+              {localize("Certificate.cert_import_from_container", locale)}
+          </Link>
+        </div>
+      </div>
+    </div>
+    )
   }
 
   getImportFromFile = () => {

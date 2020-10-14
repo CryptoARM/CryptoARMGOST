@@ -3057,6 +3057,10 @@ svg:hover {
     background: url(./resources/image/operations/export_cert.svg);
   }
 
+  i.material-icons.certificate.container {
+    background: url(./resources/image/operations/container.svg);
+  }
+
   i.material-icons.certificate.import {
     background: url(./resources/image/operations/import_cert.svg);
   }

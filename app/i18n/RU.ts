@@ -212,6 +212,7 @@ export default {
     cert_add_is_GOST_or_RSA: "Выберите сертификаты с одним алгоритмом (только ГОСТ либо только RSA)",
     cert_error_mixed_GOST_RSA: "Ошибка. Одновременно можно выбрать сертификаты шифрования только ГОСТ либо только RSA",
     cert_import_from_file: "Импорт из файла",
+    cert_import_from_container: "Установить из контейнера",
     cert_import_ok: "Сертификат успешно импортирован",
     cert_imported: "Сертификат уже импортирован",
     cert_info: "Сведения о сертификате",
