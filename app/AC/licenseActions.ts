@@ -50,17 +50,20 @@ function readRegistryLicense(): string {
     }).toString();
   } catch (e) {
     // License is not found in registry
+    console.error(e);
     return "";
   }
 
-  const searchResult = cmdResult.match(/[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}-[0-9A-Z\-]{5}/);
-
-  if (null === searchResult) {
-    // License is not match format
+  const prefix = cmdResult.match(/license\s*REG_SZ\s*/);
+  if (null === prefix) {
+    // Error while searching license value
     return "";
   }
 
-  return searchResult[0];
+  const licPos = cmdResult.toString().indexOf(prefix) + prefix.toString().length;
+  const searchResult = cmdResult.toString().substr(licPos).trim();
+
+  return searchResult;
 }
 
 export function loadLicense(license?: string) {
@@ -111,7 +114,7 @@ export function loadLicense(license?: string) {
  
           if (status.verify) {
             lic_format = status.type;
-            lic.exp = status.attribute ? status.attribute.ExpirationTime : status.payload ? JSON.parse(status.payload).exp : null;
+            lic.exp = status.attribute ? status.attribute.ExpirationTime : status.payload ? status.payload.exp : null;
             lic.iat = 0;
             licenseStatus = true;
             lic_error = 900; // CTLICENSE_R_NO_ERROR
