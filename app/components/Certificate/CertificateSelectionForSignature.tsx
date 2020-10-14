@@ -43,6 +43,7 @@ class CertificateSelectionForSignature extends React.Component<any, any> {
     const { isLoading } = this.props;
     const { certificate } = this.state;
 
+    console.log("log", this.state);
     if ((!prevState.certificate && certificate)) {
       $(".nav-small-btn").dropdown();
     }
@@ -54,7 +55,7 @@ class CertificateSelectionForSignature extends React.Component<any, any> {
 
   render() {
     const { certificates, isLoading, isLoadingFromDSS, searchValue, exportCommmand } = this.props;
-    const { certificate } = this.state;
+    const { certificate, crl } = this.state;
     const { localize, locale } = this.context;
 
     if (isLoading || isLoadingFromDSS) {
@@ -130,7 +131,7 @@ class CertificateSelectionForSignature extends React.Component<any, any> {
                 </a>
               </div>
               <div className="col s2">
-                <a className="btn btn-outlined waves-effect waves-light" onClick={this.handleChooseSigner}>
+                <a className={`btn btn-outlined waves-effect waves-light ${(certificate || crl) ? "" : "disabled"}`} onClick={this.handleChooseSigner}>
                   {localize("Settings.Choose", locale)}
                 </a>
               </div>
