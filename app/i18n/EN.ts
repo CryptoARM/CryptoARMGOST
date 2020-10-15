@@ -368,6 +368,7 @@ export default {
     transaction_created_failed: "Error create transaction",
     transaction_created_successful: "Transaction was successful created",
     use_cryptopro_dss_test_service: "Use CryptoPro DSS test service",
+    use_api_v2: "Use confirmations v2.0",
   },
   Diagnostic: {
     close: "Close",

@@ -8,6 +8,7 @@ export const UsersDSSModel = Record({
   dssUrl: null,
   id: null,
   login: null,
+  isApiv2: null,
 });
 
 export const DefaultReducerState = Record({
@@ -25,6 +26,7 @@ export default (users = new DefaultReducerState(), action) => {
         dssUrl: payload.dssUrl,
         id: payload.id,
         login: payload.login,
+        isApiv2: payload.isApiv2,
       }));
       break;
     case POST_AUTHORIZATION_USER_DSS + SUCCESS:
