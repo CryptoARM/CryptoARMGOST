@@ -155,14 +155,15 @@ function gatherRemoteFileInfo(
 function uploadFiles(
   remoteFilesToUpload: any[],
   uploader: any,
-  urlActions: any
+  urlActions: any,
+  token: string
 ) {
-  const infoRequest = {
+    const infoRequest = {
     jsonrpc: "2.0",
     method: "signAndEncrypt.outDirectResults",
     params: {
       directResults: [],
-      id: urlActions.action.id,
+      id: urlActions.action ? urlActions.action.id : token,
     },
   };
 
@@ -198,7 +199,7 @@ function uploadFiles(
       store.dispatch(finishCurrentUrlCmd(false));
       removeWarningMessage();
       // tslint:disable-next-line: no-console
-      console.log("Error sending of diagnostics info with id " + urlActions.id
+      console.log("Error sending of diagnostics info with id " + urlActions.action ? urlActions.action.id : token
         + ". Error description: " + error);
     },
   );
@@ -262,7 +263,7 @@ export function packageSign(
           });
           return;
         } else {
-          uploadFiles(remoteFilesToUpload, remoteFiles.uploader, urlActions);
+          uploadFiles(remoteFilesToUpload, remoteFiles.uploader, urlActions, remoteFiles.token);
         }
       }
 
