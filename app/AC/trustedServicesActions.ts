@@ -1,5 +1,5 @@
 import store from "../store";
-import { ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_MODAL_ADD_TRUSTED_SERVICE, HIDE_MODAL_HTTP_ERROR, SHOW_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_HTTP_ERROR, VERIFY_CERTIFICATE, VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE } from "../constants";
+import { ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_DIAGNOSTIC_MODAL_NO_CERT, HIDE_MODAL_ADD_TRUSTED_SERVICE, HIDE_MODAL_HTTP_ERROR, SHOW_DIAGNOSTIC_MODAL_NO_CERT, SHOW_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_HTTP_ERROR, VERIFY_CERTIFICATE, VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE } from "../constants";
 import { uuid } from "../utils";
 import { certificateToPkiItemInfo } from "./urlCmdCertInfo";
 import { finishCurrentUrlCmd } from "./urlActions";
@@ -68,6 +68,19 @@ export function hideModalHTTPErr() {
   store.dispatch(finishCurrentUrlCmd(false))
   store.dispatch({
     type: HIDE_MODAL_HTTP_ERROR,
+  })
+}
+
+export function showDiagnosticModalNoCert() {
+  store.dispatch({
+    type: SHOW_DIAGNOSTIC_MODAL_NO_CERT,
+  })
+}
+
+export function closeDiagnosticModalNoCert() {
+  store.dispatch(finishCurrentUrlCmd(false))
+  store.dispatch({
+    type: HIDE_DIAGNOSTIC_MODAL_NO_CERT,
   })
 }
 

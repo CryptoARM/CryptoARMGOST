@@ -1,6 +1,7 @@
-import { LOCATION_CERTIFICATES, MY } from "../constants";
+import { LOCATION_CERTIFICATES, LOCATION_MAIN, MY, SHOW_DIAGNOSTIC_MODAL_NO_CERT } from "../constants";
 import { IUrlCommandApiV4Type } from "../parse-app-url";
 import { openWindow, paramsRequest, postRequest, removeWarningMessage } from "./urlCmdUtils";
+import { showDiagnosticModalNoCert } from "./trustedServicesActions";
 
 export interface IStartViewParameters {
   uiView: string;
@@ -24,6 +25,10 @@ export function handleUrlCommandStartView(command: IUrlCommandApiV4Type) {
       switch (uiView) {
         case "CERTIFICATES_MY":
           openWindow(LOCATION_CERTIFICATES, MY);
+          break;
+
+        case "DIAGNOSTIC_PROBLEM_PERSONAL_CERTIFICATES":
+          showDiagnosticModalNoCert();
           break;
 
         default:

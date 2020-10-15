@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import { OrderedMap, Record } from "immutable";
 import {
-  ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_MODAL_ADD_TRUSTED_SERVICE, HIDE_MODAL_HTTP_ERROR, SHOW_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_HTTP_ERROR, TRUSTED_SERVICES_JSON, VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE,
+  ADD_TRUSTED_SERVICE, DELETE_TRUSTED_SERVICE, HIDE_DIAGNOSTIC_MODAL_NO_CERT, HIDE_MODAL_ADD_TRUSTED_SERVICE, HIDE_MODAL_HTTP_ERROR, 
+  SHOW_DIAGNOSTIC_MODAL_NO_CERT, SHOW_MODAL_ADD_TRUSTED_SERVICE, SHOW_MODAL_HTTP_ERROR, TRUSTED_SERVICES_JSON, VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE,
 } from "../constants";
 import { CertificateModel } from "./certificates";
 
@@ -15,6 +16,7 @@ export const DefaultReducerState = Record({
   entities: OrderedMap({}),
   showModal: false,
   showErrModal: false,
+  showErrNoCert: false,
   urlToCheck: "",
 });
 
@@ -46,6 +48,12 @@ export default (trustedServices = new DefaultReducerState(), action) => {
 
     case HIDE_MODAL_HTTP_ERROR:
       return trustedServices.set("showErrModal", false);
+
+    case SHOW_DIAGNOSTIC_MODAL_NO_CERT:
+      return trustedServices.set("showErrNoCert", true);
+
+    case HIDE_DIAGNOSTIC_MODAL_NO_CERT:
+      return trustedServices.set("showErrNoCert", false);
 
     case VERIFY_CERTIFICATE_FOR_TRUSTED_SERVICE:
       return trustedServices.setIn(["entities", payload.url, "cert", "status"], payload.certificateStatus)

@@ -12,6 +12,7 @@ import HeaderWorkspaceBlock from "../HeaderWorkspaceBlock";
 
 interface IResolveProps {
   activeError: string;
+  onClose?: () => void;
 }
 
 class Resolve extends React.Component<IResolveProps, {}> {
@@ -19,6 +20,16 @@ class Resolve extends React.Component<IResolveProps, {}> {
     locale: PropTypes.string,
     localize: PropTypes.func,
   };
+
+  handleCloseModal = () => {
+    const { onClose } = this.props;
+
+    if (onClose) {
+      onClose();
+    }
+
+    $("#modal-window-diagnostic").closeModal();
+  }
 
   gotoLink = (address: string) => {
     window.electron.shell.openExternal(address);
@@ -163,7 +174,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
             </p>
             <p className="help_paragraf">
               {localize("Problems.resolve_5_3", locale)}
-              <Link to={LOCATION_CONTAINERS} onClick={() => $("#modal-window-diagnostic").closeModal()}>
+              <Link to={LOCATION_CONTAINERS} onClick={() => this.handleCloseModal()}>
                 {localize("Containers.Containers", locale)}
               </Link>
             </p>
@@ -171,7 +182,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
               {Number(this.getCPCSPVersion().charAt(0)) < 5 ? localize("Problems.resolve_5_4_1", locale) : localize("Problems.resolve_5_4", locale)}
               <Link
                 to={{ pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY } }}
-                onClick={() => $("#modal-window-diagnostic").closeModal()}>
+                onClick={() => this.handleCloseModal()}>
                 {localize("Certificate.Certificate", locale)}
               </Link>
             </p>
