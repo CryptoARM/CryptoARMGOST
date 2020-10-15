@@ -55,12 +55,20 @@
       window.framework_NW = true;
     }
 
+    fs = require('fs');
+
     var trusted;
     try {
       trusted = require('trusted-crypto');
       window.TSP_OCSP_ENABLED = (new trusted.utils.ModuleInfo).cadesEnabled;
       const LICENSE_MNG = new trusted.utils.License_Mng();
       window.LICENSE_MNG = LICENSE_MNG;
+      if (process.platform === 'win32') {
+        const appDir = process.env['LOCALAPPDATA'] + "\\Trusted\\CryptoARM GOST";
+        if (!fs.existsSync(appDir)) {
+          fs.mkdirSync(appDir, { recursive: true });
+        }
+      }
       var result = LICENSE_MNG.generateTrial();
     } catch (err) {
       window.tcerr = err;
@@ -79,7 +87,6 @@
     }
 
     path = require('path');
-    fs = require('fs');
     os = require('os');
 
     window.archiver = require('archiver');
