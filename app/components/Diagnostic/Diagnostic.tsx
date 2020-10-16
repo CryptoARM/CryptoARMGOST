@@ -17,6 +17,7 @@ import Problems from "../Diagnostic/Problems";
 import Resolve from "../Diagnostic/Resolve";
 import { collectDiagnosticInfo } from "../../AC/urlCmdDiagnostic";
 import localize from "../../i18n/localize";
+import { closeDiagnosticModalNoCert } from "../../AC/trustedServicesActions";
 
 interface IError {
   important?: string;
@@ -27,6 +28,7 @@ interface IDiagnosticState {
   activeError: string;
   criticalError: boolean;
   errors: IError[];
+  urlCheck?: boolean;
 }
 
 const remote = window.electron.remote;
@@ -196,14 +198,18 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
 
     }
 
-    if (certificatesLoaded === false && nextProps.certificatesLoaded && (nextProps.certificates.size === 0)) {
-      this.setState({
-        errors: [...this.state.errors, {
-          important: WARNING,
-          type: NO_HAVE_CERTIFICATES_WITH_KEY,
-        }],
-      });
+    if (certificatesLoaded === false && nextProps.certificatesLoaded && (nextProps.certificates.size === 0) || nextProps.trustedServices.showErrNoCert) {
+        this.setState({
+          errors: [...this.state.errors, {
+            important: WARNING,
+            type: NO_HAVE_CERTIFICATES_WITH_KEY,
+          }],
+        });
 
+      if (nextProps.trustedServices.showErrNoCert){
+        this.setState({ urlCheck: true });
+        closeDiagnosticModalNoCert();
+      }
     }
 
   }
@@ -312,7 +318,7 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
                 <Problems errors={cspErrors.length ? cspErrors : errors} activeError={this.state.activeError} onClick={this.handleClickOnError} />
               </div>
               <div className="col s6 m7 l6 problem-contaner">
-                <Resolve activeError={this.state.activeError} />
+                <Resolve activeError={this.state.activeError} onClose={this.handleMaybeCloseApp}/>
               </div>
             </div>
 
@@ -338,8 +344,15 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
   }
 
   handleMaybeCloseApp = () => {
+    const { criticalError, urlCheck} = this.state;
 
-    const { criticalError } = this.state;
+    if (!this.props.trustedServices.showErrNoCert && urlCheck) {
+      this.setState({
+        activeError: "",
+        errors: [],
+        urlCheck: false,
+      })
+    }
 
     if (criticalError) {
       remote.getGlobal("sharedObject").isQuiting = true;
@@ -424,5 +437,6 @@ export default connect((state) => {
     loadingLicense: state.license.loading,
     statusLicense: state.license.status,
     verifiedLicense: state.license.verified,
+    trustedServices: state.trustedServices,
   };
 }, { loadAllCertificates, loadLicense })(Diagnostic);
