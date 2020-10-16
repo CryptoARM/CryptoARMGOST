@@ -167,24 +167,13 @@ class Resolve extends React.Component<IResolveProps, {}> {
         return (
           <div className="resolve-content">
             <p className="help_paragraf">{localize("Problems.resolve_5_1", locale)}</p>
-            <p className="help_paragraf">{localize("Problems.resolve_5_2", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/upload/docs/userguide-cryptoarm-gost.pdf")}>
-                {localize("Help.link_user_guide_name", locale)}
-              </a>
-            </p>
-            <p className="help_paragraf">
-              {localize("Problems.resolve_5_3", locale)}
-              <Link to={LOCATION_CONTAINERS} onClick={() => this.handleCloseModal()}>
-                {localize("Containers.Containers", locale)}
-              </Link>
-            </p>
-            <p className="help_paragraf">
-              {Number(this.getCPCSPVersion().charAt(0)) < 5 ? localize("Problems.resolve_5_4_1", locale) : localize("Problems.resolve_5_4", locale)}
-              <Link
-                to={{ pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY } }}
-                onClick={() => this.handleCloseModal()}>
-                {localize("Certificate.Certificate", locale)}
-              </Link>
+            <p className="help_paragraf">{localize("Problems.resolve_5_2", locale)}</p>
+            <p className="help_paragraf item">- {localize("Problems.resolve_5_3", locale)}</p>
+            <p className="help_paragraf item">- {localize("Problems.resolve_5_4", locale)}</p>
+            <p className="help_paragraf item">- {localize("Problems.resolve_5_5", locale)}</p>
+            <p className="help_paragraf item">- {localize("Problems.resolve_5_6", locale)}</p>
+            <p className="help_paragraf">{localize("Problems.resolve_5_7", locale)}
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/")}> cryptoarm.ru</a>
             </p>
           </div>
         );
