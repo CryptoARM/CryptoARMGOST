@@ -12,7 +12,7 @@ const url_oath = "url_oath";
 const url_sign = "url_sign";
 const login_dss = "login_dss";
 const password_dss = "password_dss";
-const is_api_v2 = "is_api_v2"
+const confApiVersion = "confApiVersion"
 
 const URL_AUTHORIZATION_USER_DSS = "https://dss.cryptopro.ru/STS/oauth";
 const URL_SIGN_SERVER_DSS = "https://dss.cryptopro.ru/SignServer/rest";
@@ -353,7 +353,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
     const { isApiv2 } = this.state;
     const newSubject = {
       ...this.state.field_value,
-      [is_api_v2]: !isApiv2 ? "v2.0" : "v1.0",
+      [confApiVersion]: !isApiv2 ? "v2.0" : "v1.0",
     };
 
     this.setState(({
@@ -396,7 +396,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
       id: dssUserID,
       password: field_value.password_dss ? field_value.password_dss : "",
       user: field_value.login_dss,
-      isApiv2: field_value.is_api_v2,
+      confApiVersion: field_value.confApiVersion,
     };
 
     dssAuthIssue(userDSS).then(

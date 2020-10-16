@@ -160,7 +160,7 @@ export function dssAuthIssue(user: IUserDSS) {
         dssUrl: user.dssUrl,
         id: user.id,
         login: user.user,
-        isApiv2: user.isApiv2,
+        confApiVersion: user.confApiVersion,
       },
       type: CREATE_TEMP_USER_DSS + START,
     });
@@ -175,7 +175,7 @@ export function dssAuthIssue(user: IUserDSS) {
       Resource: "urn:cryptopro:dss:signserver:signserver",
     };
     return dispatch(
-      dssPostMFAUser(user.authUrl.replace("/oauth", (user.isApiv2 === "v2.0") ? "/v2.0/confirmation" : "/confirmation"), headerfield, body, user.id, POST_AUTHORIZATION_USER_DSS),
+      dssPostMFAUser(user.authUrl.replace("/oauth", (user.confApiVersion === "v2.0") ? "/v2.0/confirmation" : "/confirmation"), headerfield, body, user.id, POST_AUTHORIZATION_USER_DSS),
     );
   };
 }

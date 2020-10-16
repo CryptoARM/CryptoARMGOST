@@ -7,7 +7,7 @@ import { dssAuthIssue, getPolicyDSS } from "../../AC/dssActions";
 
 const login_dss = "login_dss";
 const password_dss = "password_dss";
-const is_api_v2 = "is_api_v2";
+const confApiVersion = "confApiVersion";
 
 interface IReAuthProps {
   dssUserID: string;
@@ -72,12 +72,12 @@ class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
     if (user) {
         const newSubject = {
           ...this.state.field_value,
-          [is_api_v2]: user.isApiv2 === "v2.0" ? user.isApiv2 : "v1.0",
+          [confApiVersion]: user.confApiVersion === "v2.0" ? user.confApiVersion : "v1.0",
         };
 
         this.setState(({
           field_value: { ...newSubject },
-          isApiv2: user.isApiv2 === "v2.0" ? true : false,
+          isApiv2: user.confApiVersion === "v2.0" ? true : false,
         }));
     }
 
@@ -145,7 +145,7 @@ class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
 
                   <div className="row halfbottom">
                     <div style={{ float: "left" }}>
-                      <div style={{ display: "inline-block", margin: "10px" }}>
+                      <div style={{ display: "inline-block", marginLeft: "10px", marginTop: "10px" }}>
                         <input
                           name="isRememberPassword"
                           className="filled-in"
@@ -226,7 +226,7 @@ class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
     const { isApiv2 } = this.state;
     const newSubject = {
       ...this.state.field_value,
-      [is_api_v2]: !isApiv2 ? "v2.0" : "v1.0",
+      [confApiVersion]: !isApiv2 ? "v2.0" : "v1.0",
     };
 
     this.setState(({
@@ -247,7 +247,7 @@ class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
       id: user.id,
       password: field_value.password_dss,
       user: user.login,
-      isApiv2: field_value.is_api_v2,
+      confApiVersion: field_value.confApiVersion,
     };
 
     dssAuthIssue(userDSS).then(
