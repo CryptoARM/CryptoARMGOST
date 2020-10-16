@@ -1,3 +1,4 @@
+import { userInfo } from "os";
 import PropTypes, { any } from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
@@ -6,6 +7,7 @@ import { dssAuthIssue, getPolicyDSS } from "../../AC/dssActions";
 
 const login_dss = "login_dss";
 const password_dss = "password_dss";
+const is_api_v2 = "is_api_v2";
 
 interface IReAuthProps {
   dssUserID: string;
@@ -26,6 +28,7 @@ interface IReAuthState {
   passwordUserDSS: any;
   isRememberPassword: boolean;
   tryAuthWithoutPasswordEntering: boolean;
+  isApiv2: boolean;
 }
 
 class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
@@ -44,13 +47,13 @@ class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
       passwordUserDSS,
       tryAuthWithoutPasswordEntering: true,
       user: props.users.get(props.dssUserID),
-
+      isApiv2: false,
     });
   }
 
   componentDidMount() {
     const self = this;
-    const { field_value } = this.state;
+    const { field_value, user } = this.state;
 
     $(document).ready(() => {
       $("select").material_select();
@@ -66,12 +69,24 @@ class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
       //
     }
 
+    if (user) {
+        const newSubject = {
+          ...this.state.field_value,
+          [is_api_v2]: user.isApiv2 === "v2.0" ? user.isApiv2 : "v1.0",
+        };
+
+        this.setState(({
+          field_value: { ...newSubject },
+          isApiv2: user.isApiv2 === "v2.0" ? true : false,
+        }));
+    }
+
     this.handleReady();
   }
 
   render() {
     const { localize, locale } = this.context;
-    const { field_value, user, isRememberPassword } = this.state;
+    const { field_value, user, isRememberPassword, isApiv2 } = this.state;
 
     if (!user) {
       this.handleCancel();
@@ -146,6 +161,24 @@ class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
                     </div>
                   </div>
 
+                  <div className="row halfbottom">
+                    <div style={{ float: "left" }}>
+                      <div style={{ display: "inline-block", margin: "10px" }}>
+                        <input
+                          name="isApiv2"
+                          className="filled-in"
+                          type="checkbox"
+                          id="isApiv2"
+                          checked={isApiv2}
+                          onChange={this.toggleIsApiv2}
+                        />
+                        <label htmlFor="isApiv2">
+                          {localize("DSS.use_api_v2", locale)}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -189,6 +222,19 @@ class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
     });
   }
 
+  toggleIsApiv2 = () => {
+    const { isApiv2 } = this.state;
+    const newSubject = {
+      ...this.state.field_value,
+      [is_api_v2]: !isApiv2 ? "v2.0" : "v1.0",
+    };
+
+    this.setState(({
+      field_value: { ...newSubject },
+      isApiv2: !isApiv2,
+    }));
+  }
+
   handleReady = () => {
     const { localize, locale } = this.context;
     const { field_value, user, isRememberPassword, passwordUserDSS, tryAuthWithoutPasswordEntering } = this.state;
@@ -201,6 +247,7 @@ class ReAuth extends React.Component<IReAuthProps, IReAuthState> {
       id: user.id,
       password: field_value.password_dss,
       user: user.login,
+      isApiv2: field_value.is_api_v2,
     };
 
     dssAuthIssue(userDSS).then(
