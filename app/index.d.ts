@@ -40,6 +40,7 @@ interface IUserDSS {
   password: string;
   authUrl: string;
   dssUrl: string;
+  confApiVersion: string;
 }
 
 interface Window {

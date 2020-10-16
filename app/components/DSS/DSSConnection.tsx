@@ -12,6 +12,7 @@ const url_oath = "url_oath";
 const url_sign = "url_sign";
 const login_dss = "login_dss";
 const password_dss = "password_dss";
+const confApiVersion = "confApiVersion"
 
 const URL_AUTHORIZATION_USER_DSS = "https://dss.cryptopro.ru/STS/oauth";
 const URL_SIGN_SERVER_DSS = "https://dss.cryptopro.ru/SignServer/rest";
@@ -34,6 +35,7 @@ interface IDSSConnectionProps {
 interface IDSSConnectionState {
   field_value: any;
   isTestDSS: boolean;
+  isApiv2: boolean;
   isRememberPassword: boolean;
   dssUserID: string;
   dssResponse: any;
@@ -52,6 +54,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
     this.state = ({
       field_value: "",
       isTestDSS: false,
+      isApiv2: false,
       isRememberPassword: false,
       dssUserID: "",
       dssResponse: null,
@@ -121,7 +124,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
 
   render() {
     const { localize, locale } = this.context;
-    const { dssResponse, field_value, isTestDSS, isRememberPassword, isPasswordRequired } = this.state;
+    const { dssResponse, field_value, isTestDSS, isRememberPassword, isPasswordRequired, isApiv2 } = this.state;
     const { isLoaded, isLoading } = this.props;
 
     if (isLoading) {
@@ -214,9 +217,9 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
             </div>
           </div>
 
-          <div className="row">
+          <div >
             <div style={{ float: "left" }}>
-              <div style={{ display: "inline-block", margin: "10px" }}>
+              <div style={{ display: "inline-block", margin: "10px"}}>
                 <input
                   name="isTestDSS"
                   className="filled-in"
@@ -227,6 +230,24 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
                 />
                 <label htmlFor="isTestDSS">
                   {localize("DSS.use_cryptopro_dss_test_service", locale)}
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="row">
+            <div style={{ float: "left" }}>
+              <div style={{ display: "inline-block", marginLeft: "10px"}}>
+                <input
+                  name="isApiv2"
+                  className="filled-in"
+                  type="checkbox"
+                  id="isApiv2"
+                  checked={isApiv2}
+                  onChange={this.handleIsApiv2}
+                />
+                <label htmlFor="isApiv2">
+                  {localize("DSS.use_api_v2", locale)}
                 </label>
               </div>
             </div>
@@ -328,6 +349,19 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
     }));
   }
 
+  handleIsApiv2 = () => {
+    const { isApiv2 } = this.state;
+    const newSubject = {
+      ...this.state.field_value,
+      [confApiVersion]: !isApiv2 ? "v2.0" : "v1.0",
+    };
+
+    this.setState(({
+      field_value: { ...newSubject },
+      isApiv2: !isApiv2,
+    }));
+  }
+
   toggleIsTestDSS = () => {
     const { isTestDSS, field_value } = this.state;
     const newSubject = !isTestDSS ?
@@ -362,6 +396,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
       id: dssUserID,
       password: field_value.password_dss ? field_value.password_dss : "",
       user: field_value.login_dss,
+      confApiVersion: field_value.confApiVersion,
     };
 
     dssAuthIssue(userDSS).then(
