@@ -2537,7 +2537,7 @@ i.material-icons.left.chain_10 {
 }
 
 .problem-contaner {
-    height: 400px;
+    height: 460px;
 }
 
 .col.s6.m5.l6.problem-contaner {
@@ -2546,8 +2546,8 @@ i.material-icons.left.chain_10 {
 
 .resolve-content {
     line-height: 18px;
-    padding-left: 4px;
-    padding-right: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
     padding-top: 4px;
     padding-bottom: 4px;
     color: black;
@@ -2613,6 +2613,11 @@ a.hlink {
 
 a.help_paragraf {
     padding-left: 10px;
+}
+
+.help_paragraf.item{
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 .scroll_inside {
