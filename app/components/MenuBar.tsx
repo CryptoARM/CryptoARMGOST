@@ -338,6 +338,7 @@ class MenuBar extends React.Component<any, IMenuBarState> {
 
   handleCloseModalAddTrustedService = () => {
     this.setState({ showModalAddTrustedService: false });
+    remote.getCurrentWindow().minimize();
   }
 
   showModalHTTPErr = () => {
