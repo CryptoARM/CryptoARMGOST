@@ -402,6 +402,7 @@ export default {
     invalid: "недействительна",
     copy_text: "Информация о системе скопирована в буфер обмена.",
     copy: "Копировать",
+    documentation_text: "КриптоАРМ ГОСТ - документация",
   },
   Documents: {
     Documents: "ДОКУМЕНТЫ",

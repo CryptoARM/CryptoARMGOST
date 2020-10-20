@@ -402,6 +402,7 @@ export default {
     invalid: "invalid",
     copy_text: "System information copied to clipboard",
     copy: "Copy",
+    documentation_text: "CryptoARM GOST - documentation",
   },
   Documents: {
     archived_files: "Archived files",
