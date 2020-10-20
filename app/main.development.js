@@ -291,7 +291,7 @@ if (!gotInstanceLock && !isMAS) {
           label: 'Help', submenu: [
             {
               role: 'help',
-              click() { require('electron').shell.openExternal('https://cryptoarm.ru/upload/docs/userguide-cryptoarm-gost.pdf') }
+              click() { require('electron').shell.openExternal('https://cryptoarm.ru/documentation/5-razdel-3') }
             }
           ],
         },
