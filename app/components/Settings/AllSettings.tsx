@@ -264,7 +264,7 @@ class AllSettings extends React.Component<any, {}> {
 
   handleSignatureStandardChange = (value: string) => {
     // tslint:disable-next-line: no-shadowed-variable
-    const { changeSignatureTime, changeSignatureTimestamp, changeSignatureTimestampOnSign, changeSignatureStandard } = this.props;
+    const { changeSignatureTime, changeSignatureTimestamp, changeSignatureTimestampOnSign, changeSignatureStandard, settings } = this.props;
 
     changeSignatureStandard(value);
 
@@ -272,6 +272,9 @@ class AllSettings extends React.Component<any, {}> {
       changeSignatureTime(true);
       changeSignatureTimestamp(false);
       changeSignatureTimestampOnSign(true);
+    } else { if (settings.tsp.url === "") {
+        changeSignatureTimestampOnSign(false);
+      }
     }
   }
 
