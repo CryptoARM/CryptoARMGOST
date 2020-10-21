@@ -112,7 +112,79 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
       this.search(this.props.searchValue);
     }
   }
+  
+  dragLeaveHandler(event: any) {
+    event.target.classList.remove("draggedOver");
 
+    const zone = document.querySelector("#droppableZone");
+    if (zone) {
+      zone.classList.remove("droppableZone-active");
+    }
+  }
+
+  dragEnterHandler(event: any) {
+    event.target.classList.add("draggedOver");
+  }
+
+  dragOverHandler(event: any) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
+  directoryReader = (reader: any) => {
+    reader.readEntries((entries: any) => {
+      entries.forEach((entry: any) => {
+        this.scanFiles(entry);
+      });
+
+      if (entries.length === 100) {
+        this.directoryReader(reader);
+      }
+    });
+  }
+
+  scanFiles = (item: any) => {
+    // tslint:disable-next-line:no-shadowed-variable
+    const { selectFile } = this.props;
+
+    if (item.isDirectory) {
+      const reader = item.createReader();
+
+      this.directoryReader(reader);
+    } else {
+      item.file((dropfile: IFile) => {
+        selectFile(dropfile.path, dropfile.name, dropfile.mtime, dropfile.size);
+      });
+    }
+  }
+
+  dropHandler = (event: any) => {
+    event.stopPropagation();
+    event.preventDefault();
+    event.target.classList.remove("draggedOver");
+
+    const zone = document.querySelector("#droppableZone");
+    if (zone) {
+      zone.classList.remove("droppableZone-active");
+    }
+
+    const items = event.dataTransfer.items;
+
+    for (const item of items) {
+      const entry = item.webkitGetAsEntry();
+
+      if (entry) {
+        this.scanFiles(entry);
+      }
+    }
+  }
+
+  dropZoneActive() {
+    const zone = document.querySelector("#droppableZone");
+    if (zone) {
+      zone.classList.add("droppableZone-active");
+    }
+  }
   render() {
     const { locale, localize } = this.context;
     const { certificatesMap, searchValue } = this.props;
@@ -128,7 +200,7 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
       <React.Fragment>
         <div style={{ display: "flex" }}>
           <div style={{ flex: "1 1 auto", height: "calc(100vh - 110px)" }}>
-
+          <div onDragEnter={this.dropZoneActive.bind(this)}>
             <Media query="(max-width: 1020px)">
               {(matches) =>
                 matches ?
@@ -281,7 +353,7 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
 
               }
             </Media>
-
+          </div>
           </div>
         </div>
       </React.Fragment>
