@@ -63,7 +63,7 @@ class PasswordDialog extends React.Component<any, any> {
               <div className="row">
                 <div className="input-field col s12 input-field-password">
                   <i className={"material-icons prefix key-prefix"}>vpn_key</i>
-                  <input id="input_password" type="password" value={value} onChange={this.handleChange} />
+                  <input id="input_password" type="password" value={value} onChange={this.handleChange} autofocus="true" />
                   <label htmlFor="input_password" className={active}>{localize("Settings.password", locale)}</label>
                 </div>
               </div>

@@ -44,7 +44,7 @@ class RenameSettings extends React.Component<IRenameSettingsProps, ICertificateD
   componentWillUnmount() {
     this.handelCancel();
   }
-  handleFocus = (event) => event.target.select();
+  handleFocus = (event: any) => event.target.select();
   render() {
     const { localize, locale } = this.context;
     const { name } = this.state;
