@@ -71,6 +71,7 @@ class PinCodeForDssContainer extends React.Component<IPinCodeForDssContainerProp
                     <input
                       id="pin"
                       type="password"
+                      autofocus="true"
                       className={"validate"}
                       name="pin"
                       value={pin}

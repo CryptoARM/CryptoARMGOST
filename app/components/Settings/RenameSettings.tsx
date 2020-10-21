@@ -44,7 +44,7 @@ class RenameSettings extends React.Component<IRenameSettingsProps, ICertificateD
   componentWillUnmount() {
     this.handelCancel();
   }
-
+  handleFocus = (event) => event.target.select();
   render() {
     const { localize, locale } = this.context;
     const { name } = this.state;
@@ -63,6 +63,8 @@ class RenameSettings extends React.Component<IRenameSettingsProps, ICertificateD
             <input
               id="name"
               type="text"
+              onFocus={this.handleFocus}
+              autofocus="true"
               className="validate"
               maxLength={100}
               name="name"

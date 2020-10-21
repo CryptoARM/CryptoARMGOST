@@ -69,6 +69,7 @@ class LicenseCSPSetup extends React.Component<ILicenseCSPSetupProps, ILicenseCSP
                   <input
                     id="license"
                     type="text"
+                    autoufocus="true"
                     className={license ? (this.validateLicense(license) ? "valid" : "invalid") : "validate"}
                     name="license"
                     value={license}
