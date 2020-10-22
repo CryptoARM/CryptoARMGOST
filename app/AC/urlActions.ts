@@ -113,12 +113,13 @@ function obtainCertWithHttps(command: IUrlCommandApiV4Type, hostToCheck: string)
   const url = new URL (command.url);
 
   const hostName = url.host;
+  const hostPort = url.port ?  url.port : 443;
   const options = {
     ca: SERVICE_CHAIN,
     hostname: hostName,
     method: "GET",
     path: "/",
-    port: 443,
+    port: hostPort,
     checkServerIdentity(host: any, cert: any) {
       try {
         curCert = new trusted.pki.Certificate();
