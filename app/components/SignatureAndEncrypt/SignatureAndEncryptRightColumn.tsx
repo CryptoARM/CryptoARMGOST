@@ -854,6 +854,12 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       multiDirectOperation, multiReverseOperation, operations, recipients } = this.props;
     const { localize, locale } = this.context;
 
+    if ((setting.sign.timestamp_on_data || setting.sign.timestamp_on_sign) && setting.tsp.url === "") {
+      $(".toast-Sign_failed_TSP_misconfigured").remove();
+      Materialize.toast(localize("Tsp.failed_tsp_url", locale), 3000, "toast-Sign_failed-TSP_misconfigured");
+      return;
+    }
+
     const licenseStatus = checkLicense();
 
     let sinerCert = null;
