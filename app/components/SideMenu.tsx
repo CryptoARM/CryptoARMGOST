@@ -354,13 +354,13 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
             </Link>
           </li>
           <li onClick={() => $("#dropdown-about").dropdown("close")} >
-            <a style={{ height: "33px", padding: "0px" }} onClick={() => window.electron.shell.openExternal(localize("Help.link_user_guide", locale))}>
+            <a style={{ height: "33px", padding: "0px" }} onClick={() => window.electron.shell.openExternal("https://cryptoarm.ru/documentation/5-razdel-3")}>
               <div className="row nobottom valign-wrapper">
                 <div className="col" style={{ width: "36px" }}>
                   <i className="material-icons left help" />
                 </div>
                 <div className="col">
-                  Справка
+                  {localize("Help.help", locale)}
                 </div>
               </div>
             </a>

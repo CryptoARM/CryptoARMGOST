@@ -49,8 +49,8 @@ class Resolve extends React.Component<IResolveProps, {}> {
               {localize("Problems.resolve_6_2", locale)}
             </p>
             <p className="help_paragraf">{localize("Problems.resolve_6_3", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink(localize("Help.link_user_guide", locale))}>
-                {localize("Help.link_user_guide_name", locale)}
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ne-zagruzhen-modul-trusted-crypto")}>
+                {localize("DiagnosticInfo.documentation_text", locale)}
               </a>
             </p>
           </div>
@@ -66,8 +66,8 @@ class Resolve extends React.Component<IResolveProps, {}> {
               {localize("Problems.resolve_7_2", locale)}
             </p>
             <p className="help_paragraf">{localize("Problems.resolve_7_3", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink(localize("Help.link_user_guide", locale))}>
-                {localize("Help.link_user_guide_name", locale)}
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ne-zagruzhen-modul-trusted-crypto")}>
+                {localize("DiagnosticInfo.documentation_text", locale)}
               </a>
             </p>
           </div>
@@ -82,8 +82,8 @@ class Resolve extends React.Component<IResolveProps, {}> {
               <a className="hlink" onClick={(event) => this.gotoLink("https://diagnostic.cryptoarm.ru/")}> https://diagnostic.cryptoarm.ru/</a>
             </p>
             <p className="help_paragraf">{localize("Problems.resolve_1_4", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/upload/docs/userguide-cryptoarm-gost.pdf")}>
-                {localize("Help.link_user_guide_name", locale)}
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/otsutstvuet-skzi-kriptopro-csp")}>
+                {localize("DiagnosticInfo.documentation_text", locale)}
               </a>
             </p>
           </div>
@@ -122,8 +122,8 @@ class Resolve extends React.Component<IResolveProps, {}> {
             </p>
             <p className="help_paragraf">
               {localize("Problems.resolve_1_4", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/upload/docs/userguide-cryptoarm-gost.pdf")}>
-                {localize("Help.link_user_guide_name", locale)}
+              <a className="hlink" onClick={(event) => this.gotoLink(localize("https://cryptoarm.ru/documentation/otsutstvuet-skzi-kriptopro-csp", locale))}>
+                {localize("DiagnosticInfo.documentation_text", locale)}
               </a>
             </p>
           </div>
@@ -173,7 +173,9 @@ class Resolve extends React.Component<IResolveProps, {}> {
             <p className="help_paragraf item">- {localize("Problems.resolve_5_5", locale)}</p>
             <p className="help_paragraf item">- {localize("Problems.resolve_5_6", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_5_7", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/")}> cryptoarm.ru</a>
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/obshchie-svedeniya")}> 
+                {localize("DiagnosticInfo.documentation_text", locale)}
+              </a>
             </p>
           </div>
         );
