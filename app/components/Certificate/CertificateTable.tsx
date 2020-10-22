@@ -47,6 +47,8 @@ interface ICertificateTableProps {
   selectingFilesPackage: boolean;
   style: any;
   isCertInfoMode: boolean;
+  certImport: () => void;
+  crlDialog: () => void
 }
 
 interface ICertificateTableDispatch {
@@ -112,7 +114,7 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
       this.search(this.props.searchValue);
     }
   }
-  
+
   dragLeaveHandler(event: any) {
     event.target.classList.remove("draggedOver");
 
@@ -162,7 +164,7 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
     event.stopPropagation();
     event.preventDefault();
     event.target.classList.remove("draggedOver");
-
+    const { location } = this.props
     const zone = document.querySelector("#droppableZone");
     if (zone) {
       zone.classList.remove("droppableZone-active");
@@ -174,7 +176,11 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
       const entry = item.webkitGetAsEntry();
 
       if (entry) {
-        this.scanFiles(entry);
+                      if (location && location.state && location.state.type === CRL) {
+                this.props.crlDialog();
+              } else {
+                this.props.certImport();
+              };
       }
     }
   }
@@ -185,6 +191,7 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
       zone.classList.add("droppableZone-active");
     }
   }
+
   render() {
     const { locale, localize } = this.context;
     const { certificatesMap, searchValue } = this.props;
@@ -198,10 +205,16 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
 
     return (
       <React.Fragment>
-        <div style={{ display: "flex" }}>
-          <div style={{ flex: "1 1 auto", height: "calc(100vh - 110px)" }}>
-          <div onDragEnter={this.dropZoneActive.bind(this)}>
-            <Media query="(max-width: 1020px)">
+        <div className="add">
+          <div id="droppableZone" onDragEnter={(event: any) => this.dragEnterHandler(event)}
+            onDrop={(event: any) => this.dropHandler(event)}
+            onDragOver={(event: any) => this.dragOverHandler(event)}
+            onDragLeave={(event: any) => this.dragLeaveHandler(event)}>
+          </div>
+          <div style={{ display: "flex" }}>
+            <div style={{ flex: "1 1 auto", height: "calc(100vh - 110px)" }}>
+              <div onDragEnter={this.dropZoneActive.bind(this)}>
+                <Media query="(max-width: 1020px)">
               {(matches) =>
                 matches ?
                   <AutoSizer>
@@ -355,6 +368,7 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
             </Media>
           </div>
           </div>
+          </div>``
         </div>
       </React.Fragment>
     );
