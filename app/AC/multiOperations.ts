@@ -73,7 +73,7 @@ export function multiDirectOperation(
     let packageResult = true;
     const directResult: any = {};
     const directFiles: any = {};
-    const filesId: any[] = [];
+    let filesId: any[] = [];
 
     setTimeout(async () => {
       const { operations, outfolder } = setting;
@@ -208,6 +208,7 @@ export function multiDirectOperation(
                 result: false,
               },
             };
+            filesId = filesId.filter(id => id !== file.id)
           }
         });
       } else {
@@ -462,6 +463,7 @@ export function multiDirectOperation(
                     result: false,
                   },
                 };
+                filesId = filesId.filter(id => id !== currentIdSigned)
               }
             } else {
               directFiles[currentId] = {
@@ -470,6 +472,7 @@ export function multiDirectOperation(
                   result: false,
                 },
               };
+              filesId = filesId.filter(id => id !== currentId)
             }
           }
         });
