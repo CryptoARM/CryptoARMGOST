@@ -18,7 +18,7 @@ import {
   DEFAULT_CSR_PATH, FAIL, MODAL_ADD_CERTIFICATE, MODAL_ADD_SERVICE_CA,
   MODAL_BEST_STORE, MODAL_CERTIFICATE_IMPORT_DSS, MODAL_CERTIFICATE_REQUEST, MODAL_CERTIFICATE_REQUEST_CA,
   MODAL_CLOUD_CSP, MODAL_DELETE_CERTIFICATE, MODAL_DELETE_CRL, MODAL_DELETE_REQUEST_CA,
-  MODAL_EXPORT_CERTIFICATE, MODAL_EXPORT_CRL, MODAL_EXPORT_REQUEST_CA, MY, PFX, PROVIDER_CRYPTOPRO, REQUEST,
+  MODAL_EXPORT_CERTIFICATE, MODAL_EXPORT_REQUEST_CA, MY, PFX, PROVIDER_CRYPTOPRO, REQUEST,
   ROOT, URL_CMD_CERTIFICATES_IMPORT, USER_NAME, RESET_DSS_CERTIFICATES_VERIFIED,
 } from "../../constants";
 import { filteredCertificatesSelector } from "../../selectors";
@@ -29,7 +29,6 @@ import logger from "../../winstonLogger";
 import BlockNotElements from "../BlockNotElements";
 import CloudCSP from "../CloudCSP/CloudCSP";
 import CRLDelete from "../CRL/CRLDelete";
-import CRLExport from "../CRL/CRLExport";
 import CRLInfo from "../CRL/CRLInfo";
 import Dialog from "../Dialog";
 import DSSConnection from "../DSS/DSSConnection";
@@ -82,7 +81,6 @@ class CertWindow extends React.Component<any, any> {
       showModalDeleteCRL: false,
       showModalDeleteCertifiacte: false,
       showModalDeleteRequestCA: false,
-      showModalExportCRL: false,
       showModalExportCertifiacte: false,
       showModalExportRequestCA: false,
     });
@@ -115,9 +113,6 @@ class CertWindow extends React.Component<any, any> {
         break;
       case MODAL_EXPORT_CERTIFICATE:
         this.setState({ showModalExportCertifiacte: true });
-        break;
-      case MODAL_EXPORT_CRL:
-        this.setState({ showModalExportCRL: true });
         break;
       case MODAL_DELETE_CRL:
         this.setState({ showModalDeleteCRL: true });
@@ -162,9 +157,6 @@ class CertWindow extends React.Component<any, any> {
       case MODAL_EXPORT_CERTIFICATE:
         this.setState({ showModalExportCertifiacte: false });
         break;
-      case MODAL_EXPORT_CRL:
-        this.setState({ showModalExportCRL: false });
-        break;
       case MODAL_DELETE_CRL:
         this.setState({ showModalDeleteCRL: false });
         break;
@@ -202,7 +194,6 @@ class CertWindow extends React.Component<any, any> {
       showModalCloudCSP: false,
       showModalDeleteCRL: false,
       showModalDeleteCertifiacte: false,
-      showModalExportCRL: false,
       showModalExportCertifiacte: false,
       showModalBestStore: false,
       showModalAddService: false,
@@ -1088,30 +1079,6 @@ class CertWindow extends React.Component<any, any> {
     );
   }
 
-  showModalExportCRL = () => {
-    const { localize, locale } = this.context;
-    const { crl, showModalExportCRL } = this.state;
-
-    if (!crl || !showModalExportCRL) {
-      return;
-    }
-
-    return (
-      <Modal
-        isOpen={showModalExportCRL}
-        header={localize("CRL.export_crl", locale)}
-        onClose={() => this.handleCloseModalByType(MODAL_EXPORT_CRL)}
-        style={{ width: "600px" }}>
-
-        <CRLExport
-          crl={crl}
-          onSuccess={() => this.handleCloseModalByType(MODAL_EXPORT_CRL)}
-          onCancel={() => this.handleCloseModalByType(MODAL_EXPORT_CRL)}
-          onFail={() => this.handleCloseModalByType(MODAL_EXPORT_CRL)} />
-      </Modal>
-    );
-  }
-
   showModalDeleteCrl = () => {
     const { localize, locale } = this.context;
     const { crl, showModalDeleteCRL } = this.state;
@@ -1496,7 +1463,7 @@ class CertWindow extends React.Component<any, any> {
                     <hr />
                   </div>
                   <div className="col s4 waves-effect waves-cryptoarm" style={{ paddingLeft: "0px" }} onClick={() => certificate ? this.handleShowModalByType(MODAL_EXPORT_CERTIFICATE)
-                    : this.handleShowModalByType(MODAL_EXPORT_CRL)}>
+                    : this.CRLExport()}>
                     <div className="col s12 svg_icon">
                       <a data-position="bottom">
                         <i className="material-icons certificate export" />
@@ -1592,7 +1559,6 @@ class CertWindow extends React.Component<any, any> {
           {this.showModalAddService()}
           {this.showModalDeleteCertificate()}
           {this.showModalExportCertificate()}
-          {this.showModalExportCRL()}
           {this.showModalDeleteCrl()}
           {this.showModalExportRequestCA()}
           {this.showModalDeleteRequestCA()}
@@ -1750,7 +1716,7 @@ class CertWindow extends React.Component<any, any> {
                 {
                   crl ?
                     <li>
-                      <a onClick={() => this.handleShowModalByType(MODAL_EXPORT_CRL)}>{localize("Certificate.cert_export", locale)}</a>
+                      <a onClick={() => this.CRLExport()}>{localize("Certificate.cert_export", locale)}</a>
                       <li><a onClick={() => this.handleShowModalByType(MODAL_DELETE_CRL)}>{localize("Common.delete", locale)}</a></li>
                     </li>
                     :
@@ -1795,6 +1761,48 @@ class CertWindow extends React.Component<any, any> {
 
   handleCertInfoCancel = () => {
     certInfoFail();
+  }
+
+  CRLExport = () => {
+    const { localize, locale } = this.context;
+    const { crl } = this.state;
+
+    const extension = "crl";
+
+    const outFilePAth = dialog.showSaveDialogSync({
+      defaultPath: "export." + extension,
+      filters: [{ name: localize("CRL.crls", locale), extensions: [extension] }],
+      title: localize("CRL.export_crl", locale),
+    });
+
+    const X509_CRL = window.PKISTORE.getPkiObject(crl);
+
+    if (!X509_CRL) {
+      $(".toast-crl_export_failed").remove();
+      Materialize.toast(localize("CRL.crl_export_failed", locale), 2000, "toast-crl_export_failed");
+
+      return;
+    }
+
+    if (outFilePAth && X509_CRL) {
+      try {
+        X509_CRL.save(outFilePAth);
+      } catch (e) {
+        $(".toast-crl_export_failed").remove();
+        Materialize.toast(localize("CRL.crl_export_failed", locale), 2000, "toast-crl_export_failed");
+
+        if (fileExists(outFilePAth)) {
+          fs.unlinkSync(outFilePAth);
+        }
+
+        return;
+      }
+      $(".toast-crl_export_ok").remove();
+      Materialize.toast(localize("CRL.crl_export_ok", locale), 2000, "toast-crl_export_ok");
+    } else {
+      $(".toast-crl_export_cancel").remove();
+      Materialize.toast(localize("CRL.crl_export_cancel", locale), 2000, "toast-crl_export_cancel");
+    }
   }
 }
 
