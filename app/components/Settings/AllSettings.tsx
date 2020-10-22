@@ -122,7 +122,7 @@ class AllSettings extends React.Component<any, {}> {
                   <SignatureStandardSelector
                     value={signatureStandard}
                     handleChange={this.handleSignatureStandardChange}
-                    disabled={disabled || isCertFromDSS || !(TSP_OCSP_ENABLED) || !isCertFromRSA} />
+                    disabled={disabled || isCertFromDSS || !(TSP_OCSP_ENABLED) || !isCertFromRSA || this.isSelfSigned()} />
 
                   <SignatureTypeSelector
                     detached={isDetached}
@@ -218,6 +218,21 @@ class AllSettings extends React.Component<any, {}> {
 
       </div>
     );
+  }
+
+  isSelfSigned = () => {
+    const { signer } = this.props;
+    let certif;
+
+    try {
+      certif = window.PKISTORE.getPkiObject(signer)
+    } catch(e) {
+      return false;
+    }
+
+    if (certif.isSelfSigned) {
+      return true
+    } else return false
   }
 
   isNotRSA = (publicKeyAlgorithm: string) => {
