@@ -257,7 +257,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                   value={setting.id}
                   handleChange={this.handleChangeDefaultSettings}
                   showModalAskSaveSetting={this.handleShowModalAskSaveSetting}
-                  disabled={operationIsRemote}
+                  disabled={this.isFilesFromSocket()}
                   setting={setting}
                   settings={settings} />
               </div>
