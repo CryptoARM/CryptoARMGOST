@@ -112,7 +112,7 @@ class CertificateListItem extends React.Component<ICertificateListItemProps, {}>
 
     chooseCert();
     toggleOpen();
-  }
+ё  }
 }
 
 export default connect(null, { verifyCertificate })(CertificateListItem);

@@ -47,8 +47,6 @@ interface ICertificateTableProps {
   selectingFilesPackage: boolean;
   style: any;
   isCertInfoMode: boolean;
-  certImport: () => void;
-  crlDialog: () => void
 }
 
 interface ICertificateTableDispatch {
@@ -115,84 +113,7 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
     }
   }
 
-  dragLeaveHandler(event: any) {
-    event.target.classList.remove("draggedOver");
-
-    const zone = document.querySelector("#droppableZone");
-    if (zone) {
-      zone.classList.remove("droppableZone-active");
-    }
-  }
-
-  dragEnterHandler(event: any) {
-    event.target.classList.add("draggedOver");
-  }
-
-  dragOverHandler(event: any) {
-    event.stopPropagation();
-    event.preventDefault();
-  }
-
-  directoryReader = (reader: any) => {
-    reader.readEntries((entries: any) => {
-      entries.forEach((entry: any) => {
-        this.scanFiles(entry);
-      });
-
-      if (entries.length === 100) {
-        this.directoryReader(reader);
-      }
-    });
-  }
-
-  scanFiles = (item: any) => {
-    // tslint:disable-next-line:no-shadowed-variable
-    const { selectFile } = this.props;
-
-    if (item.isDirectory) {
-      const reader = item.createReader();
-
-      this.directoryReader(reader);
-    } else {
-      item.file((dropfile: IFile) => {
-        selectFile(dropfile.path, dropfile.name, dropfile.mtime, dropfile.size);
-      });
-    }
-  }
-
-  dropHandler = (event: any) => {
-    event.stopPropagation();
-    event.preventDefault();
-    event.target.classList.remove("draggedOver");
-    const { location } = this.props
-    const zone = document.querySelector("#droppableZone");
-    if (zone) {
-      zone.classList.remove("droppableZone-active");
-    }
-
-    const items = event.dataTransfer.items;
-
-    for (const item of items) {
-      const entry = item.webkitGetAsEntry();
-
-      if (entry) {
-                      if (location && location.state && location.state.type === CRL) {
-                this.props.crlDialog();
-              } else {
-                this.props.certImport();
-              };
-      }
-    }
-  }
-
-  dropZoneActive() {
-    const zone = document.querySelector("#droppableZone");
-    if (zone) {
-      zone.classList.add("droppableZone-active");
-    }
-  }
-
-  render() {
+render() {
     const { locale, localize } = this.context;
     const { certificatesMap, searchValue } = this.props;
     const { disableHeader, foundDocuments, scrollToIndex, sortBy, sortDirection, sortedList } = this.state;
@@ -205,16 +126,11 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
 
     return (
       <React.Fragment>
-        <div className="add">
-          <div id="droppableZone" onDragEnter={(event: any) => this.dragEnterHandler(event)}
-            onDrop={(event: any) => this.dropHandler(event)}
-            onDragOver={(event: any) => this.dragOverHandler(event)}
-            onDragLeave={(event: any) => this.dragLeaveHandler(event)}>
-          </div>
+
           <div style={{ display: "flex" }}>
             <div style={{ flex: "1 1 auto", height: "calc(100vh - 110px)" }}>
-              <div onDragEnter={this.dropZoneActive.bind(this)}>
-                <Media query="(max-width: 1020px)">
+
+              <Media query="(max-width: 1020px)">
               {(matches) =>
                 matches ?
                   <AutoSizer>
@@ -366,10 +282,9 @@ class CertificateTable extends React.Component<ICertificateTableProps & ICertifi
 
               }
             </Media>
+
           </div>
           </div>
-          </div>``
-        </div>
       </React.Fragment>
     );
   }

@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import Media from "react-media";
 import { connect } from "react-redux";
-import { loadAllCertificates, loadAllContainers, removeAllCertificates, removeAllContainers } from "../../AC";
+import { loadAllCertificates, loadAllContainers, removeAllCertificates, removeAllContainers, selectFile } from "../../AC";
 import { deleteRequestCA } from "../../AC/caActions";
 import { resetCloudCSP } from "../../AC/cloudCspActions";
 import { changeSearchValue } from "../../AC/searchActions";
@@ -50,6 +50,17 @@ import CertificateExport from "./CertificateExport";
 import CertificateInfo from "./CertificateInfo";
 import CertificateInfoTabs from "./CertificateInfoTabs";
 import CertificateList from "./CertificateList";
+
+interface IFile {
+  lastModified: number;
+  mtime: Date;
+  name: string;
+  path: string;
+  size: number;
+  type: string;
+  webkitRelativePath: string;
+  remoteId?: string;
+}
 
 const OS_TYPE = os.type();
 const dialog = window.electron.remote.dialog;
@@ -1423,7 +1434,76 @@ class CertWindow extends React.Component<any, any> {
       }
     }
   }
+  dragLeaveHandler(event: any) {
+    event.target.classList.remove("draggedOver");
 
+    const zone = document.querySelector("#droppableZone");
+    if (zone) {
+      zone.classList.remove("droppableZone-active");
+    }
+  }
+
+  dragEnterHandler(event: any) {
+    event.target.classList.add("draggedOver");
+  }
+
+  dragOverHandler(event: any) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
+  directoryReader = (reader: any) => {
+    reader.readEntries((entries: any) => {
+      entries.forEach((entry: any) => {
+        this.scanFiles(entry);
+      });
+
+      if (entries.length === 100) {
+        this.directoryReader(reader);
+      }
+    });
+  }
+
+  scanFiles = (item: any) => {
+    // tslint:disable-next-line:no-shadowed-variable
+    if (item.isDirectory) {
+      const reader = item.createReader();
+
+      this.directoryReader(reader);
+    } else {
+      item.file((dropfile: IFile) => {
+       var file = selectFile(dropfile.path, dropfile.name, dropfile.mtime, dropfile.size);
+       this.handleImportPkiItem(file.payload.file.fullpath);
+      });
+    }
+  }
+
+  dropHandler = (event: any) => {
+    event.stopPropagation();
+    event.preventDefault();
+    event.target.classList.remove("draggedOver");
+    const { location } = this.props
+    const zone = document.querySelector("#droppableZone");
+    if (zone) {
+      zone.classList.remove("droppableZone-active");
+    }
+
+    const items = event.dataTransfer.items;
+
+    for (const item of items) {
+      const entry = item.webkitGetAsEntry();
+
+      if (entry) {
+       this.scanFiles(entry);
+      }
+    }
+  }
+    dropZoneActive() {
+    const zone = document.querySelector("#droppableZone");
+    if (zone) {
+      zone.classList.add("droppableZone-active");
+    }
+  }
   render() {
     const { certrequests, certificates, crls, isLoading,
       isLoadingFromDSS, searchValue, isCertInfoMode, urlCmdCertInfo } = this.props;
@@ -1437,12 +1517,18 @@ class CertWindow extends React.Component<any, any> {
     const VIEW = certrequests.length < 1 && certificates.size < 1 && crls.size < 1 ? "not-active" : "";
 
     return (
-      <div className="content-noflex">
+      <div className="content-noflex" onDragEnter={this.dropZoneActive.bind(this)}> 
+       <div id="droppableZone" onDragEnter={(event: any) => this.dragEnterHandler(event)}
+            onDrop={(event: any) => this.dropHandler(event)}
+            onDragOver={(event: any) => this.dragOverHandler(event)}
+            onDragLeave={(event: any) => this.dragLeaveHandler(event)}>
+          </div>
         <div className="row">
-          <div className="col s8 leftcol">
-            {
+          <div className="col s8 leftcol" >
+
+        {
               isCertInfoMode ? null :
-                <div className="row halfbottom">
+                <div className="row halfbottom" >
                   <div className="row halfbottom" />
                   <div className="col" style={{ width: "calc(100% - 60px)" }}>
                     <div className="input-field input-field-csr col s12 border_element find_box">
