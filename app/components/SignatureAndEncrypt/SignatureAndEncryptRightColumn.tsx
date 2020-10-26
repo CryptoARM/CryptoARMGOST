@@ -2265,6 +2265,12 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         return true;
 
       case ARCHIVE:
+        for (const document of activeFilesArr) {
+          if (document.filesize.toString() === "0") {
+            return false;
+          }
+        }
+
       case REMOVE:
         return true;
 
