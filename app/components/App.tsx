@@ -11,7 +11,7 @@ import {
   LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE, LOCATION_CERTIFICATES,
   LOCATION_CONTAINERS, LOCATION_DOCUMENTS, LOCATION_EVENTS,
   LOCATION_RESULTS_MULTI_OPERATIONS, LOCATION_SERVICES, LOCATION_SETTINGS,
-  LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT, LOCATION_TRUSTED_SERVICES,
+  LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT, LOCATION_TRUSTED_SERVICES, LOCATION_CERTIFICATES_DSS_IMPORT,
 } from "../constants";
 import history from "../history";
 import localize from "../i18n/localize";
@@ -97,6 +97,7 @@ class App extends React.Component<IAppProps, {}> {
           <Route path={LOCATION_SERVICES} component={ServiceWindow} />
           <Route path={LOCATION_RESULTS_MULTI_OPERATIONS} component={ResultsWindow} />
           <Route path={LOCATION_TRUSTED_SERVICES} component={TrustedServicesWindow} />
+          <Route path={LOCATION_CERTIFICATES_DSS_IMPORT} component={CertificateWindow} />
         </React.Fragment>
       </Router>
     );

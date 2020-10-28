@@ -73,6 +73,6 @@
 .diag_table_resolve .diag_table_resolve_tr .diag_table_resolve_td  {
   border: 1px solid lightgrey;
   height: 50%;
-  cursor: "pointer";
+  cursor: pointer;
   padding: 5px;
 }

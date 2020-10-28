@@ -255,6 +255,7 @@ export const LOCATION_SETTINGS = "/settings";
 export const LOCATION_SETTINGS_CONFIG = "/settings_config";
 export const LOCATION_SETTINGS_SELECT = "/settings_select";
 export const LOCATION_RESULTS_MULTI_OPERATIONS = "/results_multi_operations";
+export const LOCATION_CERTIFICATES_DSS_IMPORT = "/certificateImportDSS";
 
 export const MODAL_ADD_CERTIFICATE = "MODAL_ADD_CERTIFICATE";
 export const MODAL_ADD_SERVICE_CA = "MODAL_ADD_SERVICE_CA";
