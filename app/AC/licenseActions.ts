@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import os from "os";
 import {
   DELETE_ALL_TEMPORY_LICENSES, FAIL, LICENSE_PATH, LICENSE_REGISTRY_PATH,
   LicenseManager, LOAD_LICENSE, START, SUCCESS, VERIFY_LICENSE,
@@ -50,7 +51,9 @@ function readRegistryLicense(): string {
     }).toString();
   } catch (e) {
     // License is not found in registry
-    console.error(e);
+    if (os.type() === "Windows_NT") {
+      console.error(e);
+    }
     return "";
   }
 
