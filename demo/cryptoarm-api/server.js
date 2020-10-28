@@ -1,10 +1,24 @@
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const morgan = require('morgan');
+const fs = require('fs');
+const https = require('https');
+const http = require('http');
+
+const privateKey  = fs.readFileSync('pki/key.pem', 'utf8');
+const certificate = fs.readFileSync('pki/cert.pem', 'utf8');
+const credentials = {key: privateKey, cert: certificate};
 
 const app = express();
 
-const PORT = 8080;
+const httpsServer = https.createServer(credentials, app);
+httpsServer.listen(4040);
+console.log('Express server listening on port ', 4040);
+
+const httpServer = http.createServer(app);
+httpServer.listen(8080);
+
+//const PORT = 4443;
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
@@ -193,10 +207,6 @@ app.post('/upload', function (req, res) {
 
     res.send('File uploaded to ' + uploadPath);
   });
-});
-
-app.listen(PORT, function () {
-  console.log('Express server listening on port ', PORT);
 });
 
 function printCertificateInfo(certInfo) {

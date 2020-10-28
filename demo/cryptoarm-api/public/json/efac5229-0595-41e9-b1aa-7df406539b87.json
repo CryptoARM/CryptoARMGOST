@@ -7,7 +7,7 @@
         "files":[
             {
                 "name":"file1.txt",
-                "url":"http://localhost:8080/public/files/file1.txt",
+                "url":"https://localhost:4040/public/files/file1.txt",
                 "id":1,
                 "urlSign":""
             }
@@ -17,6 +17,6 @@
             "signType":"1",
             "signStandart":"1"
         },
-        "uploader":"http://localhost:8080/upload"
+        "uploader":"https://localhost:4040/upload"
     }
 }
