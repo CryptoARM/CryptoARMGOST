@@ -777,6 +777,11 @@ export default {
     resolve_8_1: "The system does not have the CryptoPro TSP Client 2.0 and CryptoPro OCSP Client 2.0 installed. Create CAdES-X Long Type 1 and set timestamps will not supported",
     resolve_8_2: "To solve this problem, install CryptoPro TSP Client 2.0 and CryptoPro OCSP Client 2.0 and run the application again.",
     resolve_8_3: "Distribution of the CryptoPro TSP Client 2.0 and CryptoPro OCSP Client 2.0 can be downloaded from the official CryptoPro website",
+    resolve_table_1: "Import from USB token/Smart card",
+    resolve_table_2: "Import from file",
+    resolve_table_3: "Import from CryptoPRO DSS",
+    resolve_table_4: "Create a self signed certificate for testing purposes",
+    resolve_table_5: "Purchase a certificate",
   },
   Request: {
     delete_request: "Delete request",

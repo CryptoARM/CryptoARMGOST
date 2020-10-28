@@ -70,3 +70,9 @@
 .ReactVirtualized__Grid, .ReactVirtualized__Masonry, .ReactVirtualized__Table__headerColumn, .ReactVirtualized__Table__row {
   outline: none;
 }
+.diag_table_resolve .diag_table_resolve_tr .diag_table_resolve_td  {
+  border: 1px solid lightgrey;
+  height: 50%;
+  cursor: "pointer";
+  padding: 5px;
+}

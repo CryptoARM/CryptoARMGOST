@@ -168,10 +168,72 @@ class Resolve extends React.Component<IResolveProps, {}> {
           <div className="resolve-content">
             <p className="help_paragraf">{localize("Problems.resolve_5_1", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_5_2", locale)}</p>
-            <p className="help_paragraf item">- {localize("Problems.resolve_5_3", locale)}</p>
-            <p className="help_paragraf item">- {localize("Problems.resolve_5_4", locale)}</p>
-            <p className="help_paragraf item">- {localize("Problems.resolve_5_5", locale)}</p>
-            <p className="help_paragraf item">- {localize("Problems.resolve_5_6", locale)}</p>
+            <table className="diag_table_resolve">
+              <tbody >
+                <tr className="diag_table_resolve_tr">
+                  <td className="diag_table_resolve_td">
+                    <div className="col s12 valign-wrapper">
+                      <div className="col s2" style={{ padding: 0 }}>
+                        <div className="cert_status_ok" />
+                      </div>
+                      <div className="col s10" style={{ padding: 0 }}>
+                        {localize("Problems.resolve_table_1", locale)}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr className="diag_table_resolve_tr">
+                  <td className="diag_table_resolve_td">
+                    <div className="col s12 valign-wrapper">
+                      <div className="col s2" style={{ padding: 0 }}>
+                        <div className="cert_status_ok" />
+                      </div>
+                      <div className="col s10" style={{ padding: 0 }}>
+                        {localize("Problems.resolve_table_2", locale)}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr className="diag_table_resolve_tr">
+                  <td className="diag_table_resolve_td">
+                    <div className="col s12 valign-wrapper">
+                      <div className="col s2" style={{ padding: 0 }}>
+                        <div className="cert_status_ok" />
+                      </div>
+                      <div className="col s10" style={{ padding: 0 }}>
+                        {localize("Problems.resolve_table_3", locale)}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr className="diag_table_resolve_tr">
+                  <td className="diag_table_resolve_td">
+                    <div className="col s12 valign-wrapper">
+                      <div className="col s2" style={{ padding: 0 }}>
+                        <div className="cert_status_ok" />
+                      </div>
+                      <div className="col s10" style={{ padding: 0 }}>
+                        {localize("Problems.resolve_table_4", locale)}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr className="diag_table_resolve_tr">
+               
+                    <td className="diag_table_resolve_td" onClick={(event) => this.gotoLink("https://cryptoarm.ru/certificates/")}>
+                      <div className="col s12 valign-wrapper">
+                        <div className="col s2" style={{ padding: 0 }}>
+                          <div className="cert_status_ok" />
+                        </div>
+                        <div className="col s10" style={{ padding: 0 }}>
+                          {localize("Problems.resolve_table_5", locale)}
+                        </div>
+                      </div>
+                    </td>
+            ``
+                </tr>
+              </tbody>
+            </table>
             <p className="help_paragraf">{localize("Problems.resolve_5_7", locale)}
               <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/obshchie-svedeniya")}> 
                 {localize("DiagnosticInfo.documentation_text", locale)}
