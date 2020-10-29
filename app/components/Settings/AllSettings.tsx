@@ -98,7 +98,12 @@ class AllSettings extends React.Component<any, {}> {
     const isCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
     const isCertFromRSA = (signer && this.isNotRSA(signer.publicKeyAlgorithm)) ? true : false;
 
-    const signatureStandard = settings.sign.standard;
+    let signatureStandard: string = "";
+
+    if (this.isSelfSigned()) {
+      signatureStandard = "CMS"
+    } else signatureStandard = settings.sign.standard;
+
     const classDisabledTspAndOcsp = (signatureStandard === SignatureStandard.CADES && !isCertFromDSS) ? "" : "disabled";
     const classDisabledTsp = isCertFromDSS ? "disabled" : "";
     const isDetached = settings.sign.detached;
