@@ -51,9 +51,7 @@ function readRegistryLicense(): string {
     }).toString();
   } catch (e) {
     // License is not found in registry
-    if (os.type() === "Windows_NT") {
       console.error(e);
-    }
     return "";
   }
 
@@ -97,7 +95,9 @@ export function loadLicense(license?: string) {
       } else {
         let result: any | undefined = undefined;
         try {
-          data = readRegistryLicense();
+          if (os.type() === "Windows_NT") {
+            data = readRegistryLicense();
+          }
           result = JSON.parse(LicenseManager.checkLicense(data));
         } catch(e) {
           //
