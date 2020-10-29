@@ -11,7 +11,7 @@ import {
   LOCATION_CERTIFICATE_SELECTION_FOR_SIGNATURE, LOCATION_CERTIFICATES,
   LOCATION_CONTAINERS, LOCATION_DOCUMENTS, LOCATION_EVENTS,
   LOCATION_RESULTS_MULTI_OPERATIONS, LOCATION_SERVICES, LOCATION_SETTINGS,
-  LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT, LOCATION_TRUSTED_SERVICES,
+  LOCATION_SETTINGS_CONFIG, LOCATION_SETTINGS_SELECT, LOCATION_TRUSTED_SERVICES, RU,
 } from "../constants";
 import history from "../history";
 import localize from "../i18n/localize";
@@ -105,6 +105,6 @@ class App extends React.Component<IAppProps, {}> {
 
 export default connect((state) => {
   return {
-    locale: state.settings.getIn(["entities", state.settings.default]).locale,
+    locale: RU,
   };
 })(App);

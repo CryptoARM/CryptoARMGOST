@@ -4,12 +4,12 @@ import {
   GOST3410_12_512, GOST89, GOST94, GOSTR3411_94_WITH_GOSTR3410_2001, MD_GOST12_256,
 } from "../constants";
 import {
- MD_GOST12_512, MD_GOST94, RU,  SIGNWITHDIGEST_GOST3410_12_256, SIGNWITHDIGEST_GOST3410_12_512,
+  MD_GOST12_512, MD_GOST94, RU, SIGNWITHDIGEST_GOST3410_12_256, SIGNWITHDIGEST_GOST3410_12_512,
 } from "../constants";
 import en from "./EN";
 import ru from "./RU";
 
-export default function localize(message: string, locale = EN) {
+export default function localize(message: string, locale = RU) {
   const category: string = message.substring(0, message.indexOf("."));
   const field: string = message.substring(message.indexOf(".") + 1, message.length);
 

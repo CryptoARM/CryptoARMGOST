@@ -18,7 +18,6 @@ import { fileExists, mapToArr } from "../utils";
 import Diagnostic from "./Diagnostic/Diagnostic";
 import Modal from "./Modal";
 import AskSaveSetting from "./Settings/AskSaveSetting";
-import LocaleSelect from "./Settings/LocaleSelect";
 import SideMenu from "./SideMenu";
 import AddTrustedService from "./TrustedServices/AddTrustedService";
 import { removeSearchValue } from "../AC/searchActions";
@@ -77,8 +76,8 @@ class MenuBar extends React.Component<any, IMenuBarState> {
       this.handleCloseModalHTTPErr();
     }
 
-    if (this.props.location.pathname !== prevProps.location.pathname && this.props.searchValue){
-        removeSearchValue();
+    if (this.props.location.pathname !== prevProps.location.pathname && this.props.searchValue) {
+      removeSearchValue();
     }
   }
 
@@ -218,9 +217,6 @@ class MenuBar extends React.Component<any, IMenuBarState> {
               <li>
                 <ul>
                   <li>
-                    <LocaleSelect />
-                  </li>
-                  <li>
                     <a className="waves-effect waves-light" onClick={this.minimizeWindow.bind(this)}>
                       <i className="material-icons">remove</i>
 
@@ -355,24 +351,24 @@ class MenuBar extends React.Component<any, IMenuBarState> {
         onClose={hideModalHTTPErr}
         header={localize("Settings.warning", locale)}
         style={{ width: "380px" }}>
-          <div className="row halftop">
-            <div className="dialog-text">
-            Сервис использует незащищённое соединение.<br/>
+        <div className="row halftop">
+          <div className="dialog-text">
+            Сервис использует незащищённое соединение.<br />
             В целях безопасности команда не будет выполнена.
             </div>
-          </div>
-          <div className="row halfbottom" style={{ marginBottom: "0px" }}>
-            <div style={{ float: "right" }}>
-              <div style={{ display: "inline-block", margin: "4px"}}>
+        </div>
+        <div className="row halfbottom" style={{ marginBottom: "0px" }}>
+          <div style={{ float: "right" }}>
+            <div style={{ display: "inline-block", margin: "4px" }}>
               <a
                 className="btn btn-text waves-effect waves-light modal-close"
                 onClick={hideModalHTTPErr}
-                >
-                  {localize("Common.cancel", locale)}
+              >
+                {localize("Common.cancel", locale)}
               </a>
-              </div>
             </div>
           </div>
+        </div>
       </Modal>
     )
   }
