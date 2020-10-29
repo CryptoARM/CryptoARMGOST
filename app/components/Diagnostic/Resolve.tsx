@@ -2,8 +2,7 @@ import store from "../../../app/store";
 import PropTypes from "prop-types";
 import React from "react";
 import { Link } from "react-router-dom";
-import { push } from "react-router-redux";
-import { LOCATION_CERTIFICATES, LOCATION_CERTIFICATES_DSS_IMPORT, LOCATION_CONTAINERS, LOCATION_MAIN, MY } from "../../constants";
+import { LOCATION_CERTIFICATES, LOCATION_CONTAINERS, LOCATION_MAIN, MY} from "../../constants";
 import {
   ERROR_CHECK_CSP_LICENSE, ERROR_CHECK_CSP_PARAMS,
   ERROR_LOAD_TRUSTED_CRYPTO, ERROR_LOAD_TRUSTED_CURL, NO_CORRECT_CRYPTOARM_LICENSE,
@@ -11,7 +10,6 @@ import {
   NO_GOST_2001, NO_GOST_2012, NO_HAVE_CERTIFICATES_WITH_KEY, NO_TSP_OCSP_ENABLED, NOT_INSTALLED_CSP,
 } from "../../errors";
 import HeaderWorkspaceBlock from "../HeaderWorkspaceBlock";
-import AddCertificate from "../Certificate/AddCertificate";
 
 interface IResolveProps {
   activeError: string;
@@ -177,7 +175,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                 <tr className="diag_table_resolve_tr"
                 onClick={(event) => { this.handleCloseModal(); }}>
                   <td className="diag_table_resolve_td">
-                    <Link style= {{color: "black"}} to={LOCATION_CERTIFICATES_DSS_IMPORT} >
+                    <Link style= {{color: "black"}} to={LOCATION_CONTAINERS} >
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
                         <div className="cert_status_ok" />
@@ -192,7 +190,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                 <tr className="diag_table_resolve_tr"
                   onClick={(event) => { this.handleCloseModal(); }}>
                   <td className="diag_table_resolve_td">
-                    <Link style= {{color: "black"}} to={LOCATION_CERTIFICATES} >
+                    <Link style= {{color: "black"}} to={{ pathname: LOCATION_CERTIFICATES, state: { store: MY, certImport: true }}} >
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
                         <div className="cert_status_ok" />
@@ -204,8 +202,11 @@ class Resolve extends React.Component<IResolveProps, {}> {
                     </Link>
                   </td>
                 </tr>
-                <tr className="diag_table_resolve_tr">
+                <tr className="diag_table_resolve_tr"
+                 onClick={(event) => { this.handleCloseModal(); }}>
                   <td className="diag_table_resolve_td">
+                    <Link style={{ color: "black" }}
+                      to={{ pathname: LOCATION_CERTIFICATES, state: { showModalCertificateRequestCA: true } }}>
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
                         <div className="cert_status_ok" />
@@ -214,11 +215,15 @@ class Resolve extends React.Component<IResolveProps, {}> {
                         {localize("Problems.resolve_table_3", locale)}
                       </div>
                     </div>
+                    </Link>
                   </td>
                 </tr>
-                <tr className="diag_table_resolve_tr">
+                <tr className="diag_table_resolve_tr"
+                 onClick={(event) => { this.handleCloseModal(); }}>
                   <td className="diag_table_resolve_td">
-                    <div className="col s12 valign-wrapper">
+                    <Link style={{ color: "black" }}
+                      to={{ pathname: LOCATION_CERTIFICATES, state: { showModalCertificateRequest: true } }}>
+                      <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
                         <div className="cert_status_ok" />
                       </div>
@@ -226,6 +231,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                         {localize("Problems.resolve_table_4", locale)}
                       </div>
                     </div>
+                    </Link>
                   </td>
                 </tr>
                 <tr className="diag_table_resolve_tr">
