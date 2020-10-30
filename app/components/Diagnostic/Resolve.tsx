@@ -190,8 +190,9 @@ class Resolve extends React.Component<IResolveProps, {}> {
                 <tr className="diag_table_resolve_tr"
                   onClick={(event) => { this.handleCloseModal(); }}>
                   <td className="diag_table_resolve_td">
-                    <Link style= {{color: "black"}} to={{ pathname: LOCATION_CERTIFICATES, state: { store: MY, certImport: true }}} >
-                    <div className="col s12 valign-wrapper">
+                    <Link style={{ color: "black" }}
+                      to={{ pathname: LOCATION_CERTIFICATES, state: { store: MY, certImport: true } }} >
+                      <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
                         <div className="cert_status_ok" />
                       </div>
