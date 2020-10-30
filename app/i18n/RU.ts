@@ -719,6 +719,7 @@ export default {
     this_update: "Время проверки статуса сертификата",
   },
   Operations: {
+    file_empty_err: "Невозможно выполнить операции для пустых файлов, уберите их из числа выбранных!",
     Operations: "Операции",
     archivation_operation: "Архивирование",
     decryption_operation: "Расшифровывание",

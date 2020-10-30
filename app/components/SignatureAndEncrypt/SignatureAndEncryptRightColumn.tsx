@@ -854,6 +854,14 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
       multiDirectOperation, multiReverseOperation, operations, recipients } = this.props;
     const { localize, locale } = this.context;
 
+    for (const document of activeFilesArr) {
+      if (document.filesize.toString() === "0") {
+        $(".toast-Empty_file").remove();
+        Materialize.toast(localize("Operations.file_empty_err", locale), 3000, "toast-Empty_file");
+        return;
+      }
+    }
+
     if ((setting.sign.timestamp_on_data || setting.sign.timestamp_on_sign) && setting.tsp.url === "" && setting.operations.signing_operation) {
       $(".toast-Sign_failed_TSP_misconfigured").remove();
       Materialize.toast(localize("Tsp.failed_tsp_url", locale), 3000, "toast-Sign_failed-TSP_misconfigured");
@@ -2265,11 +2273,6 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         return true;
 
       case ARCHIVE:
-        for (const document of activeFilesArr) {
-          if (document.filesize.toString() === "0") {
-            return false;
-          }
-        }
 
       case REMOVE:
         return true;
