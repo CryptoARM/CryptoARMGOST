@@ -1003,16 +1003,7 @@ class CertWindow extends React.Component<any, any> {
 
     return title;
   }
-  handleInvokeCertImport = () => {
-    const { showModal } = this.props.location.state ? this.props.location.state : false;
-    console.log(showModal);
-    console.log(this.props.location.state);
-    console.log("HDFDFDF");
-    if (showModal) {
-      this.certImport();
-    }
 
-  }
   showModalAddCertificate = () => {
     const { localize, locale } = this.context;
     const { location } = this.props;
