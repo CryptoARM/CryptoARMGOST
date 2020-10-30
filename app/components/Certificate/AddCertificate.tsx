@@ -34,9 +34,7 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
 
   render() {
     const { localize, locale } = this.context;
-    console.log("DFDFDSFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFSDFD");
     
-    location.state ? this.getImportFromFile() : null;
     return (
       <React.Fragment>
         <div className="row halftop">
