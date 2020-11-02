@@ -1,7 +1,7 @@
-import store from "../../../app/store";
 import PropTypes from "prop-types";
 import React from "react";
 import { Link } from "react-router-dom";
+import store from "../../../app/store";
 import { LOCATION_CERTIFICATES, LOCATION_CONTAINERS, LOCATION_MAIN, MY} from "../../constants";
 import {
   ERROR_CHECK_CSP_LICENSE, ERROR_CHECK_CSP_PARAMS,
@@ -170,7 +170,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
 
             <p className="help_paragraf">{localize("Problems.resolve_5_1", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_5_2", locale)}</p>
-            <table className="diag_table_resolve">
+            <table className="diag_table_resolve center-align" style={{width: "85%" , marginLeft: "30px" }}>
               <tbody >
                 <tr className="diag_table_resolve_tr"
                 onClick={(event) => { this.handleCloseModal(); }}>
@@ -178,7 +178,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                     <Link style= {{color: "black"}} to={LOCATION_CONTAINERS} >
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_status_ok" />
+                        <div className="cert_grey_full" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_1", locale)}
@@ -194,7 +194,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                       to={{ pathname: LOCATION_CERTIFICATES, state: { store: MY, certImport: true } }} >
                       <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_status_ok" />
+                        <div className="cert_grey_full" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_2", locale)}
@@ -210,7 +210,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                       to={{ pathname: LOCATION_CERTIFICATES, state: { showModalCertificateRequestCA: true } }}>
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_status_ok" />
+                        <div className="cert_grey_full" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_3", locale)}
@@ -226,7 +226,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                       to={{ pathname: LOCATION_CERTIFICATES, state: { showModalCertificateRequest: true } }}>
                       <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_status_ok" />
+                        <div className="cert_grey_full" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_4", locale)}
@@ -239,7 +239,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                   <td className="diag_table_resolve_td" onClick={(event) => this.gotoLink("https://cryptoarm.ru/certificates/")}>
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_status_ok" />
+                        <div className="cert_grey_full" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_5", locale)}
