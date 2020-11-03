@@ -767,7 +767,7 @@ export default {
     resolve_5_4: "if the certificate and private key are in a PFX file, then you need to click the Install button and select the import method from the file;",
     resolve_5_5: "if the certificate is stored in DSS, then you need to click the Install button and select the import method from CryptoPro DSS;",
     resolve_5_6: "it is also possible to create a self-signed certificate for testing purposes. To do this, click the Install button and select create a request.",
-    resolve_5_7: "Other ways to install personal certificates are described in the product documentation available here ",
+    resolve_5_7: "For details on how to install personal certificates, see ",
     resolve_6_1: "When you run Crypto ARM GOST, the Trusted Crypto module is not loaded.",
     resolve_6_2: "To solve this problem, open the application control panel and forward error messages displayed on the Console tab to the technical support.",
     resolve_6_3: "Detailed instructions on how to open the control panel under the required platform can be found in the product documentation that is available on the link ",
