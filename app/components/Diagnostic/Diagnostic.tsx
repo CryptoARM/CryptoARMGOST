@@ -170,13 +170,21 @@ class Diagnostic extends React.Component<any, IDiagnosticState> {
       });
 
     }
-    if (nextProps.dataLicense && nextProps.lic_format === undefined && nextProps.statusLicense === false && nextProps.verifiedLicense == true && loadingLicense === false) {     
-      this.setState({
-        errors: [...this.state.errors, {
-          important: WARNING,
-          type: NO_CORRECT_CRYPTOARM_LICENSE,
-        }],
-      });
+    if (nextProps.dataLicense && nextProps.lic_format === undefined && nextProps.statusLicense === false && nextProps.verifiedLicense == true && loadingLicense === false) {
+      let isLicWarn: boolean = false;
+      this.state.errors.map(er => {
+        if (er.type === NO_CORRECT_CRYPTOARM_LICENSE) {
+          isLicWarn = true
+        }
+      })
+      if (!isLicWarn) {
+        this.setState({
+          errors: [...this.state.errors, {
+            important: WARNING,
+            type: NO_CORRECT_CRYPTOARM_LICENSE,
+          }],
+        });
+      }
     }
     if (nextProps.lic_format === "dlv" && nextProps.statusLicense === false && nextProps.verifiedLicense == true && loadingLicense === false) {
 
