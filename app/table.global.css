@@ -72,9 +72,9 @@
 }
 .diag_table_resolve .diag_table_resolve_tr .diag_table_resolve_td  {
   border: 1px solid lightgrey;
-  height: 50%;
+  height: 40%;
   width: 85%;
   cursor: pointer;
-  padding: 5px;
+  padding: 3px;
   margin-left: 30px;
 }

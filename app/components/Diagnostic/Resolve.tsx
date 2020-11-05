@@ -178,7 +178,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                     <Link style= {{color: "black"}} to={LOCATION_CONTAINERS} >
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_grey_full" />
+                      <i className="material-icons certificate container" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_1", locale)}
@@ -194,7 +194,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                       to={{ pathname: LOCATION_CERTIFICATES, state: { store: MY, certImport: true } }} >
                       <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_grey_full" />
+                       <i className="material-icons certificate import" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_2", locale)}
@@ -210,7 +210,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                       to={{ pathname: LOCATION_CERTIFICATES, state: { showModalCertificateRequestCA: true } }}>
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_grey_full" />
+                       <i className="material-icons certificate import_dss_cert" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_3", locale)}
@@ -226,7 +226,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                       to={{ pathname: LOCATION_CERTIFICATES, state: { showModalCertificateRequest: true } }}>
                       <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_grey_full" />
+                       <i className="material-icons certificate add_question" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_4", locale)}
@@ -239,7 +239,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                   <td className="diag_table_resolve_td" onClick={(event) => this.gotoLink("https://cryptoarm.ru/certificates/")}>
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                        <div className="cert_grey_full" />
+                       <i className="material-icons certificate cloud_question" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_5", locale)}
