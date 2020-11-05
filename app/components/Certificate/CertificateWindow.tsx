@@ -1006,8 +1006,8 @@ class CertWindow extends React.Component<any, any> {
 
   showModalAddCertificate = () => {
     const { localize, locale } = this.context;
-    const { showModalAddCertificate } = this.state;
     const { location } = this.props;
+    const { showModalAddCertificate } = this.state;
 
     if (!showModalAddCertificate) {
       return;
@@ -1050,7 +1050,7 @@ class CertWindow extends React.Component<any, any> {
           onCancel={() => this.handleCloseModalByType(MODAL_DELETE_CERTIFICATE)}
           reloadCertificates={this.handleReloadCertificates}
           reloadContainers={this.handleReloadContainers}
-          resetCertVerified={this.resetCertVerified}/>
+          resetCertVerified={this.resetCertVerified} />
       </Modal>
     );
   }
@@ -1171,8 +1171,9 @@ class CertWindow extends React.Component<any, any> {
 
   showModalCertificateRequest = () => {
     const { localize, locale } = this.context;
-    const { certificate, showModalCertificateRequest } = this.state;
-
+    const { showModalCertificateRequest } = this.props.location.state.showModalCertificateRequest ? this.props.location.state : this.state;
+    const { certificate } = this.state;
+    console.log ( "dfd", showModalCertificateRequest, this.props.location.state);
     if (!showModalCertificateRequest) {
       return;
     }
@@ -1196,7 +1197,8 @@ class CertWindow extends React.Component<any, any> {
 
   showModalCertificateRequestCA = () => {
     const { localize, locale } = this.context;
-    const { certificate, showModalCertificateRequestCA } = this.state;
+    const { showModalCertificateRequestCA } = this.props.location.state ? this.props.location.state : this.state;
+    const { certificate } = this.state;
 
     if (!showModalCertificateRequestCA) {
       return;
@@ -1397,6 +1399,10 @@ class CertWindow extends React.Component<any, any> {
     const { certificate, crl, requestCA } = this.state;
     const { localize, locale } = this.context;
 
+    if (this.props.location.state.certImport) {
+      this.certImport();
+      this.props.location.state.certImport = false;
+    }
     if (isLoading || isLoadingFromDSS) {
       return <ProgressBars />;
     }
@@ -1483,13 +1489,13 @@ class CertWindow extends React.Component<any, any> {
 
                   {
                     OS_TYPE === "Windows_NT" && certificate && certificate.category !== REQUEST ?
-                      <div style = {{right: '2px'}} className="col s4 waves-effect waves-cryptoarm" onClick={this.viewCertificate}>
+                      <div style={{ right: '2px' }} className="col s4 waves-effect waves-cryptoarm" onClick={this.viewCertificate}>
                         <div className="col s12 svg_icon">
                           <a data-position="bottom">
                             <i className="material-icons certificate import" />
                           </a>
                         </div>
-                        <div  className="col s12 svg_icon_text">{localize("Common.open", locale)}</div>
+                        <div className="col s12 svg_icon_text">{localize("Common.open", locale)}</div>
                       </div>
                       : null
                   }

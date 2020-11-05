@@ -34,7 +34,7 @@ class AddCertificate extends React.Component<IAddCertificateProps, any> {
 
   render() {
     const { localize, locale } = this.context;
-
+    
     return (
       <React.Fragment>
         <div className="row halftop">

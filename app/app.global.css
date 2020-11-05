@@ -2232,7 +2232,14 @@ a.cert-back-btn.waves-effect.waves-light {
     width: 32px;
     text-align: center;
 }
-
+.cert_grey_full {
+  background: url(./resources/image/operations/import_cert.svg);
+  background-size: 100%;
+  height: 32px;
+  width: 32px;
+  text-align: center;
+  color: gray;
+}
 .cloud_cert_status_ok {
   background: url(./resources/image/dss/cloud_cert_ok.svg);
   background-size: 100%;
