@@ -63,7 +63,7 @@ class AllSettings extends React.Component<any, {}> {
 
     const signatureStandard = settings.sign.standard;
 
-    if (signatureStandard === SignatureStandard.CADES) {
+    if (signatureStandard === SignatureStandard.CADES && !this.isSelfSigned()) {
       changeSignatureTime(true);
       changeSignatureTimestamp(false);
       changeSignatureTimestampOnSign(true);
@@ -87,6 +87,12 @@ class AllSettings extends React.Component<any, {}> {
         getDefaultEncryptionAlg(isGostRecp),
       );
     }
+
+    if (this.isSelfSigned()) {
+      changeSignatureStandard(SignatureStandard.CMS);
+      changeSignatureTimestamp(false);
+      changeSignatureTimestampOnSign(false);
+    }
   }
 
   render() {
@@ -97,8 +103,8 @@ class AllSettings extends React.Component<any, {}> {
     const disabled = this.getDisabled();
     const isCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
     const isCertFromRSA = (signer && this.isNotRSA(signer.publicKeyAlgorithm)) ? true : false;
-
     const signatureStandard = settings.sign.standard;
+
     const classDisabledTspAndOcsp = (signatureStandard === SignatureStandard.CADES && !isCertFromDSS) ? "" : "disabled";
     const classDisabledTsp = isCertFromDSS ? "disabled" : "";
     const isDetached = settings.sign.detached;
