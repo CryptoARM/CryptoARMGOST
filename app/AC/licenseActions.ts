@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import os from "os";
 import {
   DELETE_ALL_TEMPORY_LICENSES, FAIL, LICENSE_PATH, LICENSE_REGISTRY_PATH,
   LicenseManager, LOAD_LICENSE, START, SUCCESS, VERIFY_LICENSE,
@@ -50,7 +51,7 @@ function readRegistryLicense(): string {
     }).toString();
   } catch (e) {
     // License is not found in registry
-    console.error(e);
+      console.error(e);
     return "";
   }
 
@@ -93,11 +94,15 @@ export function loadLicense(license?: string) {
         data = license;
       } else {
         let result: any | undefined = undefined;
-        try {
-          data = readRegistryLicense();
-          result = JSON.parse(LicenseManager.checkLicense(data));
-        } catch(e) {
-          //
+        if (os.type() === "Windows_NT") {
+          try {
+
+              data = readRegistryLicense();
+
+            result = JSON.parse(LicenseManager.checkLicense(data));
+          } catch(e) {
+            //
+          }
         }
 
         if ((!result || !result.verify) && fs.existsSync(LICENSE_PATH)) {
