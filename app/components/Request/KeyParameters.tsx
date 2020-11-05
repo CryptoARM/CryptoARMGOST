@@ -159,7 +159,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
               checked={exportableKey}
               onChange={toggleExportableKey}
             />
-            <label htmlFor="exportableKey" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.exportable_key", locale)}>
+            <label htmlFor="exportableKey" className="truncate">
               {localize("CSR.exportable_key", locale)}
             </label>
           </div>
@@ -184,7 +184,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       disabled={keyUsageGroup === KEY_USAGE_SIGN}
                       onChange={handleKeyUsageChange}
                     />
-                    <label htmlFor="dataEncipherment" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.key_usage_dataEncipherment", locale)}>
+                    <label htmlFor="dataEncipherment" className="truncate">
                       {localize("CSR.key_usage_dataEncipherment", locale)}
                     </label>
                   </div>
@@ -198,7 +198,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       disabled={keyUsageGroup === KEY_USAGE_SIGN}
                       onChange={handleKeyUsageChange}
                     />
-                    <label htmlFor="keyAgreement" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.key_usage_keyAgreement", locale)}>
+                    <label htmlFor="keyAgreement" className="truncate">
                       {localize("CSR.key_usage_keyAgreement", locale)}
                     </label>
                   </div>
@@ -211,7 +211,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       checked={keyUsage.keyCertSign}
                       onChange={handleKeyUsageChange}
                     />
-                    <label htmlFor="keyCertSign" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.key_usage_keyCertSign", locale)}>
+                    <label htmlFor="keyCertSign" className="truncate">
                       {localize("CSR.key_usage_keyCertSign", locale)}
                     </label>
                   </div>
@@ -225,7 +225,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       disabled={true}
                       onChange={handleKeyUsageChange}
                     />
-                    <label htmlFor="decipherOnly" className="truncate tooltipped label" data-position="right" data-tooltip={localize("CSR.key_usage_decipherOnly", locale)}>
+                    <label htmlFor="decipherOnly" className="truncate label">
                       {localize("CSR.key_usage_decipherOnly", locale)}
                     </label>
                   </div>
@@ -239,7 +239,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       disabled={keyUsageGroup === KEY_USAGE_SIGN}
                       onChange={handleKeyUsageChange}
                     />
-                    <label htmlFor="encipherOnly" className="truncate tooltipped label" data-position="right" data-tooltip={localize("CSR.key_usage_encipherOnly", locale)}>
+                    <label htmlFor="encipherOnly" className="truncate label">
                       {localize("CSR.key_usage_encipherOnly", locale)}
                     </label>
                   </div>
@@ -253,7 +253,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       disabled={keyUsageGroup === KEY_USAGE_ENCIPHERMENT}
                       onChange={handleKeyUsageChange}
                     />
-                    <label htmlFor="digitalSignature" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.key_usage_digitalSignature", locale)}>
+                    <label htmlFor="digitalSignature" className="truncate">
                       {localize("CSR.key_usage_digitalSignature", locale)}
                     </label>
                   </div>
@@ -267,7 +267,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       disabled={keyUsageGroup === KEY_USAGE_ENCIPHERMENT}
                       onChange={handleKeyUsageChange}
                     />
-                    <label htmlFor="nonRepudiation" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.key_usage_nonRepudiation", locale)}>
+                    <label htmlFor="nonRepudiation" className="truncate">
                       {localize("CSR.key_usage_nonRepudiation", locale)}
                     </label>
                   </div>
@@ -281,7 +281,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       disabled={keyUsageGroup === KEY_USAGE_ENCIPHERMENT}
                       onChange={handleKeyUsageChange}
                     />
-                    <label htmlFor="cRLSign" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.key_usage_cRLSign", locale)}>
+                    <label htmlFor="cRLSign" className="truncate">
                       {localize("CSR.key_usage_cRLSign", locale)}
                     </label>
                   </div>
@@ -295,7 +295,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       disabled={keyUsageGroup === KEY_USAGE_SIGN}
                       onChange={handleKeyUsageChange}
                     />
-                    <label htmlFor="keyEncipherment" className="truncate tooltipped" data-position="right" data-tooltip={localize("CSR.key_usage_keyEncipherment", locale)}>
+                    <label htmlFor="keyEncipherment" className="truncate">
                       {localize("CSR.key_usage_keyEncipherment", locale)}
                     </label>
                   </div>
@@ -320,7 +320,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       checked={extKeyUsage["1.3.6.1.5.5.7.3.1"]}
                       onChange={handleExtendedKeyUsageChange}
                     />
-                    <label htmlFor="1.3.6.1.5.5.7.3.1" className="truncate tooltipped" data-position="right" data-tooltip="1.3.6.1.5.5.7.3.1">
+                    <label htmlFor="1.3.6.1.5.5.7.3.1" className="truncate">
                       {localize("CSR.eku_serverAuth", locale)}
                     </label>
                   </div>
@@ -334,7 +334,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       onChange={handleExtendedKeyUsageChange}
                       disabled= { this.props.disabled }
                     />
-                    <label htmlFor="1.3.6.1.5.5.7.3.2" className="truncate tooltipped" data-position="right" data-tooltip="1.3.6.1.5.5.7.3.2">
+                    <label htmlFor="1.3.6.1.5.5.7.3.2" className="truncate">
                       {localize("CSR.eku_clientAuth", locale)}
                     </label>
                   </div>
@@ -347,7 +347,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       checked={extKeyUsage["1.3.6.1.5.5.7.3.3"]}
                       onChange={handleExtendedKeyUsageChange}
                     />
-                    <label htmlFor="1.3.6.1.5.5.7.3.3" className="truncate tooltipped" data-position="right" data-tooltip="1.3.6.1.5.5.7.3.3">
+                    <label htmlFor="1.3.6.1.5.5.7.3.3" className="truncate">
                       {localize("CSR.eku_codeSigning", locale)}
                     </label>
                   </div>
@@ -360,7 +360,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       checked={extKeyUsage["1.3.6.1.5.5.7.3.4"]}
                       onChange={handleExtendedKeyUsageChange}
                     />
-                    <label htmlFor="1.3.6.1.5.5.7.3.4" className="truncate tooltipped" data-position="right" data-tooltip="1.3.6.1.5.5.7.3.4">
+                    <label htmlFor="1.3.6.1.5.5.7.3.4" className="truncate">
                       {localize("CSR.eku_emailProtection", locale)}
                     </label>
                   </div>
