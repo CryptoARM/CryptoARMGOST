@@ -94,13 +94,15 @@ export function loadLicense(license?: string) {
         data = license;
       } else {
         let result: any | undefined = undefined;
-        try {
-          if (os.type() === "Windows_NT") {
-            data = readRegistryLicense();
+        if (os.type() === "Windows_NT") {
+          try {
+
+              data = readRegistryLicense();
+
+            result = JSON.parse(LicenseManager.checkLicense(data));
+          } catch(e) {
+            //
           }
-          result = JSON.parse(LicenseManager.checkLicense(data));
-        } catch(e) {
-          //
         }
 
         if ((!result || !result.verify) && fs.existsSync(LICENSE_PATH)) {
