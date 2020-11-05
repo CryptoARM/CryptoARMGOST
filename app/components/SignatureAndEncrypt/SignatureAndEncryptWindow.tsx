@@ -34,7 +34,7 @@ interface ISignatureAndEncryptWindowProps {
   removeAllRemoteFiles: () => void;
   signatures: any;
   signedPackage: any;
-  dssOperationIsActive: boolean;
+  operationsArchivation: boolean;
 }
 
 interface ISignatureAndEncryptWindowState {
@@ -134,14 +134,18 @@ class SignatureAndEncryptWindow extends React.Component<ISignatureAndEncryptWind
   render() {
     const { localize, locale } = this.context;
     const { fileSignatures, file, showSignatureInfo } = this.state;
-    const { isDefaultFilters, dssOperationIsActive, operationsPerforming } = this.props;
+    const { isDefaultFilters, operationsPerforming, operationsArchivation, signer } = this.props;
 
     const classDefaultFilters = isDefaultFilters ? "filter_off" : "filter_on";
     const disabledNavigate = this.isFilesFromSocket();
     const classDisabled = disabledNavigate ? "disabled" : "";
 
-    if (operationsPerforming && !dssOperationIsActive) {
-      return <ProgressBars />;
+    if (operationsPerforming) {
+      if (signer) {
+        if (!signer.dssUserID && operationsArchivation) {
+          return <ProgressBars />;
+        }
+      } else return <ProgressBars />;
     }
 
     return (
@@ -337,7 +341,6 @@ export default connect((state) => {
     activeFilesArr: mapToArr(activeFilesSelector(state, { active: true })),
     connectedList: connectedSelector(state, { connected: true }),
     connections: state.connections,
-    dssOperationIsActive: state.dssResponses.entities && state.dssResponses.size,
     files: mapToArr(state.files.entities),
     filesFilteredArr: mapToArr(filteredFilesSelector(state)),
     filesInTransactionList: filesInTransactionsSelector(state),
@@ -350,6 +353,7 @@ export default connect((state) => {
     operationsPerforming: state.multiOperations.performing,
     operationsStatus: state.multiOperations.status,
     packageSignResult: state.signatures.packageSignResult,
+    operationsArchivation: state.multiOperations.operations.get("archivation_operation"),
     signatures,
     signedPackage: state.signatures.signedPackage,
     signer: state.certificates.getIn(["entities", state.settings.getIn(["entities", state.settings.default]).sign.signer]),
