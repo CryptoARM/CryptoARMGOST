@@ -183,7 +183,6 @@ class CertificateDelete extends React.Component<ICertificateDeleteProps, ICertif
       this.handelCancel();
       return;
     }
-    resetCertVerified();
     reloadCertificates();
     $(".toast-cert_delete_ok").remove();
     Materialize.toast(localize("Certificate.cert_delete_ok", locale), 2000, "toast-cert_delete_ok");
