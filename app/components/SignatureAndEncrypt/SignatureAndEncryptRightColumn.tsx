@@ -706,9 +706,17 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   checkCertificatesBeforePerformOperation = () => {
-    const { setting, signer, recipients } = this.props;
+    const { setting, signer, recipients, activeFilesArr } = this.props;
     const { localize, locale } = this.context;
     const isSignCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
+
+    for (const document of activeFilesArr) {
+      if (document.filesize.toString() === "0") {
+        $(".toast-Empty_file").remove();
+        Materialize.toast(localize("Operations.file_empty_err", locale), 3000, "toast-Empty_file");
+        return;
+      }
+    }
 
     if (isSignCertFromDSS && signer && !signer.status) {
       this.handleshowModalWrongCertificate();
@@ -853,6 +861,14 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     const { activeFilesArr, inactiveFilesArr, lic_error, setting, signer,
       multiDirectOperation, multiReverseOperation, operations, recipients } = this.props;
     const { localize, locale } = this.context;
+
+    for (const document of activeFilesArr) {
+      if (document.filesize.toString() === "0") {
+        $(".toast-Empty_file").remove();
+        Materialize.toast(localize("Operations.file_empty_err", locale), 3000, "toast-Empty_file");
+        return;
+      }
+    }
 
     if ((setting.sign.timestamp_on_data || setting.sign.timestamp_on_sign) && setting.tsp.url === "" && setting.operations.signing_operation) {
       $(".toast-Sign_failed_TSP_misconfigured").remove();
@@ -2265,11 +2281,6 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         return true;
 
       case ARCHIVE:
-        for (const document of activeFilesArr) {
-          if (document.filesize.toString() === "0") {
-            return false;
-          }
-        }
 
       case REMOVE:
         return true;
