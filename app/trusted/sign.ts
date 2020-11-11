@@ -118,7 +118,7 @@ export function signFile(
           }
 
           if (params.tspModel.proxy_login && params.tspModel.proxy_password) {
-            connSettings.AuthType = 1;
+            connSettings.ProxyAuthType = 1;
           }
         }
         if (params.tspModel && params.tspModel.url) {
@@ -139,7 +139,7 @@ export function signFile(
           }
 
           if (params.ocspModel.proxy_login && params.ocspModel.proxy_password) {
-            ocspSettings.AuthType = 1;
+            ocspSettings.ProxyAuthType = 1;
           }
         }
         if (params.ocspModel && params.ocspModel.url) {
@@ -170,8 +170,7 @@ export function signFile(
           }
 
           if (params.tspModel.proxy_login && params.tspModel.proxy_password) {
-            connSettings.AuthType = 1;
-            connSettings.ProxyAuthType = 1;
+             connSettings.ProxyAuthType = 1;
           }
         }
         if (params.tspModel && params.tspModel.url) {
@@ -316,7 +315,6 @@ export function resignFile(
           }
 
           if (params.tspModel.proxy_login && params.tspModel.proxy_password) {
-            connSettings.AuthType = 1;
             connSettings.ProxyAuthType = 1;
           }
         }
@@ -339,8 +337,7 @@ export function resignFile(
           }
 
           if (params.ocspModel.proxy_login && params.ocspModel.proxy_password) {
-            ocspSettings.AuthType = 1;
-            connSettings.ProxyAuthType = 1;
+            ocspSettings.ProxyAuthType = 1;
           }
         }
 
@@ -372,7 +369,7 @@ export function resignFile(
           }
 
           if (params.tspModel.proxy_login && params.tspModel.proxy_password) {
-            connSettings.AuthType = 1;
+            connSettings.ProxyAuthType = 1;
           }
         }
         if (params.tspModel && params.tspModel.url) {
