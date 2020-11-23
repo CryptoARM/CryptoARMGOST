@@ -1171,9 +1171,11 @@ class CertWindow extends React.Component<any, any> {
 
   showModalCertificateRequest = () => {
     const { localize, locale } = this.context;
+    const { location } = this.props;
     const { certificate, showModalCertificateRequest } = this.state;
+    const showModalCertificateRequestResolve = location && location.state && location.state.showModalCertificateRequestResolve;
 
-    if (!showModalCertificateRequest) {
+    if (!showModalCertificateRequest && !showModalCertificateRequestResolve) {
       return;
     }
 
@@ -1181,7 +1183,7 @@ class CertWindow extends React.Component<any, any> {
 
     return (
       <Modal
-        isOpen={showModalCertificateRequest}
+        isOpen={showModalCertificateRequest || showModalCertificateRequestResolve}
         header={localize("CSR.create_request", locale)}
         onClose={() => this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST)}>
 
@@ -1196,9 +1198,11 @@ class CertWindow extends React.Component<any, any> {
 
   showModalCertificateRequestCA = () => {
     const { localize, locale } = this.context;
+    const { location } = this.props;
     const { certificate, showModalCertificateRequestCA } = this.state;
+    const showModalCertificateRequestCAResolve = location && location.state && location.state.showModalCertificateRequestCAResolve;
 
-    if (!showModalCertificateRequestCA) {
+    if (!showModalCertificateRequestCA && !showModalCertificateRequestCAResolve) {
       return;
     }
 
@@ -1206,7 +1210,7 @@ class CertWindow extends React.Component<any, any> {
 
     return (
       <Modal
-        isOpen={showModalCertificateRequestCA}
+        isOpen={showModalCertificateRequestCA || showModalCertificateRequestCAResolve}
         header={localize("CSR.create_request", locale)}
         onClose={() => this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST_CA)}>
 
@@ -1257,15 +1261,17 @@ class CertWindow extends React.Component<any, any> {
 
   showModalCertificateImportDSS = () => {
     const { localize, locale } = this.context;
+    const { location } = this.props;
     const { certificate, showModalCertificateImportDSS } = this.state;
+    const showModalCertificateImportDSSResolve = location && location.state && location.state.showModalCertificateImportDSSResolve;
 
-    if (!showModalCertificateImportDSS) {
+    if (!showModalCertificateImportDSS && !showModalCertificateImportDSSResolve) {
       return;
     }
 
     return (
       <Modal
-        isOpen={showModalCertificateImportDSS}
+        isOpen={showModalCertificateImportDSS || showModalCertificateImportDSSResolve}
         header={localize("DSS.DSS_connection", locale)}
         onClose={() => this.handleCloseModalByType(MODAL_CERTIFICATE_IMPORT_DSS)}
         style={{ width: "500px" }}>

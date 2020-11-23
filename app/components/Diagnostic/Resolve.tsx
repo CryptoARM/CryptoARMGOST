@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { Link } from "react-router-dom";
 import store from "../../../app/store";
-import { LOCATION_CERTIFICATES, LOCATION_CONTAINERS, LOCATION_MAIN, MY} from "../../constants";
+import { LOCATION_CERTIFICATES, LOCATION_CONTAINERS, LOCATION_MAIN, MY } from "../../constants";
 import {
   ERROR_CHECK_CSP_LICENSE, ERROR_CHECK_CSP_PARAMS,
   ERROR_LOAD_TRUSTED_CRYPTO, ERROR_LOAD_TRUSTED_CURL, NO_CORRECT_CRYPTOARM_LICENSE,
@@ -86,9 +86,9 @@ class Resolve extends React.Component<IResolveProps, {}> {
             </p>
             <p className="help_paragraf">
               {localize("Problems.resolve_1_4", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ustanovka-kriptoprovaydera-na-platformu-ms-windows")}>Windows</a>, 
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/kak-udalit-kriptoarm-gost-na-platforme-Linux")}> Linux</a>, 
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ustanovka-kriptoprovaydera-na-platformu-os-x")}> macOS</a>. 
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ustanovka-kriptoprovaydera-na-platformu-ms-windows")}>Windows</a>,
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/kak-udalit-kriptoarm-gost-na-platforme-Linux")}> Linux</a>,
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ustanovka-kriptoprovaydera-na-platformu-os-x")}> macOS</a>.
             </p>
           </div>
         );
@@ -127,9 +127,9 @@ class Resolve extends React.Component<IResolveProps, {}> {
             </p>
             <p className="help_paragraf">
               {localize("Problems.resolve_1_4", locale)}
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ustanovka-kriptoprovaydera-na-platformu-ms-windows")}>Windows</a>, 
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/kak-udalit-kriptoarm-gost-na-platforme-Linux")}> Linux</a>, 
-              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ustanovka-kriptoprovaydera-na-platformu-os-x")}> macOS</a>. 
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ustanovka-kriptoprovaydera-na-platformu-ms-windows")}>Windows</a>,
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/kak-udalit-kriptoarm-gost-na-platforme-Linux")}> Linux</a>,
+              <a className="hlink" onClick={(event) => this.gotoLink("https://cryptoarm.ru/documentation/ustanovka-kriptoprovaydera-na-platformu-os-x")}> macOS</a>.
             </p>
           </div>
         );
@@ -174,20 +174,20 @@ class Resolve extends React.Component<IResolveProps, {}> {
 
             <p className="help_paragraf">{localize("Problems.resolve_5_1", locale)}</p>
             <p className="help_paragraf">{localize("Problems.resolve_5_2", locale)}</p>
-            <table className="diag_table_resolve center-align" style={{width: "85%" , marginLeft: "30px" }}>
+            <table className="diag_table_resolve center-align" style={{ width: "85%", marginLeft: "30px" }}>
               <tbody >
                 <tr className="diag_table_resolve_tr"
-                onClick={(event) => { this.handleCloseModal(); }}>
+                  onClick={(event) => { this.handleCloseModal(); }}>
                   <td className="diag_table_resolve_td">
-                    <Link style= {{color: "black"}} to={LOCATION_CONTAINERS} >
-                    <div className="col s12 valign-wrapper">
-                      <div className="col s2" style={{ padding: 0 }}>
-                      <i className="material-icons certificate container" />
+                    <Link style={{ color: "black" }} to={LOCATION_CONTAINERS} >
+                      <div className="col s12 valign-wrapper">
+                        <div className="col s2" style={{ padding: 0 }}>
+                          <i className="material-icons certificate container" />
+                        </div>
+                        <div className="col s10" style={{ padding: 0 }}>
+                          {localize("Problems.resolve_table_1", locale)}
+                        </div>
                       </div>
-                      <div className="col s10" style={{ padding: 0 }}>
-                        {localize("Problems.resolve_table_1", locale)}
-                      </div>
-                    </div>
                     </Link>
                   </td>
                 </tr>
@@ -195,47 +195,47 @@ class Resolve extends React.Component<IResolveProps, {}> {
                   onClick={(event) => { this.handleCloseModal(); }}>
                   <td className="diag_table_resolve_td">
                     <Link style={{ color: "black" }}
-                      to={{ pathname: LOCATION_CERTIFICATES, state: { store: MY, certImport: true } }} >
+                      to={{ pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY, certImport: true } }} >
                       <div className="col s12 valign-wrapper">
-                      <div className="col s2" style={{ padding: 0 }}>
-                       <i className="material-icons certificate import" />
+                        <div className="col s2" style={{ padding: 0 }}>
+                          <i className="material-icons certificate import" />
+                        </div>
+                        <div className="col s10" style={{ padding: 0 }}>
+                          {localize("Problems.resolve_table_2", locale)}
+                        </div>
                       </div>
-                      <div className="col s10" style={{ padding: 0 }}>
-                        {localize("Problems.resolve_table_2", locale)}
-                      </div>
-                    </div>
                     </Link>
                   </td>
                 </tr>
                 <tr className="diag_table_resolve_tr"
-                 onClick={(event) => { this.handleCloseModal(); }}>
+                  onClick={(event) => { this.handleCloseModal(); }}>
                   <td className="diag_table_resolve_td">
                     <Link style={{ color: "black" }}
-                      to={{ pathname: LOCATION_CERTIFICATES, state: { showModalCertificateRequestCA: true } }}>
-                    <div className="col s12 valign-wrapper">
-                      <div className="col s2" style={{ padding: 0 }}>
-                       <i className="material-icons certificate import_dss_cert" />
+                      to={{ pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY, showModalCertificateImportDSSResolve: true } }}>
+                      <div className="col s12 valign-wrapper">
+                        <div className="col s2" style={{ padding: 0 }}>
+                          <i className="material-icons certificate import_dss_cert" />
+                        </div>
+                        <div className="col s10" style={{ padding: 0 }}>
+                          {localize("Problems.resolve_table_3", locale)}
+                        </div>
                       </div>
-                      <div className="col s10" style={{ padding: 0 }}>
-                        {localize("Problems.resolve_table_3", locale)}
-                      </div>
-                    </div>
                     </Link>
                   </td>
                 </tr>
                 <tr className="diag_table_resolve_tr"
-                 onClick={(event) => { this.handleCloseModal(); }}>
+                  onClick={(event) => { this.handleCloseModal(); }}>
                   <td className="diag_table_resolve_td">
                     <Link style={{ color: "black" }}
-                      to={{ pathname: LOCATION_CERTIFICATES, state: { showModalCertificateRequest: true } }}>
+                      to={{ pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY, showModalCertificateRequestResolve: true } }}>
                       <div className="col s12 valign-wrapper">
-                      <div className="col s2" style={{ padding: 0 }}>
-                       <i className="material-icons certificate add_question" />
+                        <div className="col s2" style={{ padding: 0 }}>
+                          <i className="material-icons certificate add_question" />
+                        </div>
+                        <div className="col s10" style={{ padding: 0 }}>
+                          {localize("Problems.resolve_table_4", locale)}
+                        </div>
                       </div>
-                      <div className="col s10" style={{ padding: 0 }}>
-                        {localize("Problems.resolve_table_4", locale)}
-                      </div>
-                    </div>
                     </Link>
                   </td>
                 </tr>
@@ -243,7 +243,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
                   <td className="diag_table_resolve_td" onClick={(event) => this.gotoLink("https://cryptoarm.ru/certificates/")}>
                     <div className="col s12 valign-wrapper">
                       <div className="col s2" style={{ padding: 0 }}>
-                       <i className="material-icons certificate cloud_question" />
+                        <i className="material-icons certificate cloud_question" />
                       </div>
                       <div className="col s10" style={{ padding: 0 }}>
                         {localize("Problems.resolve_table_5", locale)}
