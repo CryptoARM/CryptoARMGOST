@@ -1171,9 +1171,8 @@ class CertWindow extends React.Component<any, any> {
 
   showModalCertificateRequest = () => {
     const { localize, locale } = this.context;
-    const { showModalCertificateRequest } = this.props.location.state.showModalCertificateRequest ? this.props.location.state : this.state;
-    const { certificate } = this.state;
-    console.log ( "dfd", showModalCertificateRequest, this.props.location.state);
+    const { certificate, showModalCertificateRequest } = this.state;
+
     if (!showModalCertificateRequest) {
       return;
     }
@@ -1197,8 +1196,7 @@ class CertWindow extends React.Component<any, any> {
 
   showModalCertificateRequestCA = () => {
     const { localize, locale } = this.context;
-    const { showModalCertificateRequestCA } = this.props.location.state ? this.props.location.state : this.state;
-    const { certificate } = this.state;
+    const { certificate, showModalCertificateRequestCA } = this.state;
 
     if (!showModalCertificateRequestCA) {
       return;
