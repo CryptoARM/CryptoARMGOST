@@ -1393,11 +1393,11 @@ class CertWindow extends React.Component<any, any> {
 
   render() {
     const { certrequests, certificates, crls, isLoading,
-      isLoadingFromDSS, searchValue, isCertInfoMode, urlCmdCertInfo } = this.props;
+      isLoadingFromDSS, location, searchValue, isCertInfoMode, urlCmdCertInfo } = this.props;
     const { certificate, crl, requestCA } = this.state;
     const { localize, locale } = this.context;
 
-    if (this.props.location.state.certImport) {
+    if (location && location.state && location.state.certImport) {
       this.certImport();
       this.props.location.state.certImport = false;
     }
