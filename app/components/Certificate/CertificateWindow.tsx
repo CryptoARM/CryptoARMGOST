@@ -88,7 +88,9 @@ class CertWindow extends React.Component<any, any> {
   }
 
   componentDidMount() {
-    const { isCertInfoMode, urlCmdProps, urlCmdCertInfo } = this.props;
+    const { isCertInfoMode, location, urlCmdProps, urlCmdCertInfo } = this.props;
+    const { localize, locale } = this.context;
+
     $(".btn-floated").dropdown();
     if (urlCmdProps && !urlCmdProps.done) {
       if (urlCmdProps.operation === URL_CMD_CERTIFICATES_IMPORT) {
@@ -98,6 +100,17 @@ class CertWindow extends React.Component<any, any> {
 
     if (isCertInfoMode && urlCmdCertInfo.certToProcessPkiItemInfo) {
       this.handleActiveCert(urlCmdCertInfo.certToProcessPkiItemInfo);
+    }
+
+    if (location && location.state && location.state.certImport) {
+      setTimeout(() => {
+        this.certImport();
+        if (this.props.history) {
+          this.props.history.replace({
+            pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY },
+          });
+        }
+      }, 100);
     }
   }
 
@@ -1411,14 +1424,6 @@ class CertWindow extends React.Component<any, any> {
     const { certificate, crl, requestCA } = this.state;
     const { localize, locale } = this.context;
 
-    if (location && location.state && location.state.certImport) {
-      this.certImport();
-      if (this.props.history) {
-        this.props.history.replace({
-          pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY },
-        });
-      }
-    }
     if (isLoading || isLoadingFromDSS) {
       return <ProgressBars />;
     }
