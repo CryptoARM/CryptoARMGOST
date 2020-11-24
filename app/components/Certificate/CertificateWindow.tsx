@@ -1198,7 +1198,7 @@ class CertWindow extends React.Component<any, any> {
             }
             this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST);
           }}
-          selfSigned={false}
+          selfSigned={showModalCertificateRequestResolve ? true : false}
         />
       </Modal>
     );
