@@ -1,4 +1,3 @@
-import store from "../../store";
 import { execFile } from "child_process";
 import fs from "fs";
 import * as os from "os";
@@ -15,15 +14,17 @@ import { urlCmdCertImportFail, urlCmdCertImportSuccess } from "../../AC/urlCmdCe
 import { certInfoFail, sendCertificateInfo } from "../../AC/urlCmdCertInfo";
 import {
   ADDRESS_BOOK, CA, CERTIFICATE, CRL,
-  DEFAULT_CSR_PATH, FAIL, MODAL_ADD_CERTIFICATE, MODAL_ADD_SERVICE_CA,
+  DEFAULT_CSR_PATH, FAIL, LOCATION_CERTIFICATES, MODAL_ADD_CERTIFICATE, MODAL_ADD_SERVICE_CA,
   MODAL_BEST_STORE, MODAL_CERTIFICATE_IMPORT_DSS, MODAL_CERTIFICATE_REQUEST, MODAL_CERTIFICATE_REQUEST_CA,
   MODAL_CLOUD_CSP, MODAL_DELETE_CERTIFICATE, MODAL_DELETE_CRL, MODAL_DELETE_REQUEST_CA,
   MODAL_EXPORT_CERTIFICATE, MODAL_EXPORT_REQUEST_CA, MY, PFX, PROVIDER_CRYPTOPRO, REQUEST,
-  ROOT, URL_CMD_CERTIFICATES_IMPORT, USER_NAME, RESET_DSS_CERTIFICATES_VERIFIED,
+  RESET_DSS_CERTIFICATES_VERIFIED, ROOT, URL_CMD_CERTIFICATES_IMPORT, USER_NAME,
 } from "../../constants";
+import history from "../../history";
 import { filteredCertificatesSelector } from "../../selectors";
 import { filteredCrlsSelector } from "../../selectors/crlsSelectors";
 import { filteredRequestCASelector } from "../../selectors/requestCASelector";
+import store from "../../store";
 import { fileCoding, fileExists } from "../../utils";
 import logger from "../../winstonLogger";
 import BlockNotElements from "../BlockNotElements";
@@ -1189,7 +1190,14 @@ class CertWindow extends React.Component<any, any> {
 
         <CertificateRequest
           certificateTemplate={certificateTemplate}
-          onCancel={() => this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST)}
+          onCancel={() => {
+            if (showModalCertificateRequestResolve && this.props.history) {
+              this.props.history.replace({
+                pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY },
+              });
+            }
+            this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST);
+          }}
           selfSigned={false}
         />
       </Modal>
@@ -1405,7 +1413,11 @@ class CertWindow extends React.Component<any, any> {
 
     if (location && location.state && location.state.certImport) {
       this.certImport();
-      this.props.location.state.certImport = false;
+      if (this.props.history) {
+        this.props.history.replace({
+          pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY },
+        });
+      }
     }
     if (isLoading || isLoadingFromDSS) {
       return <ProgressBars />;
