@@ -81,7 +81,10 @@ class Resolve extends React.Component<IResolveProps, {}> {
             <p className="help_paragraf">{localize("Problems.resolve_1_1", locale)}</p>
             <p className="help_paragraf">
               {localize("Problems.resolve_1_2", locale)}
-              <a className="hlink" onClick={(event) => (this.gotoLink("https://diagnostic.cryptoarm.ru/Stepdownloadprovider"), this.handleCloseApp())}>{localize("Diagnostic.diagn_link", locale)}</a>
+              <a className="hlink" onClick={(event) => {
+                this.gotoLink("https://diagnostic.cryptoarm.ru/Stepdownloadprovider");
+                setTimeout(() => this.handleCloseApp(), 1000);
+              }}>{localize("Diagnostic.diagn_link", locale)}</a>
               {localize("Problems.resolve_1_3", locale)}
             </p>
             <p className="help_paragraf">
@@ -272,12 +275,9 @@ class Resolve extends React.Component<IResolveProps, {}> {
     }
   }
 
-  handleCloseApp() {
-
+  handleCloseApp = () => {
     remote.getGlobal("sharedObject").isQuiting = true;
     remote.getCurrentWindow().close();
-
-    $("#modal-window-diagnostic").closeModal();
   }
 
   getResolve() {
