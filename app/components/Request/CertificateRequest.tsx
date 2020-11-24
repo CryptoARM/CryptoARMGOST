@@ -113,7 +113,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
         digitalSignature: true,
         encipherOnly: false,
         keyAgreement: false,
-        keyCertSign: false,
+        keyCertSign: props.selfSigned,
         keyEncipherment: true,
         nonRepudiation: true,
       },
@@ -123,7 +123,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       organization: props.organization1,
       organizationUnitName: template.OU,
       province: template.stateOrProvinceName,
-      selfSigned: false,
+      selfSigned: props.selfSigned,
       snils: template.snils,
       template: template.snils || template.ogrnip || template.inn
         || template.OU || template.title ? REQUEST_TEMPLATE_ADDITIONAL : REQUEST_TEMPLATE_DEFAULT,
@@ -167,17 +167,17 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
     }
   }
 
-  componentDidUpdate(prevProps , prevState) {
+  componentDidUpdate(prevProps, prevState) {
     const self = this;
     const slider = document.getElementById("key-length-slider");
 
-    if  (!prevState.filedChanged && this.state.filedChanged) {
+    if (!prevState.filedChanged && this.state.filedChanged) {
       if (this.verifyFields() === true) {
         this.setState({ disabled: true });
       } else {
         this.setState({ disabled: false });
       }
-      this.setState ( {filedChanged: false});
+      this.setState({ filedChanged: false });
     }
 
     if (slider && !slider.noUiSlider) {
@@ -662,7 +662,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       let cert = undefined;
       try {
         cert = certReq.toCertificate(60, randomSerial());
-      } catch(err) {
+      } catch (err) {
         logger.log({
           certificate: cn,
           level: "error",
