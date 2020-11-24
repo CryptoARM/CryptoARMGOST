@@ -113,7 +113,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
         digitalSignature: true,
         encipherOnly: false,
         keyAgreement: false,
-        keyCertSign: props.selfSigned,
+        keyCertSign: !!props.selfSigned,
         keyEncipherment: true,
         nonRepudiation: true,
       },
@@ -123,7 +123,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       organization: props.organization1,
       organizationUnitName: template.OU,
       province: template.stateOrProvinceName,
-      selfSigned: props.selfSigned,
+      selfSigned: !!props.selfSigned,
       snils: template.snils,
       template: template.snils || template.ogrnip || template.inn
         || template.OU || template.title ? REQUEST_TEMPLATE_ADDITIONAL : REQUEST_TEMPLATE_DEFAULT,
