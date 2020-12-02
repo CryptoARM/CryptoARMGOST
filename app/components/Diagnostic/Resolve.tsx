@@ -83,7 +83,7 @@ class Resolve extends React.Component<IResolveProps, {}> {
               {localize("Problems.resolve_1_2", locale)}
               <a className="hlink" onClick={(event) => {
                 this.gotoLink("https://diagnostic.cryptoarm.ru/Stepdownloadprovider");
-                setTimeout(() => this.handleCloseApp(), 1000);
+                setTimeout(() => this.handleCloseApp(), 2500);
               }}>{localize("Diagnostic.diagn_link", locale)}</a>
               {localize("Problems.resolve_1_3", locale)}
             </p>
