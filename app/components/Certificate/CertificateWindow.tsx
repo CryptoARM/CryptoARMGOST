@@ -1199,7 +1199,14 @@ class CertWindow extends React.Component<any, any> {
       <Modal
         isOpen={showModalCertificateRequest || showModalCertificateRequestResolve}
         header={localize("CSR.create_request", locale)}
-        onClose={() => this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST)}>
+        onClose={() => {
+          if (showModalCertificateRequestResolve && this.props.history) {
+            this.props.history.replace({
+              pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY },
+            });
+          }
+          this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST);
+        }}>
 
         <CertificateRequest
           certificateTemplate={certificateTemplate}
@@ -1233,12 +1240,26 @@ class CertWindow extends React.Component<any, any> {
       <Modal
         isOpen={showModalCertificateRequestCA || showModalCertificateRequestCAResolve}
         header={localize("CSR.create_request", locale)}
-        onClose={() => this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST_CA)}>
+        onClose={() => {
+          if (showModalCertificateRequestCAResolve && this.props.history) {
+            this.props.history.replace({
+              pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY },
+            });
+          }
+          this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST_CA);
+        }}>
 
         <CertificateRequestCA
           certificateTemplate={certificateTemplate}
           handleShowModalByType={this.handleShowModalByType}
-          onCancel={() => this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST_CA)}
+          onCancel={() => {
+            if (showModalCertificateRequestCAResolve && this.props.history) {
+              this.props.history.replace({
+                pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY },
+              });
+            }
+            this.handleCloseModalByType(MODAL_CERTIFICATE_REQUEST_CA);
+          }}
           selfSigned={false}
         />
       </Modal>
@@ -1294,10 +1315,24 @@ class CertWindow extends React.Component<any, any> {
       <Modal
         isOpen={showModalCertificateImportDSS || showModalCertificateImportDSSResolve}
         header={localize("DSS.DSS_connection", locale)}
-        onClose={() => this.handleCloseModalByType(MODAL_CERTIFICATE_IMPORT_DSS)}
+        onClose={() => {
+          if (showModalCertificateImportDSSResolve && this.props.history) {
+            this.props.history.replace({
+              pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY },
+            });
+          }
+          this.handleCloseModalByType(MODAL_CERTIFICATE_IMPORT_DSS);
+        }}
         style={{ width: "500px" }}>
         <DSSConnection
-          onCancel={() => this.handleCloseModalByType(MODAL_CERTIFICATE_IMPORT_DSS)}
+          onCancel={() => {
+            if (showModalCertificateImportDSSResolve && this.props.history) {
+              this.props.history.replace({
+                pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY },
+              });
+            }
+            this.handleCloseModalByType(MODAL_CERTIFICATE_IMPORT_DSS);
+          }}
           handleReloadCertificates={this.handleReloadCertificates}
         />
       </Modal>
