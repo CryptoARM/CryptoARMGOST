@@ -71,7 +71,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
       $("select").on("change", self.handleInputChange);
     });
 
-    $(document).on("ready", function() {
+    $(document).on("ready", function () {
       Materialize.updateTextFields();
     });
 
@@ -80,6 +80,10 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
     } catch (e) {
       //
     }
+  }
+
+  componentWillUnmount() {
+    this.handleCancel();
   }
 
   componentDidUpdate(prevProps: IDSSConnectionProps) {
@@ -97,7 +101,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
       if (isPasswordRequired || this.props.tokensAuth.get(dssUserID)) {
         this.handleCancel();
       } else {
-        this.setState({isPasswordRequired: true});
+        this.setState({ isPasswordRequired: true });
       }
     }
 
@@ -118,7 +122,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
     }
 
     if (!prevProps.dssResponses.size && this.props.dssResponses.size) {
-      this.setState({dssResponse:  this.props.dssResponses.first()});
+      this.setState({ dssResponse: this.props.dssResponses.first() });
     }
   }
 
@@ -219,7 +223,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
 
           <div >
             <div style={{ float: "left" }}>
-              <div style={{ display: "inline-block", margin: "10px"}}>
+              <div style={{ display: "inline-block", margin: "10px" }}>
                 <input
                   name="isTestDSS"
                   className="filled-in"
@@ -237,7 +241,7 @@ class DSSConnection extends React.Component<IDSSConnectionProps, IDSSConnectionS
 
           <div className="row">
             <div style={{ float: "left" }}>
-              <div style={{ display: "inline-block", marginLeft: "10px"}}>
+              <div style={{ display: "inline-block", marginLeft: "10px" }}>
                 <input
                   name="isApiv2"
                   className="filled-in"
