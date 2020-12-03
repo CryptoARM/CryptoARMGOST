@@ -51,6 +51,13 @@
         "filter": [
           "**/*.json"
         ]
+      },
+      {
+        "from": "./docs",
+        "to": "../docs",
+        "filter": [
+          "**/*.pdf"
+        ]
       }
     ],
     "copyright": "Copyright 2020 Cifrovye tekhnologii LLC",
