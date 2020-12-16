@@ -41,9 +41,9 @@ export default {
     send: "Отправить",
     support: "Техническая поддержка",
     username: "Имя",
-    version: "2.5.10",
+    version: "2.5.11",
     version_app: "Версия приложения",
-    version_full: "Версия продукта: 2.5.10",
+    version_full: "Версия продукта: 2.5.11",
   },
   AddressBook: {
     address_book: "Контакты",
