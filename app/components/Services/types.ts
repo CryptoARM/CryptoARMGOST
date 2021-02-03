@@ -14,6 +14,7 @@ export interface ICryptoProSVSSettings {
 
 export interface ICAServiceSettings {
   url: string;
+  template_file: string;
 }
 
 export interface IService {

@@ -16,6 +16,7 @@ export const ServiceModel = Record({
 
 export const SettingsModel = Record({
   url: null,
+  template_file: null,
 });
 
 export const DefaultReducerState = Record({

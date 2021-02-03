@@ -51,6 +51,7 @@ class ServiceList extends React.Component<IServiceListProps, any> {
     services.forEach((service: any) => {
       switch (service.type) {
         case "CA_SERVICE":
+        case "CA_SERVICE_LOCAL":
           return ca.push(service);
       }
     });

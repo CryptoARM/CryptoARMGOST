@@ -6,10 +6,10 @@ import PropTypes, { any } from "prop-types";
 import React from "react";
 import ReactDOM from "react-dom";
 import { connect } from "react-redux";
-import { addCertificateRequestCA, loadAllCertificates, removeAllCertificates} from "../../AC";
+import { addCertificateRequestCA, loadAllCertificates, removeAllCertificates } from "../../AC";
 import { postCertRequest, postCertRequestAuthCert } from "../../AC/caActions";
 import {
-  ALG_GOST12_256, ALG_GOST12_512, CA_SERVICE, DEFAULT_CSR_PATH,
+  ALG_GOST12_256, ALG_GOST12_512, CA_SERVICE, CA_SERVICE_LOCAL, DEFAULT_CSR_PATH,
   HOME_DIR, KEY_USAGE_ENCIPHERMENT, KEY_USAGE_SIGN, KEY_USAGE_SIGN_AND_ENCIPHERMENT,
   MODAL_ADD_SERVICE_CA, MY, PROVIDER_CRYPTOPRO, PROVIDER_SYSTEM,
   REQUEST, REQUEST_TEMPLATE_ADDITIONAL, REQUEST_TEMPLATE_DEFAULT, REQUEST_TEMPLATE_KEP_FIZ, REQUEST_TEMPLATE_KEP_IP, ROOT, USER_NAME,
@@ -24,6 +24,7 @@ import { ICertificateRequestCA, IRegRequest } from "../Services/types";
 import DynamicSubjectName from "./DynamicSubjectName";
 import HeaderTabs from "./HeaderTabs";
 import KeyParameters from "./KeyParameters";
+const dialog = window.electron.remote.dialog;
 
 interface IKeyUsage {
   cRLSign: boolean;
@@ -182,15 +183,17 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     const { activeSubjectNameInfoTab, addService, algorithm, containerName, formVerified,
       exportableKey, extKeyUsage, keyLength, keyUsage, keyUsageGroup,
       template, templateName, activeService, OpenButton, RDNsubject } = this.state;
-    const { certificates, certrequests, regrequests, services, servicesMap, templates } = this.props;
-    const notEmptyCATemplate = (OpenButton && !this.state.caTemplate) ? true : false;
+    const { certificates, certrequests, regrequests, services, servicesLocal, servicesMap, templates } = this.props;
+
+    const service = servicesMap.get(activeService);
+    const notEmptyCATemplate = (OpenButton && (!this.state.caTemplate && service.type === CA_SERVICE)) ? true : false;
     const classDisabled = this.state.disabled && !notEmptyCATemplate ? "" : "disabled";
 
     let regRequest;
     let certrequest;
     let certificate;
 
-    const elements = services.map((service: any) => {
+    const elements = services.concat(servicesLocal).map((service: any) => {
       const rrequest = regrequests.find((obj: any) => obj.get("serviceId") === service.id);
 
       return (
@@ -270,14 +273,36 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
               <div className="row halfbottom" />
 
               <div className="row halfbottom">
+                <div className="col s8">
+                  <div className="input-field col s12 input-field-licence">
+                    <i
+                      className="material-icons prefix key-prefix"
+                      style={{ left: "-10px" }}
+                    >
+                      file_download
+              </i>
+                    <input
+                      id="input_file"
+                      type="text"
+                    />
+                    <label htmlFor="input_file">
+                      Укажите файл с шаблонами
+              </label>
+                    <a onClick={this.openLicenseFile.bind(this)}>
+                      <i className="file-setting-item waves-effect material-icons secondary-content pulse active">
+                        insert_drive_file
+                </i>
+                    </a>
+                  </div>
+                </div>
                 <div style={{ float: "right" }}>
                   <div style={{ display: "inline-block", margin: "10px" }}>
                     <a className="btn btn-text waves-effect waves-light modal-close" onClick={this.handelCancel}>{localize("Common.cancel", locale)}</a>
                   </div>
                   <div style={{ display: "inline-block", margin: "10px" }}>
-                  <a
-                    className={`btn btn-outlined waves-effect waves-light ${classDisabled}`}
-                    onClick={this.handelReady}>{localize("Common.ready", locale)}</a>
+                    <a
+                      className={`btn btn-outlined waves-effect waves-light ${classDisabled}`}
+                      onClick={this.handelReady}>{localize("Common.ready", locale)}</a>
                   </div>
                 </div>
               </div>
@@ -374,7 +399,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                 <a className="btn btn-text waves-effect waves-light modal-close" onClick={this.handelCancel}>{localize("Common.cancel", locale)}</a>
               </div>
               <div style={{ display: "inline-block", margin: "10px" }}>
-                <a className={`btn btn-outlined waves-effect waves-light ${classDisabled}`}onClick={() => { this.funcOpenButton()}}>{localize("Common.ready", locale)}</a>
+                <a className={`btn btn-outlined waves-effect waves-light ${classDisabled}`} onClick={() => { this.funcOpenButton() }}>{localize("Common.ready", locale)}</a>
               </div>
             </div>
           </div>
@@ -428,7 +453,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
   funcOpenButton = () => {
     const { activeService, addService } = this.state;
-    const { regrequests } = this.props;
+    const { regrequests, servicesMap } = this.props;
 
     if (addService) {
       this.handelCancel();
@@ -437,24 +462,33 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       }, 100);
     }
 
-    const regrequest = regrequests.find((obj: any) => obj.get("serviceId") === activeService);
-    const caTemplatesObj = this.props.caTemplates.get(regrequest.id);
-    let caTemplatesArray;
+    const service = servicesMap.get(activeService);
 
-    if (caTemplatesObj) {
-      caTemplatesArray = caTemplatesObj.template;
+    if (service.type === CA_SERVICE) {
+      const regrequest = regrequests.find((obj: any) => obj.get("serviceId") === activeService);
+      const caTemplatesObj = this.props.caTemplates.get(regrequest.id);
+      let caTemplatesArray;
+
+      if (caTemplatesObj) {
+        caTemplatesArray = caTemplatesObj.template;
+      }
+
+      this.setState({ OpenButton: true, caTemplatesArray });
+    } else {
+      this.setState({ OpenButton: true });
     }
-
-    this.setState({ OpenButton: true, caTemplatesArray });
   }
 
   verifyFields = () => {
-    const { template, RDNsubject, containerName, caTemplate, caTemplatesArray } = this.state;
+    const { activeService, template, RDNsubject, containerName, caTemplate, caTemplatesArray } = this.state;
+    const { servicesMap } = this.props;
+    const service = servicesMap.get(activeService);
+
     const REQULAR_EXPRESSION = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
     if (!containerName.length) {
       return false;
     }
-    if (caTemplatesArray && caTemplatesArray.length && !caTemplate) {return false; }
+    if ((service.type === CA_SERVICE) && caTemplatesArray && caTemplatesArray.length && !caTemplate) { return false; }
     if (!template || !template.RDN) {
       return false;
     }
@@ -631,62 +665,89 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     const url = path.join(DEFAULT_CSR_PATH, urlName);
     const urlSig = path.join(DEFAULT_CSR_PATH, urlSigName);
 
-    try {
-      certReq.save(url, trusted.DataFormat.PEM);
+    const service = servicesMap.get(activeService);
 
-      const service = servicesMap.get(activeService);
-      const regrequest = regrequests.find((obj: any) => obj.get("serviceId") === service.id);
-      let cmsContext = fs.readFileSync(url, "utf8");
-      let cmsContextSig = "";
-      if (regrequest.certThumbprint) {
-        const sd1: trusted.cms.SignedData = new trusted.cms.SignedData();
-        const sd2: trusted.cms.SignedData = new trusted.cms.SignedData();
-        const certificate = certificates.get(`CRYPTOPRO_MY_${regrequest.certThumbprint}`);
-        const cert = window.PKISTORE.getPkiObject(certificate);
-        sd1.content = {
-          data: cmsContext,
-          type: trusted.cms.SignedDataContentType.buffer,
+    if (service.type === CA_SERVICE) {
+      try {
+        certReq.save(url, trusted.DataFormat.PEM);
+
+        const regrequest = regrequests.find((obj: any) => obj.get("serviceId") === service.id);
+        let cmsContext = fs.readFileSync(url, "utf8");
+        let cmsContextSig = "";
+        if (regrequest.certThumbprint) {
+          const sd1: trusted.cms.SignedData = new trusted.cms.SignedData();
+          const sd2: trusted.cms.SignedData = new trusted.cms.SignedData();
+          const certificate = certificates.get(`CRYPTOPRO_MY_${regrequest.certThumbprint}`);
+          const cert = window.PKISTORE.getPkiObject(certificate);
+          sd1.content = {
+            data: cmsContext,
+            type: trusted.cms.SignedDataContentType.buffer,
+          };
+          sd1.sign(cert);
+          sd1.save(urlSig, trusted.DataFormat.PEM);
+          sd2.content = {
+            data: urlSig,
+            type: trusted.cms.SignedDataContentType.url,
+          };
+          sd2.sign(cert);
+          sd2.save(urlSig, trusted.DataFormat.PEM);
+          cmsContextSig = fs.readFileSync(urlSig, "utf8");
+        }
+        if (fileCoding(url) === trusted.DataFormat.PEM) {
+          cmsContext = cmsContext.replace("-----BEGIN CERTIFICATE REQUEST-----", "");
+          cmsContext = cmsContext.replace("-----END CERTIFICATE REQUEST-----", "");
+          cmsContext = cmsContext.replace(/\r\n|\n|\r/gm, "");
+        } else {
+          cmsContext = fs.readFileSync(url, "base64");
+        }
+
+        const id = uuid();
+        const certificateRequestCA: ICertificateRequestCA = {
+          certRequestId: "",
+          certificateReq: cmsContext,
+          id,
+          status: "",
         };
-        sd1.sign(cert);
-        sd1.save(urlSig, trusted.DataFormat.PEM);
-        sd2.content = {
-          data: urlSig,
-          type: trusted.cms.SignedDataContentType.url,
-        };
-        sd2.sign(cert);
-        sd2.save(urlSig, trusted.DataFormat.PEM);
-        cmsContextSig = fs.readFileSync(urlSig, "utf8");
+
+        addCertificateRequestCA(certificateRequestCA);
+
+        if (!regrequest.certThumbprint) {
+          postCertRequest(`${service.settings.url}`, certificateRequestCA, values, regrequest, service.id);
+        } else {
+          postCertRequestAuthCert(`${service.settings.url}`, certificateRequestCA, cmsContextSig, values, regrequest, service.id);
+        }
+
+        Materialize.toast(localize("CSR.create_request_created", locale), 2000, "toast-csr_created");
+      } catch (e) {
+        Materialize.toast(localize("CSR.create_request_error", locale), 4000, "toast-csr_error");
       }
-      if (fileCoding(url) === trusted.DataFormat.PEM) {
-        cmsContext = cmsContext.replace("-----BEGIN CERTIFICATE REQUEST-----", "");
-        cmsContext = cmsContext.replace("-----END CERTIFICATE REQUEST-----", "");
-        cmsContext = cmsContext.replace(/\r\n|\n|\r/gm, "");
-      } else {
-        cmsContext = fs.readFileSync(url, "base64");
+    } else {
+      try {
+        certReq.save(url, trusted.DataFormat.PEM);
+      } catch (err) {
+        Materialize.toast(localize("CSR.create_request_error", locale), 4000, "toast-csr_error");
       }
-
-      const id = uuid();
-      const certificateRequestCA: ICertificateRequestCA = {
-        certRequestId: "",
-        certificateReq: cmsContext,
-        id,
-        status: "",
-      };
-
-      addCertificateRequestCA(certificateRequestCA);
-
-      if (!regrequest.certThumbprint) {
-        postCertRequest(`${service.settings.url}`, certificateRequestCA, values, regrequest, service.id);
-      } else {
-        postCertRequestAuthCert(`${service.settings.url}`, certificateRequestCA, cmsContextSig, values, regrequest, service.id);
-      }
-
-      Materialize.toast(localize("CSR.create_request_created", locale), 2000, "toast-csr_created");
-    } catch (e) {
-      Materialize.toast(localize("CSR.create_request_error", locale), 4000, "toast-csr_error");
     }
 
+
     this.handelCancel();
+  }
+
+  openLicenseFile = () => {
+    const { localize, locale } = this.context;
+
+    if (!window.framework_NW) {
+      const file = dialog.showOpenDialogSync({
+        filters: [
+          { name: "Шаблоны", extensions: ["json"] },
+        ],
+        properties: ["openFile"],
+      });
+      if (file) {
+        $("#input_file").focus();
+        console.log(file[0]);
+      }
+    }
   }
 
   handleReloadCertificates = () => {
@@ -724,13 +785,13 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   }
 
   handleCATemplateChange = (ev: any) => {
-    this.setState({ caTemplate: ev.target.value, filedChanged: true});
+    this.setState({ caTemplate: ev.target.value, filedChanged: true });
   }
 
   handleInputChange = (ev: any) => {
     const { localize, locale } = this.context;
     const pattern = /^[0-9a-z-.\\\s]+$/i;
-    const {containerName} = this.state;
+    const { containerName } = this.state;
     const target = ev.target;
     const name = target.name;
     const value = ev.target.value;
@@ -848,6 +909,7 @@ export default connect((state) => {
     certrequests: state.certrequests.entities,
     regrequests: state.regrequests.entities,
     services: mapToArr(filteredServicesByType(state, { type: CA_SERVICE })),
+    servicesLocal: mapToArr(filteredServicesByType(state, { type: CA_SERVICE_LOCAL })),
     servicesMap: state.services.entities,
     templates: state.templates.entities.toArray(),
   };

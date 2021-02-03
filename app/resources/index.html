@@ -99,68 +99,105 @@
       window.DEFAULT_PATH = path.dirname(process.execPath);
     }
 
-    window.HOME_DIR = os.homedir();
-    window.TMP_DIR = os.tmpdir();
-    window.USER_NAME = os.userInfo().username;
-    window.DEFAULT_CERTSTORE_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CertStore');
-    window.DEFAULT_DOCUMENTS_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'Documents');
-    window.DEFAULT_TEMP_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'TEMP');
-    window.DEFAULT_CSR_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CSR');
-    window.DEFAULT_CA_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA');
-    if (process.env.NODE_ENV === "development") {
-      window.TEMPLATES_PATH = path.join(window.DEFAULT_PATH, "/certreq_templates/CertReqTemplateDefault.json");
+    if (process.env.PORTABLE === "portable") {
+      window.IS_PORTABLE = true;
+      window.HOME_DIR = DEFAULT_PATH;
+      window.TMP_DIR = path.join(HOME_DIR, 'TEMP');
+      window.USER_NAME = os.userInfo().username;
+      window.DEFAULT_CERTSTORE_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CertStore');
+      window.DEFAULT_DOCUMENTS_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'Documents');
+      window.DEFAULT_TEMP_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'TEMP');
+      window.DEFAULT_CSR_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CSR');
+      window.DEFAULT_CA_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA');
+      if (process.env.NODE_ENV === "development") {
+        window.TEMPLATES_PATH = path.join(window.DEFAULT_PATH, "/certreq_templates/CertReqTemplateDefault.json");
+      } else {
+        window.TEMPLATES_PATH = path.join(process.resourcesPath, "app/resources/certreq_templates/CertReqTemplateDefault.json");
+      }
+      window.PLATFORM = process.platform;
+      LICENSE_DIR = HOME_DIR;
+      window.LICENSE_PATH = path.join(LICENSE_DIR, "/Trusted/CryptoARM GOST/license.lic");
+      window.LICENSE_REGISTRY_PATH = "HKLM\\SOFTWARE\\Trusted\\CryptoARM GOST";
+      window.SETTINGS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "settings.json");
+      window.SERVICES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "services.json");
+      window.TRUSTED_SERVICES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "trustedServices.json");
+      window.CA_REGREGUESTS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "regrequests.json");
+      window.CA_CERTTEMPLATE_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certtemplate.json");
+      window.CA_CERTTEMPLATE_LOCAL_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certtemplate_local.json");
+      window.CA_CERTREGUESTS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certrequests.json");
+      window.CA_CSR_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "csr.json");
+      window.DSS_TOKENS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "tokens.json");
+      window.DSS_USERS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "users.json");
+      window.CERTIFICATES_DSS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "certificateDSS.json");
+      window.POLICY_DSS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "policyDSS.json");
+      window.TRUSTED_CRYPTO_LOG = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost.log");
+      window.APP_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_operations.log");
+      window.APP_ERRORS_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_errors.log");
     } else {
-      window.TEMPLATES_PATH = path.join(process.resourcesPath, "app/resources/certreq_templates/CertReqTemplateDefault.json");
+      window.IS_PORTABLE = false;
+      window.HOME_DIR = os.homedir();
+      window.TMP_DIR = os.tmpdir();
+      window.USER_NAME = os.userInfo().username;
+      window.DEFAULT_CERTSTORE_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CertStore');
+      window.DEFAULT_DOCUMENTS_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'Documents');
+      window.DEFAULT_TEMP_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'TEMP');
+      window.DEFAULT_CSR_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CSR');
+      window.DEFAULT_CA_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA');
+      if (process.env.NODE_ENV === "development") {
+        window.TEMPLATES_PATH = path.join(window.DEFAULT_PATH, "/certreq_templates/CertReqTemplateDefault.json");
+      } else {
+        window.TEMPLATES_PATH = path.join(process.resourcesPath, "app/resources/certreq_templates/CertReqTemplateDefault.json");
+      }
+      window.PLATFORM = process.platform;
+      LICENSE_DIR = (PLATFORM == 'win32') ? process.env['LOCALAPPDATA'] : "/etc/opt";
+      window.LICENSE_PATH = path.join(LICENSE_DIR, "/Trusted/CryptoARM GOST/license.lic");
+      window.LICENSE_REGISTRY_PATH = "HKLM\\SOFTWARE\\Trusted\\CryptoARM GOST";
+      window.SETTINGS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "settings.json");
+      window.SERVICES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "services.json");
+      window.TRUSTED_SERVICES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "trustedServices.json");
+      window.CA_REGREGUESTS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "regrequests.json");
+      window.CA_CERTTEMPLATE_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certtemplate.json");
+      window.CA_CERTREGUESTS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certrequests.json");
+      window.CA_CSR_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "csr.json");
+      window.DSS_TOKENS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "tokens.json");
+      window.DSS_USERS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "users.json");
+      window.CERTIFICATES_DSS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "certificateDSS.json");
+      window.POLICY_DSS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "policyDSS.json");
+      window.TRUSTED_CRYPTO_LOG = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost.log");
+      window.APP_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_operations.log");
+      window.APP_ERRORS_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_errors.log");
     }
-    window.PLATFORM = process.platform;
-    LICENSE_DIR = (PLATFORM == 'win32') ? process.env['LOCALAPPDATA'] : "/etc/opt";
-    window.LICENSE_PATH = path.join(LICENSE_DIR, "/Trusted/CryptoARM GOST/license.lic");
-    window.LICENSE_REGISTRY_PATH = "HKLM\\SOFTWARE\\Trusted\\CryptoARM GOST";
-    window.SETTINGS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "settings.json");
-    window.SERVICES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "services.json");
-    window.TRUSTED_SERVICES_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "trustedServices.json");
-    window.CA_REGREGUESTS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "regrequests.json");
-    window.CA_CERTTEMPLATE_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certtemplate.json");
-    window.CA_CERTREGUESTS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "certrequests.json");
-    window.CA_CSR_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "CA", "csr.json");
-    window.DSS_TOKENS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "tokens.json");
-    window.DSS_USERS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "users.json");
-    window.CERTIFICATES_DSS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "certificateDSS.json");
-    window.POLICY_DSS_JSON = path.join(HOME_DIR, ".Trusted", "CryptoARM GOST", "DSS", "policyDSS.json");
-    window.TRUSTED_CRYPTO_LOG = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost.log");
-    window.APP_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_operations.log");
-    window.APP_ERRORS_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_errors.log");
 
     if (!fs.existsSync(path.join(HOME_DIR, '.Trusted'))) {
-      fs.mkdirSync(path.join(HOME_DIR, '.Trusted'), { mode: 0o700 });
-    }
-    if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST'))) {
-      fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST'), { mode: 0o700 });
-    }
+        fs.mkdirSync(path.join(HOME_DIR, '.Trusted'), { mode: 0o700 });
+      }
+      if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST'))) {
+        fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST'), { mode: 0o700 });
+      }
 
-    if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'Documents'))) {
-      fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'Documents'), { mode: 0o700 });
-    }
+      if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'Documents'))) {
+        fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'Documents'), { mode: 0o700 });
+      }
 
-    if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'TEMP'))) {
-      fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'TEMP'), { mode: 0o700 });
-    }
+      if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'TEMP'))) {
+        fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'TEMP'), { mode: 0o700 });
+      }
 
-    if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CSR'))) {
-      fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CSR'), { mode: 0o700 });
-    }
+      if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CSR'))) {
+        fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CSR'), { mode: 0o700 });
+      }
 
-    if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CertStore'))) {
-      fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CertStore'), { mode: 0o700 });
-    }
+      if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CertStore'))) {
+        fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CertStore'), { mode: 0o700 });
+      }
 
-    if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA'))) {
-      fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA'), { mode: 0o700 });
-    }
+      if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA'))) {
+        fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA'), { mode: 0o700 });
+      }
 
-    if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'DSS'))) {
-      fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'DSS'), { mode: 0o700 });
-    }
+      if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'DSS'))) {
+        fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'DSS'), { mode: 0o700 });
+      }
 
     document.ondragover = function (evt) {
       evt.preventDefault();

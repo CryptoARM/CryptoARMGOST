@@ -4,10 +4,11 @@ import React from "react";
 import { connect } from "react-redux";
 import { getRegRequest, postRegRequest } from "../../AC/caActions";
 import { addService } from "../../AC/servicesActions";
-import { CA_SERVICE } from "../../constants";
+import { CA_SERVICE, CA_SERVICE_LOCAL } from "../../constants";
 import { uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
 import CryptoProCASettings from "../CA/CryptoProCASettings";
 import DynamicRegistrationForm from "../CA/DynamicRegistrationForm";
+import LocalCASettings from "../CA/LocalCASettings";
 import LoginForm from "../CA/LoginForm";
 import { ICAServiceSettings, IService } from "./types";
 
@@ -26,8 +27,9 @@ interface IAddServiceState {
   password: string;
   regNewUser: boolean;
   serviceName: string;
-  serviceType: "CA_SERVICE";
+  serviceType: "CA_SERVICE" | "CA_SERVICE_LOCAL";
   serviceSettings: ICAServiceSettings;
+  template_file: string;
   RDNmodel: any;
 }
 
@@ -46,6 +48,7 @@ const initialState = {
   serviceName: "КриптоПро УЦ 2.0",
   serviceSettings: {
     url: "",
+    template_file: "",
   },
   serviceType: CA_SERVICE,
   RDNmodel: null,
@@ -72,7 +75,7 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
   }
 
   componentDidMount() {
-    $(document).on("ready", function() {
+    $(document).on("ready", function () {
       Materialize.updateTextFields();
     });
 
@@ -124,6 +127,15 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
                               {localize("CA.cryptopro_ca", locale)}
                             </label>
                           </p>
+                          <p>
+                            <input name="serviceType" type="radio"
+                              checked={serviceType === CA_SERVICE_LOCAL}
+                              id={CA_SERVICE_LOCAL}
+                              onClick={() => this.handleChangeServiceType(CA_SERVICE_LOCAL)} />
+                            <label htmlFor={CA_SERVICE_LOCAL}>
+                              Локальный УЦ
+                            </label>
+                          </p>
                         </form>
                       </div>
                     </div>
@@ -153,21 +165,25 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
             {
               activeSettingsTab ?
                 <div className="row halfbottom">
-                  <div style={{ float: "left" }}>
-                    <div style={{ display: "inline-block", margin: "10px" }}>
-                      <input
-                        name="regNewUser"
-                        type="checkbox"
-                        id="regNewUser"
-                        className="filled-in"
-                        checked={regNewUser}
-                        onClick={this.toggleRegNewUser}
-                      />
-                      <label htmlFor={"regNewUser"} className="truncate">
-                        {localize("CA.reg_new_user", locale)}
-                      </label>
+                  {serviceType === CA_SERVICE ?
+                    <div style={{ float: "left" }}>
+                      <div style={{ display: "inline-block", margin: "10px" }}>
+                        <input
+                          name="regNewUser"
+                          type="checkbox"
+                          id="regNewUser"
+                          className="filled-in"
+                          checked={regNewUser}
+                          onClick={this.toggleRegNewUser}
+                        />
+                        <label htmlFor={"regNewUser"} className="truncate">
+                          {localize("CA.reg_new_user", locale)}
+                        </label>
+                      </div>
                     </div>
-                  </div>
+                    : null
+                  }
+
 
                   <div style={{ float: "right" }}>
                     <div style={{ display: "inline-block", margin: "10px" }}>
@@ -217,6 +233,20 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
           </React.Fragment>
         );
 
+      case CA_SERVICE_LOCAL:
+        return (
+          <React.Fragment>
+            <LocalCASettings
+              description={this.state.description}
+              descriptionChange={this.handleDescriptionChange}
+              nameChange={this.handleServiceNameChange}
+              template_file={this.state.serviceSettings.template_file}
+              templateFileChange={this.handleTemplateChange}
+              service={{ settings: serviceSettings, name: serviceName }}
+            />
+          </React.Fragment>
+        );
+
       default:
         return null;
     }
@@ -250,12 +280,16 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
     this.setState({ keyPhrase: ev.target.value });
   }
 
+  handleTemplateChange = (value: string) => {
+    this.setState({ serviceSettings: { ...this.state.serviceSettings, template_file: value } });
+  }
+
   handleCAUrlChange = (ev: any) => {
     this.setState({ serviceSettings: { ...this.state.serviceSettings, url: ev.target.value } });
   }
 
-  handleChangeServiceType = (type: "CA_SERVICE") => {
-    this.setState({ serviceType: type });
+  handleChangeServiceType = (type: "CA_SERVICE" | "CA_SERVICE_LOCAL") => {
+    this.setState({ serviceType: type, serviceName: type === CA_SERVICE ? "КриптоПро УЦ" : "Локальный УЦ" });
 
     return;
   }
@@ -269,11 +303,24 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
   }
 
   handleAdd = () => {
-    const { serviceType } = this.state;
+    const { serviceType, serviceName, serviceSettings } = this.state;
+    const { addService, onCancel } = this.props;
 
     if (serviceType === CA_SERVICE) {
       this.setState({ activeSettingsTab: false });
       return;
+    } else if (serviceType === CA_SERVICE_LOCAL) {
+      const id = uuid();
+      const service: IService = {
+        id,
+        name: serviceName,
+        settings: serviceSettings,
+        type: serviceType,
+      };
+
+      addService(service);
+
+      onCancel(service);
     }
   }
 
