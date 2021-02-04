@@ -1,3 +1,4 @@
+import { timeStamp } from "console";
 import fs from "fs";
 import { Map } from "immutable";
 import * as os from "os";
@@ -5,6 +6,7 @@ import * as path from "path";
 import PropTypes, { any } from "prop-types";
 import React from "react";
 import ReactDOM from "react-dom";
+import { Parser } from "xml2js";
 import { connect } from "react-redux";
 import { addCertificateRequestCA, loadAllCertificates, removeAllCertificates } from "../../AC";
 import { postCertRequest, postCertRequestAuthCert } from "../../AC/caActions";
@@ -18,6 +20,7 @@ import { filteredServicesByType } from "../../selectors/servicesSelectors";
 import * as jwt from "../../trusted/jwt";
 import { arrayToMap, fileCoding, formatDate, mapToArr, uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
 import logger from "../../winstonLogger";
+import SelectFolder from "../SelectFolder";
 import ServiceInfo from "../Services/ServiceInfo";
 import ServiceListItem from "../Services/ServiceListItem";
 import { ICertificateRequestCA, IRegRequest } from "../Services/types";
@@ -63,9 +66,11 @@ interface ICertificateRequestCAState {
   keyLength: number;
   keyUsage: IKeyUsage;
   keyUsageGroup: string;
+  outCsrDir: string;
   selfSigned: boolean;
   template: any;
   templateName: string;
+  xmlFile: string;
   OpenButton: boolean;
   RDNsubject: any;
 }
@@ -128,7 +133,9 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
         nonRepudiation: true,
       },
       keyUsageGroup: KEY_USAGE_SIGN_AND_ENCIPHERMENT,
+      outCsrDir: DEFAULT_CSR_PATH,
       selfSigned: false,
+      xmlFile: "",
       template: this.props.templates && this.props.templates.length ? this.props.templates[0] : null,
       templateName: this.props.templates && this.props.templates.length ? this.props.templates[0].FriendlyName : null,
       RDNsubject: {
@@ -169,6 +176,8 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
     $(document).ready(() => {
       $("select").material_select();
+
+      Materialize.updateTextFields();
     });
 
     $(ReactDOM.findDOMNode(this.refs.templateSelect)).on("change", this.handleTemplateChange);
@@ -182,8 +191,8 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     const { localize, locale } = this.context;
     const { activeSubjectNameInfoTab, addService, algorithm, containerName, formVerified,
       exportableKey, extKeyUsage, keyLength, keyUsage, keyUsageGroup,
-      template, templateName, activeService, OpenButton, RDNsubject } = this.state;
-    const { certificates, certrequests, regrequests, services, servicesLocal, servicesMap, templates } = this.props;
+      template, templateName, activeService, outCsrDir, OpenButton, RDNsubject } = this.state;
+    const { certificates, certrequests, regrequests, services, servicesLocal, servicesMap, templates, xmlFile } = this.props;
 
     const service = servicesMap.get(activeService);
     const notEmptyCATemplate = (OpenButton && (!this.state.caTemplate && service.type === CA_SERVICE)) ? true : false;
@@ -270,10 +279,20 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                 </div>
               }
 
-              <div className="row halfbottom" />
-
               <div className="row halfbottom">
-                <div className="col s8">
+                <div className="col s6">
+                  <label style={{ marginLeft: "10px", color: "#334294" }}>
+                    Каталог сохранения запроса
+                  </label>
+                  <SelectFolder
+                    disabled={false}
+                    directory={outCsrDir}
+                    viewDirect={this.handleOutfolderChange}
+                    openDirect={this.addDirect.bind(this)}
+                  />
+
+                </div>
+                <div className="col s6">
                   <div className="input-field col s12 input-field-licence">
                     <i
                       className="material-icons prefix key-prefix"
@@ -284,11 +303,16 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                     <input
                       id="input_file"
                       type="text"
+                      value={xmlFile}
+                      onChange={(e: any) => {
+                        console.log("e", e);
+                        console.log("e.target.value", e.target.value);
+                      }}
                     />
                     <label htmlFor="input_file">
-                      Укажите файл с шаблонами
+                      XML с данными
               </label>
-                    <a onClick={this.openLicenseFile.bind(this)}>
+                    <a onClick={this.openXmlFile}>
                       <i className="file-setting-item waves-effect material-icons secondary-content pulse active">
                         insert_drive_file
                 </i>
@@ -733,20 +757,68 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     this.handelCancel();
   }
 
-  openLicenseFile = () => {
+  addDirect() {
+    const directory = dialog.showOpenDialogSync({ properties: ["openDirectory"] });
+    if (directory) {
+      this.setState({ outCsrDir: directory[0] });
+    }
+  }
+
+  handleOutfolderChange = (ev: any) => {
+    this.setState({ outCsrDir: ev.target.value });
+  }
+
+  openXmlFile = () => {
     const { localize, locale } = this.context;
+    const self = this;
 
     if (!window.framework_NW) {
       const file = dialog.showOpenDialogSync({
         filters: [
-          { name: "Шаблоны", extensions: ["json"] },
+          { name: "XML шаблоны", extensions: ["xml"] },
         ],
         properties: ["openFile"],
       });
       if (file) {
         $("#input_file").focus();
-        console.log(file[0]);
+
+        self.setState({ xmlFile: file[0] });
+        const data = fs.readFileSync(file[0], "utf8");
+
+        const parser = new Parser({explicitArray : false});
+        const tt = parser.parseString(data, (err: any, result: any) => {
+          if (err) {
+            throw err;
+          }
+
+          // `result` is a JavaScript object
+          // convert it to a JSON string
+          const json = JSON.stringify(result, null, 4);
+
+          // log JSON string
+          console.log(json);
+          this.fillFildsByXml(result);
+        });
       }
+    }
+  }
+
+  fillFildsByXml = (data: any) => {
+    if (data && data["person"]) {
+      let newSubject = {
+        ...this.state.RDNsubject,
+      };
+
+      for (const value of Object.values(data["person"])) {
+        if (value) {
+          newSubject = {
+            ...newSubject,
+            [`${value["Oid"]}`]: { type: value["Oid"], value: value["DefaultValue"] },
+          };
+        }
+      }
+
+      this.onSubjectChange(newSubject);
     }
   }
 
