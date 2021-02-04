@@ -61,6 +61,7 @@ interface Window {
     DEFAULT_CERTSTORE_PATH: string;
     DEFAULT_DOCUMENTS_PATH: string;
     DEFAULT_CSR_PATH: string;
+    DEFAULT_LOCAL_CA_PATH: string;
     CA_REGREGUESTS_JSON: string;
     CA_CERTREGUESTS_JSON: string;
     CA_CERTTEMPLATE_JSON: string;

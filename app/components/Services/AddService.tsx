@@ -1,11 +1,13 @@
+import * as fs from "fs";
 import { Map } from "immutable";
+import * as path from "path";
 import PropTypes from "prop-types";
 import React from "react";
 import { connect } from "react-redux";
 import { getRegRequest, postRegRequest } from "../../AC/caActions";
 import { addService } from "../../AC/servicesActions";
-import { CA_SERVICE, CA_SERVICE_LOCAL } from "../../constants";
-import { uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
+import { CA_SERVICE, CA_SERVICE_LOCAL, DEFAULT_LOCAL_CA_PATH } from "../../constants";
+import { fileExists, uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
 import CryptoProCASettings from "../CA/CryptoProCASettings";
 import DynamicRegistrationForm from "../CA/DynamicRegistrationForm";
 import LocalCASettings from "../CA/LocalCASettings";
@@ -317,6 +319,15 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
         settings: serviceSettings,
         type: serviceType,
       };
+
+      if (serviceSettings && serviceSettings.template_file && fileExists(serviceSettings.template_file)) {
+        console.log("serviceSettings.template_file", serviceSettings.template_file);
+
+        const newPath = path.join(DEFAULT_LOCAL_CA_PATH, `${id}.json`);
+        fs.copyFileSync(serviceSettings.template_file, newPath);
+
+        service.settings.template_file = newPath;
+      }
 
       addService(service);
 

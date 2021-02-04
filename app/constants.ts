@@ -213,6 +213,7 @@ export const CERTIFICATES_DSS_JSON = window.CERTIFICATES_DSS_JSON;
 export const POLICY_DSS_JSON = window.POLICY_DSS_JSON;
 export const TEMPLATES_PATH = window.TEMPLATES_PATH;
 export const TSP_OCSP_ENABLED = window.TSP_OCSP_ENABLED;
+export const DEFAULT_LOCAL_CA_PATH = window.DEFAULT_LOCAL_CA_PATH;
 
 export const LicenseManager: trusted.utils.License_Mng = window.LICENSE_MNG;
 

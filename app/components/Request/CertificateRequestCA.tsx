@@ -1,4 +1,3 @@
-import { timeStamp } from "console";
 import fs from "fs";
 import { Map } from "immutable";
 import * as os from "os";
@@ -9,6 +8,8 @@ import ReactDOM from "react-dom";
 import { Parser } from "xml2js";
 import { connect } from "react-redux";
 import { addCertificateRequestCA, loadAllCertificates, removeAllCertificates } from "../../AC";
+import { DefaultReducerState as DefaultTemplatesReducerState, TemplateModel } from "../../reducer/templates";
+import { CertTemplateModel, DefaultReducerState as DefaultCertTemplateReducerState } from "../../reducer/certtemplate";
 import { postCertRequest, postCertRequestAuthCert } from "../../AC/caActions";
 import {
   ALG_GOST12_256, ALG_GOST12_512, CA_SERVICE, CA_SERVICE_LOCAL, DEFAULT_CSR_PATH,
@@ -18,7 +19,7 @@ import {
 } from "../../constants";
 import { filteredServicesByType } from "../../selectors/servicesSelectors";
 import * as jwt from "../../trusted/jwt";
-import { arrayToMap, fileCoding, formatDate, mapToArr, uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
+import { arrayToMap, dirExists, fileCoding, fileExists, formatDate, mapToArr, uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
 import logger from "../../winstonLogger";
 import SelectFolder from "../SelectFolder";
 import ServiceInfo from "../Services/ServiceInfo";
@@ -66,6 +67,7 @@ interface ICertificateRequestCAState {
   keyLength: number;
   keyUsage: IKeyUsage;
   keyUsageGroup: string;
+  localCATemplates: any;
   outCsrDir: string;
   selfSigned: boolean;
   template: any;
@@ -138,6 +140,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       xmlFile: "",
       template: this.props.templates && this.props.templates.length ? this.props.templates[0] : null,
       templateName: this.props.templates && this.props.templates.length ? this.props.templates[0].FriendlyName : null,
+      localCATemplates: this.props.templates,
       RDNsubject: {
         "2.5.4.6": {
           type: "2.5.4.6",
@@ -156,6 +159,8 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
     $(document).ready(() => {
       $("select").material_select();
+
+      Materialize.updateTextFields();
     });
 
     $(ReactDOM.findDOMNode(this.refs.templateSelect)).on("change", this.handleTemplateChange);
@@ -164,14 +169,12 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   componentDidUpdate(prevProps, prevState) {
 
     if (!prevState.filedChanged && this.state.filedChanged) {
-
       if (this.verifyFields() === true) {
         this.setState({ disabled: true });
       } else {
         this.setState({ disabled: false });
       }
       this.setState({ filedChanged: false });
-
     }
 
     $(document).ready(() => {
@@ -191,8 +194,8 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     const { localize, locale } = this.context;
     const { activeSubjectNameInfoTab, addService, algorithm, containerName, formVerified,
       exportableKey, extKeyUsage, keyLength, keyUsage, keyUsageGroup,
-      template, templateName, activeService, outCsrDir, OpenButton, RDNsubject } = this.state;
-    const { certificates, certrequests, regrequests, services, servicesLocal, servicesMap, templates, xmlFile } = this.props;
+      template, templateName, activeService, outCsrDir, OpenButton, RDNsubject, xmlFile } = this.state;
+    const { certificates, certrequests, regrequests, services, servicesLocal, servicesMap, templates } = this.props;
 
     const service = servicesMap.get(activeService);
     const notEmptyCATemplate = (OpenButton && (!this.state.caTemplate && service.type === CA_SERVICE)) ? true : false;
@@ -244,6 +247,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                     <div className="content-item-relative">
                       <div className="row halfbottom" />
                       <DynamicSubjectName
+                        filedChanged={this.state.filedChanged}
                         formVerified={formVerified}
                         model={RDNsubject}
                         template={this.state.template}
@@ -305,14 +309,13 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                       type="text"
                       value={xmlFile}
                       onChange={(e: any) => {
-                        console.log("e", e);
-                        console.log("e.target.value", e.target.value);
+                        this.setState({ xmlFile: e.target.value });
                       }}
                     />
                     <label htmlFor="input_file">
                       XML с данными
-              </label>
-                    <a onClick={this.openXmlFile}>
+                    </label>
+                    <a onClick={this.openXmlFile.bind(this)}>
                       <i className="file-setting-item waves-effect material-icons secondary-content pulse active">
                         insert_drive_file
                 </i>
@@ -369,11 +372,16 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                     <div className="row">
                       <div className="row" />
                       <div className="input-field input-field-csr col s12">
-                        <select className="select" ref="templateSelect" defaultValue={templateName} onChange={this.handleTemplateChange} >
+                        <select className="select" ref="templateSelect" value={templateName} defaultValue={templateName} onChange={this.handleTemplateChange} >
                           {
-                            templates.map((template: any) => {
-                              return <option key={template.FriendlyName} value={template.FriendlyName}>{template.FriendlyName}</option>;
-                            })
+                            service && service.type === CA_SERVICE ?
+                              templates.map((template: any) => {
+                                return <option key={template.FriendlyName} value={template.FriendlyName}>{template.FriendlyName}</option>;
+                              })
+                              :
+                              this.state.localCATemplates.map((template: any) => {
+                                return <option key={template.FriendlyName} value={template.FriendlyName}>{template.FriendlyName}</option>;
+                              })
                           }
                         </select>
                         <label>{localize("Services.type_certificate_holder", locale)}</label>
@@ -463,6 +471,33 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
         });
 
         this.setState({ RDNsubject: { ...newSubject } });
+      }
+
+      if (service.type === CA_SERVICE_LOCAL) {
+        if (service.settings && service.settings.template_file && fileExists(service.settings.template_file)) {
+          const certtemplate = fs.readFileSync(service.settings.template_file, "utf8");
+
+          if (certtemplate) {
+            try {
+              const data = JSON.parse(certtemplate);
+
+              if (data && data["TEMPLATES"] && data["TEMPLATES"].length) {
+                this.setState({
+                  localCATemplates: [...data["TEMPLATES"]],
+                  template: data["TEMPLATES"][0],
+                  templateName: data["TEMPLATES"][0].FriendlyName,
+                  filedChanged: true
+                });
+              } else {
+                this.setState({ localCATemplates: [...this.props.templates] })
+              }
+            } catch (e) {
+              this.setState({ localCATemplates: [...this.props.templates] })
+            }
+          }
+        } else {
+          this.setState({ localCATemplates: [...this.props.templates] })
+        }
       }
     }
   }
@@ -554,7 +589,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   handelReady = () => {
     const { localize, locale } = this.context;
     const { activeService, activeSubjectNameInfoTab, caTemplatesArray, algorithm, caTemplate, containerName, exportableKey, extKeyUsage,
-      keyUsage, template, RDNsubject } = this.state;
+      keyUsage, template, RDNsubject, outCsrDir } = this.state;
     // tslint:disable-next-line: no-shadowed-variable
     const { addCertificateRequestCA, postCertRequest, postCertRequestAuthCert } = this.props;
     const { servicesMap, regrequests, certrequests, certificates } = this.props;
@@ -686,8 +721,8 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       urlSigName = urlSigName.replace(/[/\\:]/g, "-");
     }
 
-    const url = path.join(DEFAULT_CSR_PATH, urlName);
-    const urlSig = path.join(DEFAULT_CSR_PATH, urlSigName);
+    const url = path.join(outCsrDir && dirExists(outCsrDir) ? outCsrDir : DEFAULT_CSR_PATH, urlName);
+    const urlSig = path.join(outCsrDir && dirExists(outCsrDir) ? outCsrDir : DEFAULT_CSR_PATH, urlSigName);
 
     const service = servicesMap.get(activeService);
 
@@ -768,9 +803,8 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     this.setState({ outCsrDir: ev.target.value });
   }
 
-  openXmlFile = () => {
+  openXmlFile() {
     const { localize, locale } = this.context;
-    const self = this;
 
     if (!window.framework_NW) {
       const file = dialog.showOpenDialogSync({
@@ -782,21 +816,17 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       if (file) {
         $("#input_file").focus();
 
-        self.setState({ xmlFile: file[0] });
-        const data = fs.readFileSync(file[0], "utf8");
+        const fpath = file[0];
 
-        const parser = new Parser({explicitArray : false});
+        this.setState({ xmlFile: fpath });
+        const data = fs.readFileSync(fpath, "utf8");
+
+        const parser = new Parser({ explicitArray: false });
         const tt = parser.parseString(data, (err: any, result: any) => {
           if (err) {
             throw err;
           }
 
-          // `result` is a JavaScript object
-          // convert it to a JSON string
-          const json = JSON.stringify(result, null, 4);
-
-          // log JSON string
-          console.log(json);
           this.fillFildsByXml(result);
         });
       }
@@ -846,10 +876,18 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   }
 
   handleTemplateChange = (ev: any) => {
-    const { templates } = this.props;
+    const { templates, servicesMap } = this.props;
+    const { localCATemplates, activeService } = this.state;
+
     const name = ev.target.value;
 
-    this.setState({ filedChanged: true, templateName: name, template: templates.find((item: any) => item.FriendlyName === name) });
+    const service = servicesMap.get(activeService);
+
+    if (service.type === CA_SERVICE) {
+      this.setState({ filedChanged: true, templateName: name, template: templates.find((item: any) => item.FriendlyName === name) });
+    } else {
+      this.setState({ filedChanged: true, templateName: name, template: localCATemplates.find((item: any) => item.FriendlyName === name) });
+    }
   }
 
   handleAlgorithmChange = (ev: any) => {

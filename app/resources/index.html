@@ -109,6 +109,7 @@
       window.DEFAULT_TEMP_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'TEMP');
       window.DEFAULT_CSR_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CSR');
       window.DEFAULT_CA_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA');
+      window.DEFAULT_LOCAL_CA_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'LOCAL_CA');
       if (process.env.NODE_ENV === "development") {
         window.TEMPLATES_PATH = path.join(window.DEFAULT_PATH, "/certreq_templates/CertReqTemplateDefault.json");
       } else {
@@ -143,6 +144,7 @@
       window.DEFAULT_TEMP_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'TEMP');
       window.DEFAULT_CSR_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CSR');
       window.DEFAULT_CA_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA');
+      window.DEFAULT_LOCAL_CA_PATH = path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'LOCAL_CA');
       if (process.env.NODE_ENV === "development") {
         window.TEMPLATES_PATH = path.join(window.DEFAULT_PATH, "/certreq_templates/CertReqTemplateDefault.json");
       } else {
@@ -193,6 +195,10 @@
 
       if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA'))) {
         fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'CA'), { mode: 0o700 });
+      }
+
+      if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'LOCAL_CA'))) {
+        fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'LOCAL_CA'), { mode: 0o700 });
       }
 
       if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST', 'DSS'))) {
