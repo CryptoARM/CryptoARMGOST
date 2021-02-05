@@ -1,6 +1,7 @@
+import { fileExists } from "../../utils";
 import PropTypes from "prop-types";
 import React from "react";
-import { REQUEST_STATUS } from "../../constants";
+import { CA_SERVICE_LOCAL, REQUEST_STATUS } from "../../constants";
 
 interface IServiceListItemProps {
   chooseCert: () => void;
@@ -42,7 +43,11 @@ class ServiceListItem extends React.Component<IServiceListItemProps, {}> {
           status = status + "unknown";
       }
     } else {
-      status = status + "unknown";
+      if (service.type === CA_SERVICE_LOCAL && service.settings && service.settings.template_file && fileExists(service.settings.template_file)) {
+        status = status + "ok";
+      } else {
+        status = status + "unknown";
+      }
     }
 
     if (isOpen) {

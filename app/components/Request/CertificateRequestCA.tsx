@@ -28,6 +28,7 @@ import { ICertificateRequestCA, IRegRequest } from "../Services/types";
 import DynamicSubjectName from "./DynamicSubjectName";
 import HeaderTabs from "./HeaderTabs";
 import KeyParameters from "./KeyParameters";
+import { checkLicense } from "../../trusted/jwt";
 const dialog = window.electron.remote.dialog;
 
 interface IKeyUsage {
@@ -592,7 +593,27 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       keyUsage, template, RDNsubject, outCsrDir } = this.state;
     // tslint:disable-next-line: no-shadowed-variable
     const { addCertificateRequestCA, postCertRequest, postCertRequestAuthCert } = this.props;
-    const { servicesMap, regrequests, certrequests, certificates } = this.props;
+    const { servicesMap, regrequests, certrequests, certificates, lic_error } = this.props;
+
+    const licenseStatus = checkLicense();
+
+    if (licenseStatus !== true) {
+      $(".toast-jwtErrorLicense").remove();
+      Materialize.toast(localize(jwt.getErrorMessage(lic_error), locale), 5000, "toast-jwtErrorLicense");
+
+      logger.log({
+        level: "error",
+        message: "No correct license",
+        operation: "Генерация и сохранение запроса",
+        operationObject: {
+          in: "License",
+          out: "Null",
+        },
+        userName: USER_NAME,
+      });
+
+      return;
+    }
 
     const exts = new trusted.pki.ExtensionCollection();
     let keyUsageStr = "critical";
@@ -1017,6 +1038,7 @@ export default connect((state) => {
     certificateLoading: state.certificates.loading,
     certificates: state.certificates.entities,
     certrequests: state.certrequests.entities,
+    lic_error: state.license.lic_error,
     regrequests: state.regrequests.entities,
     services: mapToArr(filteredServicesByType(state, { type: CA_SERVICE })),
     servicesLocal: mapToArr(filteredServicesByType(state, { type: CA_SERVICE_LOCAL })),

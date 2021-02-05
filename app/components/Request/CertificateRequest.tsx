@@ -13,6 +13,7 @@ import {
   REQUEST_TEMPLATE_DEFAULT, REQUEST_TEMPLATE_KEP_FIZ, REQUEST_TEMPLATE_CLIENT_AUTH, REQUEST_TEMPLATE_KEP_IP, ROOT, USER_NAME,
 } from "../../constants";
 import * as jwt from "../../trusted/jwt";
+import { checkLicense } from "../../trusted/jwt";
 import { formatDate, randomSerial, uuid, validateInn, validateOgrnip, validateSnils } from "../../utils";
 import logger from "../../winstonLogger";
 import HeaderTabs from "./HeaderTabs";
@@ -378,6 +379,26 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
     let extendedKeyUsageStr = "";
     let oid;
     let ext;
+
+    const licenseStatus = checkLicense();
+
+    if (licenseStatus !== true) {
+      $(".toast-jwtErrorLicense").remove();
+      Materialize.toast(localize(jwt.getErrorMessage(this.props.lic_error), locale), 5000, "toast-jwtErrorLicense");
+
+      logger.log({
+        level: "error",
+        message: "No correct license",
+        operation: "Генерация и сохранение запроса",
+        operationObject: {
+          in: "License",
+          out: "Null",
+        },
+        userName: USER_NAME,
+      });
+
+      return;
+    }
 
     if (!this.verifyFields()) {
       $(".toast-required_fields").remove();
@@ -969,5 +990,6 @@ const getTemplateByCertificate = (certificate: any) => {
 export default connect((state) => {
   return {
     certificateLoading: state.certificates.loading,
+    lic_error: state.license.lic_error,
   };
 }, { loadAllCertificates, removeAllCertificates })(CertificateRequest);
