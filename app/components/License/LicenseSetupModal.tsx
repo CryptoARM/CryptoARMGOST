@@ -66,6 +66,10 @@ class LicenseSetupModal extends React.Component<ILicenseSetupModalProps, ILicens
     if (PLATFORM !== "win32") {
       command = "sh -c " + "\"";
       command = command + "mkdir -p " + "'" + path + "'" + " && ";
+    } else {
+      if (!fs.existsSync(path)) {
+        command = command + " mkdir " + '"' + path + '"' + " && ";
+      }
     }
 
     let key;
@@ -92,7 +96,7 @@ class LicenseSetupModal extends React.Component<ILicenseSetupModalProps, ILicens
     } else {
       if (jwt.checkLicense(key)) {
         if (PLATFORM === "win32") {
-          command = "reg add \"" + LICENSE_REGISTRY_PATH + "\" /v license /t REG_SZ /f /d " + key.trim();
+          command = command + "echo " + key.trim() + " > " + '"' + LICENSE_PATH + '"';
         } else {
           command = command + " printf " + key.trim() + " > " + "'" + LICENSE_PATH + "'" + " && ";
           command = command + " chmod 777 " + "'" + LICENSE_PATH + "'" + "\"";

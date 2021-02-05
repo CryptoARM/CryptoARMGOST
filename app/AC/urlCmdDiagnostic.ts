@@ -236,15 +236,8 @@ export function collectDiagnosticInfo(
           licCryptoarm.status = false;
         }
       } else {
-        const status = JSON.parse(LicenseManager.checkTrialLicense());
-        licCryptoarm.type = "temporary";
-        licCryptoarm.expiration = status.attribute.ExpirationTime + "000";
-        if (status.verify) {
-          licCryptoarm.status = true;
-        } else {
           licCryptoarm.status = false;
         }
-      }
     } catch (e) {
       //
     }

@@ -131,24 +131,11 @@ export function loadLicense(license?: string) {
             dispatch({ payload: { data, lic_format, licenseStatus, lic_error }, type: LOAD_LICENSE + FAIL });
           }
         } else {
-          const status = JSON.parse(LicenseManager.checkTrialLicense());
-          // // Проверка на наличие и истечение временной лицензии
-          if (status.verify) {
-            const expirationTimeTrial = status.attribute.ExpirationTime;
-            lic_format = "TRIAL";
-            lic.exp = expirationTimeTrial;
-            lic.iat = expirationTimeTrial - 14 * 86400;
-            data = "";
-            licenseStatus = true;
-            lic_error = 900;
-            dispatch({ payload: { data, lic, lic_format, licenseStatus, lic_error }, type: LOAD_LICENSE + SUCCESS });
-          } else {
             lic_format = "NONE"; // Лицензия отсутствует, т.к. триальная истекла
             licenseStatus = false; // Статуст лицензии: 0 - не действует
             data = "";
             lic_error = 911; // CTLICENSE_R_ERROR_NO_LICENSE_IN_STORE
             dispatch({ payload: { data, lic_format, licenseStatus, lic_error }, type: LOAD_LICENSE + FAIL });
-          }
         }
       } catch (e) {
         console.log("error", e);
