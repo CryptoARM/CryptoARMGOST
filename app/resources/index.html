@@ -134,9 +134,10 @@
       window.APP_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_operations.log");
       window.APP_ERRORS_LOG_FILE = path.join(HOME_DIR, ".Trusted", "cryptoarm_gost_errors.log");
 
-    if (!fs.existsSync(path.join(HOME_DIR, '.Trusted'))) {
+      if (!fs.existsSync(path.join(HOME_DIR, '.Trusted'))) {
         fs.mkdirSync(path.join(HOME_DIR, '.Trusted'), { mode: 0o700 });
       }
+
       if (!fs.existsSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST'))) {
         fs.mkdirSync(path.join(HOME_DIR, '.Trusted', 'CryptoARM GOST'), { mode: 0o700 });
       }
@@ -175,6 +176,10 @@
 
       if (!fs.existsSync(path.join(HOME_DIR, 'Trusted', 'CryptoARM GOST'))) {
         fs.mkdirSync(path.join(HOME_DIR, 'Trusted', 'CryptoARM GOST'), { mode: 0o700 });
+      }
+
+      if (!fs.existsSync(path.join(HOME_DIR, 'TEMP'))) {
+        fs.mkdirSync(path.join(HOME_DIR, 'TEMP'), { mode: 0o700 });
       }
 
     document.ondragover = function (evt) {
