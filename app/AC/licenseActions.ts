@@ -118,6 +118,7 @@ export function loadLicense(license?: string) {
           const status = JSON.parse(LicenseManager.checkLicense(data));
  
           if (status.verify) {
+            LicenseManager.addLicense(data);
             lic_format = status.type;
             lic.exp = status.attribute ? status.attribute.ExpirationTime : status.payload ? status.payload.exp : null;
             lic.iat = 0;
