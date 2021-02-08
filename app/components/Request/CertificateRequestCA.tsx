@@ -512,7 +512,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   }
 
   funcOpenButton = () => {
-    const { activeService, addService } = this.state;
+    const { activeService, addService, template } = this.state;
     const { regrequests, servicesMap } = this.props;
 
     if (addService) {
@@ -535,6 +535,24 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
       this.setState({ OpenButton: true, caTemplatesArray });
     } else {
+      if (template && template.RDN) {
+        let newSubject = {
+          ...this.state.RDNsubject,
+        };
+
+        Object.keys(template.RDN).map((key) => {
+          const value = template.RDN[key];
+          if (value && value.Oid && value.DefaultValue) {
+            newSubject = {
+              ...newSubject,
+              [value.Oid]: { type: value.Oid, value: value.DefaultValue },
+            };
+          }
+        });
+
+       this.setState({ RDNsubject: { ...newSubject } });
+      }
+
       this.setState({ OpenButton: true });
     }
   }
