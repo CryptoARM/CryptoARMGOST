@@ -550,7 +550,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
           }
         });
 
-       this.setState({ RDNsubject: { ...newSubject } });
+        this.setState({ RDNsubject: { ...newSubject } });
       }
 
       this.setState({ OpenButton: true });
@@ -558,7 +558,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   }
 
   verifyFields = () => {
-    const { activeService, template, RDNsubject, containerName, caTemplate, caTemplatesArray } = this.state;
+    const { activeService, template, RDNsubject, containerName, caTemplate, caTemplatesArray, OpenButton } = this.state;
     const { servicesMap } = this.props;
     const service = servicesMap.get(activeService);
 
@@ -574,26 +574,30 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     for (let key of Object.keys(template.RDN)) {
       const templateField = template.RDN[key];
       const field = RDNsubject[templateField.Oid];
-      if (field) {
+
+      if (OpenButton) {
         if (templateField.ProhibitEmpty && (!field || !field.value)) {
           result = false;
           break;
         }
-        if (field.value && (field.type === "1.2.643.3.131.1.1")) {
-          result = validateInn(field.value);
-          if (!result) { break; }
-        } else if (field.value && (field.type === "1.2.643.100.1")) {
-          result = validateOgrn(field.value);
-          if (!result) { break; }
-        } else if (field.value && (field.type === "1.2.643.100.3")) {
-          result = validateSnils(field.value);
-          if (!result) { break; }
-        } else if (field.value && (field.type === "1.2.643.100.5")) {
-          result = validateOgrnip(field.value);
-          if (!result) { break; }
-        } else if (field.value && (field.type === "1.2.840.113549.1.9.1")) {
-          result = REQULAR_EXPRESSION.test(field.value);
-          if (!result) { break; }
+
+        if (field) {
+          if (field.value && (field.type === "1.2.643.3.131.1.1")) {
+            result = validateInn(field.value);
+            if (!result) { break; }
+          } else if (field.value && (field.type === "1.2.643.100.1")) {
+            result = validateOgrn(field.value);
+            if (!result) { break; }
+          } else if (field.value && (field.type === "1.2.643.100.3")) {
+            result = validateSnils(field.value);
+            if (!result) { break; }
+          } else if (field.value && (field.type === "1.2.643.100.5")) {
+            result = validateOgrnip(field.value);
+            if (!result) { break; }
+          } else if (field.value && (field.type === "1.2.840.113549.1.9.1")) {
+            result = REQULAR_EXPRESSION.test(field.value);
+            if (!result) { break; }
+          }
         }
       }
     }
