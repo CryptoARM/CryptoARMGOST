@@ -135,7 +135,7 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
                               id={CA_SERVICE_LOCAL}
                               onClick={() => this.handleChangeServiceType(CA_SERVICE_LOCAL)} />
                             <label htmlFor={CA_SERVICE_LOCAL}>
-                              Локальный УЦ
+                              Offline УЦ
                             </label>
                           </p>
                         </form>
@@ -291,7 +291,7 @@ class AddService extends React.Component<IAddServiceProps, IAddServiceState> {
   }
 
   handleChangeServiceType = (type: "CA_SERVICE" | "CA_SERVICE_LOCAL") => {
-    this.setState({ serviceType: type, serviceName: type === CA_SERVICE ? "КриптоПро УЦ" : "Локальный УЦ" });
+    this.setState({ serviceType: type, serviceName: type === CA_SERVICE ? "КриптоПро УЦ" : "Offline УЦ" });
 
     return;
   }
