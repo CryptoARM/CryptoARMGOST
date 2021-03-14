@@ -230,7 +230,8 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
           regRequest={rrequest}
           service={service}
           handleOnMouseOver={() => this.handleOnRowMouseOver(service)}
-          isHoveredServiceListItem={this.state.hoveredRowIndex === service.id} />
+          isHoveredServiceListItem={this.state.hoveredRowIndex === service.id}
+          isDefaultService={this.props.defaultCAService === service.id} />
       );
     });
 
@@ -1076,12 +1077,24 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   }
 
   handleDeleteService = (id: any) => {
-    this.setState({activeService: null});
+    this.setState({ activeService: null });
     this.props.deleteService(id);
   }
 
   handleSetServiceAsDefault = (id: any) => {
+    const { defaultCAService, servicesMap } = this.props;
+    const service = servicesMap.get(id);
+
     this.props.setServiceAsDefault(id);
+    this.activeItemChose(service);
+
+    if (defaultCAService !== id) {
+      $(".toast-defaultService").remove();
+      Materialize.toast("Сервис выбран по умолчанию", 2000, "toast-defaultService");
+    } else {
+      $(".toast-defaultService").remove();
+      Materialize.toast("Сервис по умолчанию сброшен", 2000, "toast-defaultService");
+    }
   }
 }
 

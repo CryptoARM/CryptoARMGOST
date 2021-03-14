@@ -6,6 +6,7 @@ import { CA_SERVICE_LOCAL, REQUEST_STATUS } from "../../constants";
 const shell = window.electron.shell;
 
 interface IServiceListItemProps {
+  isDefaultService?: boolean;
   deleteService?: (id: string) => void;
   setServiceAsDefault?: (id: string) => void;
   handleOnMouseOver: () => void;
@@ -75,12 +76,16 @@ class ServiceListItem extends React.Component<IServiceListItemProps, {}> {
           onClick={this.handleClick}
         >
           <div className="row nobottom valign-wrapper">
-            <div className="col s1">
+            <div className="valign-wrapper">
+              {this.props.isDefaultService ?
+              < div className="side-nav-rectangle" style={{background: "green"}}/>
+              : null
+              }
               <div className={status} />
             </div>
             {service.type === CA_SERVICE_LOCAL &&
             this.props.isHoveredServiceListItem ? (
-              <div className="col s11">
+              <div className="col s11 valign-wrapper">
                 <div className="collection-title">{service.name}</div>
                 <div className="collection-info ">{service.settings.url}</div>
 
