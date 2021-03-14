@@ -70,7 +70,8 @@ export async function checkTrustedServiceForCommand(
     curl.on("end", (status: any) => {
       let cert: trusted.pki.Certificate | undefined;
       if (status !== 200) {
-        // throw Error(`Invalid status code: ${status}`)
+        curl.close();
+        obtainCertWithHttps(command, hostToCheck);
       } else {
         try {
           const certInfo: string | number | any[] | null = curl.getInfo(Curl.info.CERTINFO);
@@ -370,7 +371,7 @@ function signDocumentsFromURL(action: URLActionType) {
 
       data = action.props;
       data.method = "sign";
-      data.uploader = action.url;
+      //data.uploader = action.url;
 
       if (data && data.files) {
         await downloadFiles(data);
@@ -410,7 +411,7 @@ function verifyDocumentsFromURL(action: URLActionType) {
 
       data = action.props;
       data.method = "verify";
-      data.uploader = action.url;
+      //data.uploader = action.url;
 
       if (data && data.files) {
         await downloadFiles(data);
