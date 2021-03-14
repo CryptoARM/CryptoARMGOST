@@ -10,6 +10,7 @@ import {
   LOCATION_TRUSTED_SERVICES, MY, REQUEST, ROOT,
 } from "../constants";
 import { mapToArr } from "../utils";
+import history from "../history";
 
 const remote = window.electron.remote;
 
@@ -228,7 +229,7 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
   }
 
   getCertStoresMenu = () => {
-    const { certificates, crls, certrequests } = this.props;
+    const { certificates, crls, certrequests, servicesMap } = this.props;
     const { localize, locale } = this.context;
 
     const my: object[] = [];
@@ -267,6 +268,24 @@ class SideMenu extends React.Component<ISideMenuProps, {}> {
               </div>
             </li>
           </Link>
+
+          {
+            servicesMap && servicesMap.size ?
+              <Link
+                to={{ pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY } }}
+                style={{ padding: "0px" }}
+              >
+                <li onClick={() => history.replace({
+                  pathname: LOCATION_CERTIFICATES, search: "my", state: { head: localize("Certificate.certs_my", locale), store: MY, showModalCertificateRequestCAResolve: true },
+                })}>
+                  <div className="center-align">
+                    <a style={{ fontWeight: "bold", color: "#bf3817" }}>СЕРВИСЫ УЦ</a>
+                  </div>
+                </li>
+              </Link>
+              : null
+          }
+
 
           {this.getCertStoreMenuElement(localize("Certificate.sidesubmenu_my", locale), localize("Certificate.certs_my", locale), "my", MY, my)}
           {this.getCertStoreMenuElement(localize("Certificate.sidesubmenu_intermediate", locale), localize("Certificate.certs_intermediate", locale), "intermediate", CA, intermediate)}
@@ -415,5 +434,6 @@ export default connect((state) => {
     certrequests: state.certrequests.entities,
     crls: mapToArr(state.crls.entities),
     setting: state.settings.getIn(["entities", state.settings.active]),
+    servicesMap: state.services.entities,
   };
 })(SideMenu);
