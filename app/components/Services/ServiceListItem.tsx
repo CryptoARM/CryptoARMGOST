@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import React from "react";
 import { CA_SERVICE_LOCAL, REQUEST_STATUS } from "../../constants";
 
+const shell = window.electron.shell;
+
 interface IServiceListItemProps {
   deleteService?: (id: any) => void;
   handleOnMouseOver: () => void;
@@ -76,7 +78,7 @@ class ServiceListItem extends React.Component<IServiceListItemProps, {}> {
               <div className={status} />
             </div>
             {service.type === CA_SERVICE_LOCAL &&
-              this.props.isHoveredServiceListItem ? (
+            this.props.isHoveredServiceListItem ? (
               <div className="col s11">
                 <div className="collection-title">{service.name}</div>
                 <div className="collection-info ">{service.settings.url}</div>
@@ -86,12 +88,27 @@ class ServiceListItem extends React.Component<IServiceListItemProps, {}> {
                   style={{ width: "40px" }}
                   onClick={(event) => {
                     event.stopPropagation();
+                    shell.openItem(service.settings.template_file);
+                  }}
+                >
+                  <i className="file-setting-item waves-effect material-icons secondary-content" style={{ right: "60px" }}>
+                    edit
+                  </i>
+                </div>
+
+                <div
+                  className="col"
+                  onClick={(event) => {
+                    event.stopPropagation();
                     if (this.props.deleteService) {
                       this.props.deleteService(service.id);
                     }
                   }}
                 >
-                  <i className="file-setting-item waves-effect material-icons secondary-content">
+                  <i
+                    className="file-setting-item waves-effect material-icons secondary-content"
+                    style={{ width: "40px" }}
+                  >
                     delete
                   </i>
                 </div>
