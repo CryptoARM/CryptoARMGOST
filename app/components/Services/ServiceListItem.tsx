@@ -4,11 +4,14 @@ import React from "react";
 import { CA_SERVICE_LOCAL, REQUEST_STATUS } from "../../constants";
 
 interface IServiceListItemProps {
+  deleteService?: (id: any) => void;
+  handleOnMouseOver: () => void;
   chooseCert: () => void;
   isOpen: boolean;
   toggleOpen: () => void;
   regRequest: any;
   service: any;
+  isHoveredServiceListItem?: boolean;
 }
 
 class ServiceListItem extends React.Component<IServiceListItemProps, {}> {
@@ -43,7 +46,12 @@ class ServiceListItem extends React.Component<IServiceListItemProps, {}> {
           status = status + "unknown";
       }
     } else {
-      if (service.type === CA_SERVICE_LOCAL && service.settings && service.settings.template_file && fileExists(service.settings.template_file)) {
+      if (
+        service.type === CA_SERVICE_LOCAL &&
+        service.settings &&
+        service.settings.template_file &&
+        fileExists(service.settings.template_file)
+      ) {
         status = status + "ok";
       } else {
         status = status + "unknown";
@@ -55,16 +63,45 @@ class ServiceListItem extends React.Component<IServiceListItemProps, {}> {
     }
 
     return (
-      <div className="row certificate-list-item">
-        <div className={"collection-item avatar certs-collection " + active} onClick={this.handleClick}>
+      <div
+        className="row certificate-list-item"
+        onMouseOver={() => this.props.handleOnMouseOver()}
+      >
+        <div
+          className={"collection-item avatar certs-collection " + active}
+          onClick={this.handleClick}
+        >
           <div className="row nobottom valign-wrapper">
             <div className="col s1">
               <div className={status} />
             </div>
-            <div className="col s11">
-              <div className="collection-title">{service.name}</div>
-              <div className="collection-info ">{service.settings.url}</div>
-            </div>
+            {service.type === CA_SERVICE_LOCAL &&
+              this.props.isHoveredServiceListItem ? (
+              <div className="col s11">
+                <div className="collection-title">{service.name}</div>
+                <div className="collection-info ">{service.settings.url}</div>
+
+                <div
+                  className="col"
+                  style={{ width: "40px" }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (this.props.deleteService) {
+                      this.props.deleteService(service.id);
+                    }
+                  }}
+                >
+                  <i className="file-setting-item waves-effect material-icons secondary-content">
+                    delete
+                  </i>
+                </div>
+              </div>
+            ) : (
+              <div className="col s11">
+                <div className="collection-title">{service.name}</div>
+                <div className="collection-info ">{service.settings.url}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -76,6 +113,6 @@ class ServiceListItem extends React.Component<IServiceListItemProps, {}> {
 
     chooseCert();
     toggleOpen();
-  }
+  };
 }
-export default (ServiceListItem);
+export default ServiceListItem;
