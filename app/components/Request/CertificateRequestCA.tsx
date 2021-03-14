@@ -29,6 +29,7 @@ import DynamicSubjectName from "./DynamicSubjectName";
 import HeaderTabs from "./HeaderTabs";
 import KeyParameters from "./KeyParameters";
 import { checkLicense } from "../../trusted/jwt";
+import { deleteService } from "../../AC/servicesActions";
 const dialog = window.electron.remote.dialog;
 
 interface IKeyUsage {
@@ -76,6 +77,7 @@ interface ICertificateRequestCAState {
   xmlFile: string;
   OpenButton: boolean;
   RDNsubject: any;
+  hoveredRowIndex: number;
 }
 
 interface ICertificateRequestCAProps {
@@ -123,6 +125,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       },
       formVerified: false,
       filedChanged: false,
+      hoveredRowIndex: -1,
       keyLength: 1024,
       keyUsage: {
         cRLSign: false,
@@ -211,12 +214,15 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
       return (
         <ServiceListItem
+          deleteService={this.handleDeleteService}
           key={service.id}
           chooseCert={() => this.activeItemChose(service)}
           isOpen={activeService === service.id}
           toggleOpen={() => this.activeItemChose(service)}
           regRequest={rrequest}
-          service={service} />
+          service={service}
+          handleOnMouseOver={() => this.handleOnRowMouseOver(service)}
+          isHoveredServiceListItem={this.state.hoveredRowIndex === service.id} />
       );
     });
 
@@ -346,7 +352,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
             this.props.service ?
               null :
               <div className="col s12">
-                <div className="content-wrapper tbody border_group" style={activeService ? { height: "200px" } : { height: "450px" }}>
+                <div className="content-wrapper tbody border_group" style={activeService && service ? { height: "200px" } : { height: "450px" }}>
                   <div className="row">
                     <div className="col s12">
                       <span className="card-infos sub">
@@ -366,7 +372,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
           }
 
           {
-            activeService ?
+            activeService && service ?
               <React.Fragment>
                 <div className="col s12">
                   <div className="content-wrapper tbody border_group" style={this.props.service ? { height: "420px" } : { height: "200px" }}>
@@ -393,7 +399,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
                     <div className="row">
                       <ServiceInfo service={{
-                        ...(servicesMap.get(activeService)).toJS(), login: regRequest ? regRequest.Token : "",
+                        ...service.toJS(), login: regRequest ? regRequest.Token : "",
                         password: regRequest ? regRequest.Password : "",
                         comment: regRequest ? regRequest.Comment : "",
                         keyPhrase: regRequest ? regRequest.KeyPhrase : "",
@@ -1052,6 +1058,19 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       return "";
     }
   }
+
+  handleOnRowMouseOver = (service: any) => {
+    if (this.state.hoveredRowIndex !== service.id) {
+      this.setState({
+        hoveredRowIndex: service.id,
+      });
+    }
+  }
+
+  handleDeleteService = (id: any) => {
+    this.setState({activeService: null});
+    this.props.deleteService(id);
+  }
 }
 
 export default connect((state) => {
@@ -1069,4 +1088,5 @@ export default connect((state) => {
   };
 }, {
   addCertificateRequestCA, loadAllCertificates, postCertRequest, postCertRequestAuthCert, removeAllCertificates,
+  deleteService,
 })(CertificateRequestCA);

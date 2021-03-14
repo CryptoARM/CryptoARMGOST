@@ -3,7 +3,7 @@ import * as fs from "fs";
 import { OrderedMap, Record } from "immutable";
 import { mapToArr } from "../../app/utils";
 import {
-  ADD_SERVICE, CHANGE_SERVICE_NAME, CHANGE_SERVICE_SETTINGS,
+  ADD_SERVICE, CA_SERVICE_LOCAL, CHANGE_SERVICE_NAME, CHANGE_SERVICE_SETTINGS,
   DELETE_SERVICE, GET_CA_REGREQUEST, POST_CA_REGREQUEST, SERVICES_JSON, SUCCESS,
 } from "../constants";
 
@@ -37,6 +37,16 @@ export default (services = new DefaultReducerState(), action) => {
       break;
 
     case DELETE_SERVICE:
+      const service = services.getIn(["entities", payload.id]);
+
+      if (service && service.type === CA_SERVICE_LOCAL && service.settings) {
+        try {
+          fs.unlinkSync(service.settings.template_file);
+        } catch (e) {
+          //
+        }
+      }
+
       services = services
         .deleteIn(["entities", payload.id]);
       break;
