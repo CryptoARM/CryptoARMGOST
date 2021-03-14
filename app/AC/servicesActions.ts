@@ -1,7 +1,7 @@
 import { IService } from "../components/Services/types";
 import {
   ADD_SERVICE, CHANGE_SERVICE_NAME,
-  CHANGE_SERVICE_SETTINGS, DELETE_SERVICE,
+  CHANGE_SERVICE_SETTINGS, DELETE_SERVICE, SET_SERVICE_AS_DEFAULT,
 } from "../constants";
 
 export function addService(service: IService) {
@@ -39,5 +39,14 @@ export function changeServiceName(id: string, name: string) {
       name,
     },
     type: CHANGE_SERVICE_NAME,
+  };
+}
+
+export function setServiceAsDefault(id: string) {
+  return {
+    payload: {
+      id,
+    },
+    type: SET_SERVICE_AS_DEFAULT,
   };
 }

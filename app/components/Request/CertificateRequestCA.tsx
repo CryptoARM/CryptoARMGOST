@@ -29,7 +29,7 @@ import DynamicSubjectName from "./DynamicSubjectName";
 import HeaderTabs from "./HeaderTabs";
 import KeyParameters from "./KeyParameters";
 import { checkLicense } from "../../trusted/jwt";
-import { deleteService } from "../../AC/servicesActions";
+import { deleteService, setServiceAsDefault } from "../../AC/servicesActions";
 const dialog = window.electron.remote.dialog;
 
 interface IKeyUsage {
@@ -155,10 +155,17 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   }
 
   componentDidMount() {
-    const { service } = this.props;
+    const { defaultCAService, service, servicesMap } = this.props;
 
     if (service) {
       this.activeItemChose(service);
+    }
+
+    if (defaultCAService && servicesMap && servicesMap.size) {
+      const defaultService = servicesMap.get(defaultCAService);
+      if (defaultService) {
+        this.activeItemChose(defaultService);
+      }
     }
 
     $(document).ready(() => {
@@ -215,6 +222,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       return (
         <ServiceListItem
           deleteService={this.handleDeleteService}
+          setServiceAsDefault={this.handleSetServiceAsDefault}
           key={service.id}
           chooseCert={() => this.activeItemChose(service)}
           isOpen={activeService === service.id}
@@ -1071,6 +1079,10 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     this.setState({activeService: null});
     this.props.deleteService(id);
   }
+
+  handleSetServiceAsDefault = (id: any) => {
+    this.props.setServiceAsDefault(id);
+  }
 }
 
 export default connect((state) => {
@@ -1079,6 +1091,7 @@ export default connect((state) => {
     certificateLoading: state.certificates.loading,
     certificates: state.certificates.entities,
     certrequests: state.certrequests.entities,
+    defaultCAService: state.services.defaultCAService,
     lic_error: state.license.lic_error,
     regrequests: state.regrequests.entities,
     services: mapToArr(filteredServicesByType(state, { type: CA_SERVICE })),
@@ -1088,5 +1101,5 @@ export default connect((state) => {
   };
 }, {
   addCertificateRequestCA, loadAllCertificates, postCertRequest, postCertRequestAuthCert, removeAllCertificates,
-  deleteService,
+  deleteService, setServiceAsDefault,
 })(CertificateRequestCA);

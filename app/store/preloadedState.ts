@@ -89,6 +89,10 @@ if (fileExists(SERVICES_JSON)) {
         servicesMap = servicesMap.setIn(["entities", service.id], mservice);
       }
 
+      if (data.defaultCAService) {
+        servicesMap = servicesMap.set("defaultCAService", data.defaultCAService);
+      }
+
       odata.services = servicesMap;
     } catch (e) {
       console.log(e)

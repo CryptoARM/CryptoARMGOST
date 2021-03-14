@@ -6,7 +6,8 @@ import { CA_SERVICE_LOCAL, REQUEST_STATUS } from "../../constants";
 const shell = window.electron.shell;
 
 interface IServiceListItemProps {
-  deleteService?: (id: any) => void;
+  deleteService?: (id: string) => void;
+  setServiceAsDefault?: (id: string) => void;
   handleOnMouseOver: () => void;
   chooseCert: () => void;
   isOpen: boolean;
@@ -88,10 +89,31 @@ class ServiceListItem extends React.Component<IServiceListItemProps, {}> {
                   style={{ width: "40px" }}
                   onClick={(event) => {
                     event.stopPropagation();
+                    if (this.props.setServiceAsDefault) {
+                      this.props.setServiceAsDefault(service.id);
+                    }
+                  }}
+                >
+                  <i
+                    className="file-setting-item waves-effect material-icons secondary-content"
+                    style={{ right: "100px" }}
+                  >
+                    star
+                  </i>
+                </div>
+
+                <div
+                  className="col"
+                  style={{ width: "40px" }}
+                  onClick={(event) => {
+                    event.stopPropagation();
                     shell.openItem(service.settings.template_file);
                   }}
                 >
-                  <i className="file-setting-item waves-effect material-icons secondary-content" style={{ right: "60px" }}>
+                  <i
+                    className="file-setting-item waves-effect material-icons secondary-content"
+                    style={{ right: "50px" }}
+                  >
                     edit
                   </i>
                 </div>

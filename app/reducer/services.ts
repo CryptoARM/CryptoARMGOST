@@ -4,7 +4,7 @@ import { OrderedMap, Record } from "immutable";
 import { mapToArr } from "../../app/utils";
 import {
   ADD_SERVICE, CA_SERVICE_LOCAL, CHANGE_SERVICE_NAME, CHANGE_SERVICE_SETTINGS,
-  DELETE_SERVICE, GET_CA_REGREQUEST, POST_CA_REGREQUEST, SERVICES_JSON, SUCCESS,
+  DELETE_SERVICE, GET_CA_REGREQUEST, POST_CA_REGREQUEST, SERVICES_JSON, SET_SERVICE_AS_DEFAULT, SUCCESS,
 } from "../constants";
 
 export const ServiceModel = Record({
@@ -20,6 +20,7 @@ export const SettingsModel = Record({
 });
 
 export const DefaultReducerState = Record({
+  defaultCAService: null,
   entities: OrderedMap({}),
 });
 
@@ -51,6 +52,14 @@ export default (services = new DefaultReducerState(), action) => {
         .deleteIn(["entities", payload.id]);
       break;
 
+    case SET_SERVICE_AS_DEFAULT:
+      if (payload.id === services.get("defaultCAService")) {
+        services = services.set("defaultCAService", null);
+      } else {
+        services = services.set("defaultCAService", payload.id);
+      }
+      break;
+
     case CHANGE_SERVICE_SETTINGS:
       services = services.setIn(["entities", payload.id, "settings"], new SettingsModel(payload.settings));
       break;
@@ -60,11 +69,12 @@ export default (services = new DefaultReducerState(), action) => {
       break;
   }
 
-  if (type === ADD_SERVICE || type === DELETE_SERVICE ||
+  if (type === ADD_SERVICE || type === DELETE_SERVICE || type === SET_SERVICE_AS_DEFAULT ||
     type === CHANGE_SERVICE_SETTINGS || type === CHANGE_SERVICE_NAME ||
     type === POST_CA_REGREQUEST + SUCCESS || type === GET_CA_REGREQUEST + SUCCESS) {
 
     const state = {
+      defaultCAService: services.defaultCAService,
       services: mapToArr(services.entities),
     };
 
