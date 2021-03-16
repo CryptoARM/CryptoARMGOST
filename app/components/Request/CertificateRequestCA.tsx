@@ -71,6 +71,7 @@ interface ICertificateRequestCAState {
   keyUsageGroup: string;
   localCATemplates: any;
   outCsrDir: string;
+  subjectSignTool: string;
   selfSigned: boolean;
   template: any;
   templateName: string;
@@ -140,6 +141,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       },
       keyUsageGroup: KEY_USAGE_SIGN_AND_ENCIPHERMENT,
       outCsrDir: DEFAULT_CSR_PATH,
+      subjectSignTool: `КриптоПро CSP (версия ${this.getCPCSPVersion()})`,
       selfSigned: false,
       xmlFile: "",
       template: this.props.templates && this.props.templates.length ? this.props.templates[0] : null,
@@ -292,7 +294,10 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                         handleKeyUsageChange={this.handleKeyUsageChange}
                         handleKeyUsageGroupChange={this.handleKeyUsageGroupChange}
                         handleExtendedKeyUsageChange={this.handleExtendedKeyUsageChange}
+                        handleSubjectSignToolChange={this.handleSubjectSignToolChange}
                         toggleExportableKey={this.toggleExportableKey}
+                        signTool={this.state.subjectSignTool}
+                        subjectSignTools={this.state.template && this.state.template.Extensions ? this.state.template.Extensions.SubjectSignTool : undefined}
                       />
                     </div>
                   </div>
@@ -568,6 +573,16 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
         this.setState({ RDNsubject: { ...newSubject } });
       }
 
+      if (template && template.Extensions && template.Extensions.SubjectSignTool) {
+        if (template.Extensions.SubjectSignTool.DefaultValue) {
+          this.setState({ subjectSignTool: template.Extensions.SubjectSignTool.DefaultValue });
+        } else if (template.Extensions.SubjectSignTool.SettingsValues && template.Extensions.SubjectSignTool.SettingsValues.length) {
+          this.setState({ subjectSignTool: template.Extensions.SubjectSignTool.SettingsValues[0] });
+        } else {
+          this.setState({ subjectSignTool: `КриптоПро CSP (версия ${this.getCPCSPVersion()})` });
+        }
+      }
+
       this.setState({ OpenButton: true });
     }
   }
@@ -627,7 +642,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   handelReady = () => {
     const { localize, locale } = this.context;
     const { activeService, activeSubjectNameInfoTab, caTemplatesArray, algorithm, caTemplate, containerName, exportableKey, extKeyUsage,
-      keyUsage, template, RDNsubject, outCsrDir } = this.state;
+      keyUsage, template, RDNsubject, outCsrDir, subjectSignTool } = this.state;
     // tslint:disable-next-line: no-shadowed-variable
     const { addCertificateRequestCA, postCertRequest, postCertRequestAuthCert } = this.props;
     const { servicesMap, regrequests, certrequests, certificates, lic_error } = this.props;
@@ -745,7 +760,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
     // if (template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_ADDITIONAL || REQUEST_TEMPLATE_KEP_FIZ) {
     oid = new trusted.pki.Oid("1.2.643.100.111");
-    ext = new trusted.pki.Extension(oid, `КриптоПро CSP (версия ${this.getCPCSPVersion()})`);
+    ext = new trusted.pki.Extension(oid, subjectSignTool ? subjectSignTool : `КриптоПро CSP (версия ${this.getCPCSPVersion()})`);
     exts.push(ext);
     // }
 
@@ -954,6 +969,10 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
   handleCATemplateChange = (ev: any) => {
     this.setState({ caTemplate: ev.target.value, filedChanged: true });
+  }
+
+  handleSubjectSignToolChange = (ev: any) => {
+    this.setState({ subjectSignTool: ev.target.value });
   }
 
   handleInputChange = (ev: any) => {
