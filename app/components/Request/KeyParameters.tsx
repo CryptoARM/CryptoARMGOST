@@ -43,8 +43,11 @@ interface IKeyParametersProps {
   handleKeyUsageChange: (ev: any) => void;
   handleKeyUsageGroupChange: (ev: any) => void;
   handleExtendedKeyUsageChange: (ev: any) => void;
+  handleSubjectSignToolChange: (ev: any) => void;
   toggleExportableKey: () => void;
   disabled: boolean;
+  signTool: string;
+  subjectSignTools?: any;
 }
 
 class KeyParameters extends React.Component<IKeyParametersProps, {}> {
@@ -67,12 +70,13 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
 
     $(ReactDOM.findDOMNode(this.refs.algorithmSelect)).on("change", this.props.handleAlgorithmChange);
     $(ReactDOM.findDOMNode(this.refs.keyUsageGroup)).on("change", this.props.handleKeyUsageGroupChange);
+    $(ReactDOM.findDOMNode(this.refs.subjectSignToolsSelect)).on("change", this.props.handleSubjectSignToolChange);
 
     if (this.props.handleCATemplateChange) {
       $(ReactDOM.findDOMNode(this.refs.templateSelect)).on("change", this.props.handleCATemplateChange);
     }
 
-    $(document).on("ready", function() {
+    $(document).on("ready", function () {
       Materialize.updateTextFields();
     });
 
@@ -93,9 +97,9 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
 
   render() {
     const { localize, locale } = this.context;
-    const { algorithm, caTemplates, containerName, exportableKey, extKeyUsage, keyUsage, keyUsageGroup,
+    const { algorithm, caTemplates, containerName, exportableKey, extKeyUsage, keyUsage, keyUsageGroup, subjectSignTools,
       handleAlgorithmChange, handleCATemplateChange, handleExtendedKeyUsageChange,
-      handleInputChange, handleKeyUsageChange, handleKeyUsageGroupChange, toggleExportableKey } = this.props;
+      handleInputChange, handleKeyUsageChange, handleKeyUsageGroupChange, handleSubjectSignToolChange, toggleExportableKey } = this.props;
 
     return (
       <div className="row nobottom">
@@ -332,7 +336,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
                       className="filled-in"
                       checked={extKeyUsage["1.3.6.1.5.5.7.3.2"]}
                       onChange={handleExtendedKeyUsageChange}
-                      disabled= { this.props.disabled }
+                      disabled={this.props.disabled}
                     />
                     <label htmlFor="1.3.6.1.5.5.7.3.2" className="truncate">
                       {localize("CSR.eku_clientAuth", locale)}
@@ -368,9 +372,47 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
               </div>
             </div>
           </div>
+          {
+            this.getSelectSubjectSignTools()
+          }
         </div>
       </div>
     );
+  }
+
+  getSelectSubjectSignTools = () => {
+    const { subjectSignTools } = this.props;
+
+    if (subjectSignTools && subjectSignTools.SettingsValues && subjectSignTools.SettingsValues.length) {
+      return (
+        <div className="row" >
+          <div className="input-field input-field-csr col s6">
+            <select
+              disabled={subjectSignTools.ProhibitChange}
+              id="1.2.643.100.111"
+              className="select"
+              defaultValue={this.props.signTool ? this.props.signTool : ""}
+              name="Средство электронной подписи владельца"
+              value={this.props.signTool ? this.props.signTool : ""}
+              onChange={this.props.handleSubjectSignToolChange}
+              ref="subjectSignToolsSelect"
+            >
+              {
+                subjectSignTools.SettingsValues.map((settingsValue: any) =>
+                  <option key={settingsValue} value={settingsValue}>
+                    {settingsValue}
+                  </option>)
+              }
+            </select>
+
+            <label>Средство электронной подписи владельца</label>
+          </div>
+        </div>
+      );
+
+    } else {
+      return null;
+    }
   }
 }
 
