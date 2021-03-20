@@ -8,15 +8,16 @@
       "license": "",
       "files": [
         {
-          "name": "file1.txt.sig",
-          "url": "http://localhost:8080/public/files/file1.txt.sig",
+          "name": "file2.txt.sig",
+          "url": "http://localhost:8080/public/files/file2.txt.sig",
           "id": 2,
           "urlDetached": ""
         }
       ],
       "extra": {
         "token": "9c7101f7-9c47-4481-b4da-a6a497abde08"
-      }
+      },
+      "uploader": "https://localhost:4040/upload"
     }
   },
   "id": "1b9e26e0-0524-402c-b255-b17dd49ef49b"
