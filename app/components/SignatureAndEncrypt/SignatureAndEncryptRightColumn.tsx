@@ -1948,7 +1948,6 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               }
   
               signers.push({
-                signerCertificate: {
                   serialNumber: subjectCert.serial,
                   subjectFriendlyName: signature.subject,
                   status: subjectCert.status,
@@ -1961,8 +1960,6 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
                   subjectName: subjectCert.subjectName,
                   issuerName: subjectCert.issuerName,
                   x509,
-                },
-                status: signature.status_verify,
               });
             }
           };
