@@ -199,6 +199,10 @@ export const validateInn = (inn: string | number) => {
     err_inn = err_hint[1];
     return false;
   } else {
+    if (inn.length === 12 && inn[0] === "0" && inn[1] === "0") {
+      inn = inn.substring(2);
+    }
+
     const checkDigit = (inn, coefficients) => {
       let n = 0;
 

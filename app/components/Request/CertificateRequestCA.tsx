@@ -647,6 +647,8 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     const { addCertificateRequestCA, postCertRequest, postCertRequestAuthCert } = this.props;
     const { servicesMap, regrequests, certrequests, certificates, lic_error } = this.props;
 
+    const service = servicesMap.get(activeService);
+
     const licenseStatus = checkLicense();
 
     if (licenseStatus !== true) {
@@ -764,9 +766,11 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     exts.push(ext);
     // }
 
-    oid = new trusted.pki.Oid("1.3.6.1.4.1.311.21.7");
-    ext = caTemplate ? new trusted.pki.Extension(oid, caTemplate) : new trusted.pki.Extension(oid, "1.2.643.2.2.46.0.8");
-    exts.push(ext);
+    if (service && service.type === CA_SERVICE) {
+      oid = new trusted.pki.Oid("1.3.6.1.4.1.311.21.7");
+      ext = caTemplate ? new trusted.pki.Extension(oid, caTemplate) : new trusted.pki.Extension(oid, "1.2.643.2.2.46.0.8");
+      exts.push(ext);
+    }
 
     const certReq = new trusted.pki.CertificationRequest();
 
@@ -797,7 +801,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     const url = path.join(outCsrDir && dirExists(outCsrDir) ? outCsrDir : DEFAULT_CSR_PATH, urlName);
     const urlSig = path.join(outCsrDir && dirExists(outCsrDir) ? outCsrDir : DEFAULT_CSR_PATH, urlSigName);
 
-    const service = servicesMap.get(activeService);
+
 
     if (service.type === CA_SERVICE) {
       try {
