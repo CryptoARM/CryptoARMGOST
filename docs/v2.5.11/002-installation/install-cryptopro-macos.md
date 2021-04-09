@@ -6,9 +6,7 @@ sort: "5"
 
 ## Установка криптопровайдера
 
-Для установки КриптоПро CSP на платформу OS X можно воспользоваться инструкцией,
-доступной по адресу
-<https://cryptoarm.ru/How-to-install-cryptopro-csp-4-on-mac-os-x> .
+Для установки КриптоПро CSP на платформу OS X можно воспользоваться инструкцией, доступной по адресу <https://cryptoarm.ru/How-to-install-cryptopro-csp-4-on-mac-os-x> .
 
 ## Установка пакета для модулей TSP и OCSP
 
