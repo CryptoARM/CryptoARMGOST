@@ -3,3 +3,7 @@ title: "Документы"
 metaTitle: "Syntax Highlighting is the meta title tag for this page"
 metaDescription: "This is the meta description for this page"
 ---
+
+В данном разделе описана работа с документами, полученных в результате выполнения операций подписи, снятия подписи, архивирования, шифрования и расшифрования.
+
+Для сохранения архивной копии файлов, , используется каталог **Документы**. 

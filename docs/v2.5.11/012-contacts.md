@@ -3,3 +3,11 @@ title: "Контакты"
 metaTitle: "Syntax Highlighting is the meta title tag for this page"
 metaDescription: "This is the meta description for this page"
 ---
+
+В разделе содержится описание работы с сертификатами других пользователей, в адрес которых происходит шифрование документов.
+
+Переход в список контактов происходит при выборе пункта меню **Контакты**.
+
+![contacts.png](./012-contacts/images/contacts.png "Список контактов")
+
+Контакты можно импортировать, экспортировать и удалять. Так же в списке контактов работает поиск.

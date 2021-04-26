@@ -3,3 +3,5 @@ title: "Управление списком файлов для выполнен
 metaTitle: "Syntax Highlighting is the meta title tag for this page"
 metaDescription: "This is the meta description for this page"
 ---
+
+В данном разделе описана работа со списком документов, добавленных в приложение.
