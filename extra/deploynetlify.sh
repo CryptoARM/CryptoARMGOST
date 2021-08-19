@@ -2,7 +2,7 @@
 
 project_name='CryptoGost'
 build_path='/home/alr/temp/'
-tr_path=$build_path'tr'
+tr_path=$build_path'tr/'
 md_files_path='/home/alr/temp/'$project_name'/content/'
 
 
@@ -27,7 +27,7 @@ sudo find $md_files_path  -type f -name 'faq' -exec rm -f {} \;
 
 # copy files from gitlab repo
 current_path=$(pwd)
-sudo cp -r $tr_path $current_path
+sudo cp -rT $tr_path $current_path
 cd ..
 
 # commit and push to github repo
