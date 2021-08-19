@@ -19,7 +19,7 @@ import {
 } from "../../constants";
 import { filteredServicesByType } from "../../selectors/servicesSelectors";
 import * as jwt from "../../trusted/jwt";
-import { arrayToMap, dirExists, fileCoding, fileExists, formatDate, mapToArr, uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
+import { arrayToMap, dirExists, fileCoding, fileExists, formatDate, identificationKindToNumber, mapToArr, uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
 import logger from "../../winstonLogger";
 import SelectFolder from "../SelectFolder";
 import ServiceInfo from "../Services/ServiceInfo";
@@ -72,6 +72,7 @@ interface ICertificateRequestCAState {
   localCATemplates: any;
   outCsrDir: string;
   subjectSignTool: string;
+  identificationKind: string;
   selfSigned: boolean;
   template: any;
   templateName: string;
@@ -142,6 +143,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       keyUsageGroup: KEY_USAGE_SIGN_AND_ENCIPHERMENT,
       outCsrDir: DEFAULT_CSR_PATH,
       subjectSignTool: `КриптоПро CSP (версия ${this.getCPCSPVersion()})`,
+      identificationKind: "",
       selfSigned: false,
       xmlFile: "",
       template: this.props.templates && this.props.templates.length ? this.props.templates[0] : null,
@@ -295,9 +297,12 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                         handleKeyUsageGroupChange={this.handleKeyUsageGroupChange}
                         handleExtendedKeyUsageChange={this.handleExtendedKeyUsageChange}
                         handleSubjectSignToolChange={this.handleSubjectSignToolChange}
+                        handleIdentificationKindChange={this.handleIdentificationKindChange}
                         toggleExportableKey={this.toggleExportableKey}
                         signTool={this.state.subjectSignTool}
                         subjectSignTools={this.state.template && this.state.template.Extensions ? this.state.template.Extensions.SubjectSignTool : undefined}
+                        identificationKind={this.state.identificationKind}
+                        identificationKinds={this.state.template && this.state.template.Extensions ? this.state.template.Extensions.IdentificationKind : undefined}
                       />
                     </div>
                   </div>
@@ -324,7 +329,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                       style={{ left: "-10px" }}
                     >
                       file_download
-              </i>
+                    </i>
                     <input
                       id="input_file"
                       type="text"
@@ -339,7 +344,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
                     <a onClick={this.openXmlFile.bind(this)}>
                       <i className="file-setting-item waves-effect material-icons secondary-content pulse active">
                         insert_drive_file
-                </i>
+                      </i>
                     </a>
                   </div>
                 </div>
@@ -583,6 +588,14 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
         }
       }
 
+      if (template && template.Extensions && template.Extensions.IdentificationKind) {
+        if (template.Extensions.IdentificationKind.DefaultValue) {
+          this.setState({ identificationKind: identificationKindToNumber(template.Extensions.IdentificationKind.DefaultValue) });
+        } else if (template.Extensions.IdentificationKind.SettingsValues && template.Extensions.IdentificationKind.SettingsValues.length) {
+          this.setState({ identificationKind: identificationKindToNumber(template.Extensions.IdentificationKind.SettingsValues[0]) });
+        }
+      }
+
       this.setState({ OpenButton: true });
     }
   }
@@ -642,7 +655,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
   handelReady = () => {
     const { localize, locale } = this.context;
     const { activeService, activeSubjectNameInfoTab, caTemplatesArray, algorithm, caTemplate, containerName, exportableKey, extKeyUsage,
-      keyUsage, template, RDNsubject, outCsrDir, subjectSignTool } = this.state;
+      keyUsage, template, RDNsubject, outCsrDir, subjectSignTool, identificationKind } = this.state;
     // tslint:disable-next-line: no-shadowed-variable
     const { addCertificateRequestCA, postCertRequest, postCertRequestAuthCert } = this.props;
     const { servicesMap, regrequests, certrequests, certificates, lic_error } = this.props;
@@ -766,6 +779,12 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
     exts.push(ext);
     // }
 
+    if (identificationKind && identificationKind.length) {
+      oid = new trusted.pki.Oid("1.2.643.100.114");
+      ext = new trusted.pki.Extension(oid, identificationKind);
+      exts.push(ext);
+    }
+
     if (service && service.type === CA_SERVICE) {
       oid = new trusted.pki.Oid("1.3.6.1.4.1.311.21.7");
       ext = caTemplate ? new trusted.pki.Extension(oid, caTemplate) : new trusted.pki.Extension(oid, "1.2.643.2.2.46.0.8");
@@ -861,6 +880,7 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
       try {
         certReq.save(url, trusted.DataFormat.PEM);
       } catch (err) {
+        console.log("err", err);
         Materialize.toast(localize("CSR.create_request_error", locale), 4000, "toast-csr_error");
       }
     }
@@ -977,6 +997,10 @@ class CertificateRequestCA extends React.Component<ICertificateRequestCAProps, I
 
   handleSubjectSignToolChange = (ev: any) => {
     this.setState({ subjectSignTool: ev.target.value });
+  }
+
+  handleIdentificationKindChange = (ev: any) => {
+    this.setState({ identificationKind: ev.target.value });
   }
 
   handleInputChange = (ev: any) => {

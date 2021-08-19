@@ -172,7 +172,20 @@
                         "DefaultValue":true,
                         "ProhibitChange":true
                     }
-                ]
+                ],
+				"IdentificationKind": {
+                    "LocalizedName":"Тип идентификации заявителя",
+                    "SettingsValues":[
+                        "personal",
+						"remote_cert",
+						"remote_passport",
+						"remote_system"
+                    ],
+                    "DefaultValue":"personal",
+                    "ProhibitAnyValue":false,
+                    "ProhibitChange":false,
+                    "ProhibitEmpty":true
+				}
             },
             "MarkExportable":false
         },
@@ -372,7 +385,20 @@
                         "DefaultValue":true,
                         "ProhibitChange":true
                     }
-                ]
+                ],
+				"IdentificationKind": {
+                    "LocalizedName":"Тип идентификации заявителя",
+                    "SettingsValues":[
+                        "personal",
+						"remote_cert",
+						"remote_passport",
+						"remote_system"
+                    ],
+                    "DefaultValue":"personal",
+                    "ProhibitAnyValue":false,
+                    "ProhibitChange":false,
+                    "ProhibitEmpty":true
+				}
             },
             "MarkExportable":false
         },
@@ -560,7 +586,20 @@
                         "DefaultValue":true,
                         "ProhibitChange":true
                     }
-                ]
+                ],
+				"IdentificationKind": {
+                    "LocalizedName":"Тип идентификации заявителя",
+                    "SettingsValues":[
+                        "personal",
+						"remote_cert",
+						"remote_passport",
+						"remote_system"
+                    ],
+                    "DefaultValue":"personal",
+                    "ProhibitAnyValue":false,
+                    "ProhibitChange":false,
+                    "ProhibitEmpty":true
+				}
             },
             "MarkExportable":false
         },
@@ -820,7 +859,20 @@
                         "DefaultValue":true,
                         "ProhibitChange":true
                     }
-                ]
+                ],
+				"IdentificationKind": {
+                    "LocalizedName":"Тип идентификации заявителя",
+                    "SettingsValues":[
+                        "personal",
+						"remote_cert",
+						"remote_passport",
+						"remote_system"
+                    ],
+                    "DefaultValue":"personal",
+                    "ProhibitAnyValue":false,
+                    "ProhibitChange":false,
+                    "ProhibitEmpty":true
+				}
             },
             "MarkExportable":false
         },
@@ -1020,7 +1072,20 @@
                         "DefaultValue":true,
                         "ProhibitChange":true
                     }
-                ]
+                ],
+				"IdentificationKind": {
+                    "LocalizedName":"Тип идентификации заявителя",
+                    "SettingsValues":[
+                        "personal",
+						"remote_cert",
+						"remote_passport",
+						"remote_system"
+                    ],
+                    "DefaultValue":"personal",
+                    "ProhibitAnyValue":false,
+                    "ProhibitChange":false,
+                    "ProhibitEmpty":true
+				}
             },
             "MarkExportable":false
         },
@@ -1232,7 +1297,20 @@
                         "DefaultValue":true,
                         "ProhibitChange":true
                     }
-                ]
+                ],
+				"IdentificationKind": {
+                    "LocalizedName":"Тип идентификации заявителя",
+                    "SettingsValues":[
+                        "personal",
+						"remote_cert",
+						"remote_passport",
+						"remote_system"
+                    ],
+                    "DefaultValue":"remote_cert",
+                    "ProhibitAnyValue":false,
+                    "ProhibitChange":false,
+                    "ProhibitEmpty":true
+				}
             },
             "MarkExportable":false
         }
