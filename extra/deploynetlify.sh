@@ -20,7 +20,10 @@ sudo git clone https://$GITHUB_LOGIN:$GITHUB_PASSWORD@github.com/DigtLab-QA/$pro
 cd $project_name
 sudo git checkout master
 cd content
-sudo rm -r $md_files_path
+sudo find $md_files_path  -type d -name 'v2*' -exec rm -rf {} \;
+sudo find $md_files_path  -type f -name 'v2*' -exec rm -f {} \;
+sudo find $md_files_path  -type d -name 'faq' -exec rm -rf {} \;
+sudo find $md_files_path  -type f -name 'faq' -exec rm -f {} \;
 
 # copy files from gitlab repo
 current_path=$(pwd)
