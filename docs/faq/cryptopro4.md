@@ -1,27 +1,34 @@
 ---
 slug: "/post8"
-title: "КриптоАРМ ГОСТ 2 и выше на unix системах не работает с КриптоПро 4"
+title: "Настройка работы приложения на unix системах с КриптоПро CSP 4"
 sort: "08"
 --- 
 
+Приложение КриптоАРМ ГОСТ выше версии 2 не работает с КриптоПро CSP 4.
+
 Признак - нет никаких сертификатов на вкладке **Сертификаты**.
 
-Для решения проблемы надо:
+Для решения проблемы:
 
-1. Доустановить пакет КриптоПро cprocsp-rsa.
+1. Установите пакет cprocsp-rsa из дистрибутива КриптоПро: 
+   - для линукс: в терминале выполните команду **sudo dpkg -i \<путь к файлу>/cprocsp-rsa-\<...>.deb**
+   - для MacOS: при установке КриптоПро CSPнадо выбрать пакет cprocsp-rsa. Если Криптопро был установленн, то нужно переустановить с нужным пакетом.
 
-2. MacOS: скачать скрипт https://drive.google.com/file/d/11Ts3wshs0-Fy7mc5NACKEb1x7fEu9oAy/view?usp=sharing,
-в терминале ввести команду chmod u+x <путь к скрипту>/script.sh
+2. MacOS:   
+   - скачайте скрипт https://drive.google.com/file/d/11Ts3wshs0-Fy7mc5NACKEb1x7fEu9oAy/view?usp=sharing,
+   - в терминале ввести команду: chmod u+x \<путь к скрипту\>/script.sh
+   - sudo \<путь к скрипту\>/script.sh
 
-sudo ./script.sh
+Linux:   
+   - скачайте скрипт (https://drive.google.com/file/d/11Ts3wshs0-Fy7mc5NACKEb1x7fEu9oAy/view?usp=sharing),
+   - в терминале ввести команду chmod u+x \<путь к скрипту\>/script.sh
+   - sudo bash \<путь к скрипту\>/script.sh
 
-Linux: скачать скрипт (https://drive.google.com/file/d/11Ts3wshs0-Fy7mc5NACKEb1x7fEu9oAy/view?usp=sharing),
-в терминале ввести команду chmod u+x <путь к скрипту>/script.sh
-sudo bash ./script.sh
+***Важно!*** В результату выполнения команды должно быть сообщение Operations done.
 
-Или:
+Или, если скрипт не удается запустить.
 
-2. В конфигурационном файле КриптоПро (/etc/opt/cprocsp/config.ini) от администратора добавить блоки:
+1. В конфигурационном файле КриптоПро (/etc/opt/cprocsp/config.ini) от администратора добавьте блоки:
 
 -   **Для Linux:**
 
@@ -63,4 +70,3 @@ sudo bash ./script.sh
 
     TypeName = "RSA Full (Signature and Key Exchange)"
 
-    Для редактирования конфигурационного файла можно запросить скрипт в технической поддержке.

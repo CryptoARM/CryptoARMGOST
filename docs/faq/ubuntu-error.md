@@ -1,6 +1,6 @@
 ---
 slug: "/post5"
-title: " Не запускается приложение на Ubuntu 18.04, или другой deb системе (Astra Linux)"
+title: " Не запускается приложение на Ubuntu или другой deb системе (Astra Linux)"
 sort: "05"
 --- 
 
