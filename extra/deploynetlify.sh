@@ -20,15 +20,30 @@ sudo git clone https://$GITHUB_LOGIN:$GITHUB_PASSWORD@github.com/DigtLab-QA/$pro
 cd $project_name
 sudo git checkout master
 cd content
-sudo find $md_files_path  -type d -name 'v2*' -exec rm -rf {} \;
-sudo find $md_files_path  -type f -name 'v2*' -exec rm -f {} \;
-sudo find $md_files_path  -type d -name 'faq' -exec rm -rf {} \;
-sudo find $md_files_path  -type f -name 'faq' -exec rm -f {} \;
+sudo find $md_files_path  -type d -name '*-v2*' -exec rm -rf {} \;
+sudo find $md_files_path  -type f -name '*-v2*' -exec rm -f {} \;
+sudo find $md_files_path  -type d -name '*-faq' -exec rm -rf {} \;
+sudo find $md_files_path  -type f -name '*-faq' -exec rm -f {} \;
 
 # copy files from gitlab repo
 current_path=$(pwd)
 sudo cp -rT $tr_path $current_path
+
+#custom sort in conf.js
+cd $PWD
+readarray -d '' namesYml < <(find -maxdepth 1 -type d | cut -c 3- | sort -n)
+
+for i in ${namesYml[@]}
+	do
+		folders+="'"$i"',"
+	done
+
+folders=${folders::-1}
 cd ..
+number=$(grep -n forcedNavOrder config.js | head -1 | cut -d: -f 1)
+nums=$number's'
+fullstring="forcedNavOrder: ["$folders"],"
+sudo sed -i -e "$nums;""forcedNavOrder.*;$fullstring;" config.js
 
 # commit and push to github repo
 sudo git config user.email 'you@example.com' && \
