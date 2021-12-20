@@ -10,10 +10,10 @@ import {
   ALG_GOST12_256, ALG_GOST12_512, DEFAULT_CSR_PATH, HOME_DIR,
   KEY_USAGE_ENCIPHERMENT, KEY_USAGE_SIGN, KEY_USAGE_SIGN_AND_ENCIPHERMENT, MY,
   PROVIDER_CRYPTOPRO, PROVIDER_SYSTEM, REQUEST, REQUEST_TEMPLATE_ADDITIONAL,
-  REQUEST_TEMPLATE_DEFAULT, REQUEST_TEMPLATE_KEP_FIZ, REQUEST_TEMPLATE_CLIENT_AUTH, REQUEST_TEMPLATE_KEP_IP, ROOT, USER_NAME,
+  REQUEST_TEMPLATE_DEFAULT, REQUEST_TEMPLATE_KEP_FIZ, REQUEST_TEMPLATE_CLIENT_AUTH, REQUEST_TEMPLATE_KEP_IP, REQUEST_TEMPLATE_KEP_YUR, ROOT, USER_NAME,
 } from "../../constants";
 import * as jwt from "../../trusted/jwt";
-import { formatDate, randomSerial, uuid, validateInn, validateOgrnip, validateSnils } from "../../utils";
+import { formatDate, randomSerial, uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
 import logger from "../../winstonLogger";
 import HeaderTabs from "./HeaderTabs";
 import KeyParameters from "./KeyParameters";
@@ -52,11 +52,13 @@ interface ICertificateRequestState {
   extKeyUsage: IExtendedKeyUsage;
   formVerified: boolean;
   filedChanged: boolean;
+  innle?: string;
   inn?: string;
   keyLength: number;
   keyUsage: IKeyUsage;
   keyUsageGroup: string;
   locality: string;
+  ogrn?: string;
   ogrnip?: string;
   organization: string;
   organizationUnitName?: string;
@@ -105,6 +107,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       formVerified: false,
       filedChanged: false,
       inn: template.inn,
+      innle: template.innle,
       keyLength: 1024,
       keyUsage: {
         cRLSign: false,
@@ -119,13 +122,14 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       },
       keyUsageGroup: KEY_USAGE_SIGN_AND_ENCIPHERMENT,
       locality: template.localityName,
+      ogrn: template.ogrn,
       ogrnip: template.ogrnip,
       organization: props.organization1,
       organizationUnitName: template.OU,
       province: template.stateOrProvinceName,
       selfSigned: !!props.selfSigned,
       snils: template.snils,
-      template: template.snils || template.ogrnip || template.inn
+      template: template.snils || template.ogrnip || template.ogrn || template.inn || template.innle
         || template.OU || template.title ? REQUEST_TEMPLATE_ADDITIONAL : REQUEST_TEMPLATE_DEFAULT,
       title: template.title,
     };
@@ -210,8 +214,8 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
     const { localize, locale } = this.context;
     const classDisabled = this.state.disabled ? "" : "disabled";
 
-    const { activeSubjectNameInfoTab, algorithm, cn, containerName, country, formVerified, email, exportableKey, extKeyUsage, inn, keyLength,
-      keyUsage, keyUsageGroup, locality, ogrnip, organization, organizationUnitName, province, selfSigned, snils, template, title } = this.state;
+    const { activeSubjectNameInfoTab, algorithm, cn, containerName, country, formVerified, email, exportableKey, extKeyUsage, inn, innle, keyLength,
+      keyUsage, keyUsageGroup, locality, ogrnip, ogrn, organization, organizationUnitName, province, selfSigned, snils, template, title } = this.state;
 
     return (
       <React.Fragment>
@@ -237,6 +241,8 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
                       province={province}
                       country={country}
                       inn={inn}
+                      innle={innle}
+                      ogrn={ogrn}
                       ogrnip={ogrnip}
                       snils={snils}
                       title={title}
@@ -310,7 +316,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
   }
 
   verifyFields = () => {
-    const { algorithm, cn, containerName, email, inn, locality, ogrnip, province, snils, template } = this.state;
+    const { algorithm, cn, containerName, email, inn, innle, locality, ogrnip, ogrn, province, snils, template } = this.state;
     const REQULAR_EXPRESSION = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
     if (!containerName.length || (containerName.trim() === "")) {
@@ -319,13 +325,23 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
 
     if (cn.length > 0) {
       if (template === REQUEST_TEMPLATE_KEP_FIZ) {
-        if (!snils || !snils.length || !validateSnils(snils) || !province.length || !locality.length) {
+        if (!snils || !snils.length || !validateSnils(snils) || !province.length || !locality.length ||
+          !inn || !inn.length || !validateInn(inn)) {
           return false;
         }
       }
 
       if (template === REQUEST_TEMPLATE_KEP_IP) {
-        if (!snils || !snils.length || !ogrnip || !ogrnip.length || !validateOgrnip(ogrnip) || !province.length || !locality.length) {
+        if (!ogrnip || !ogrnip.length || !validateOgrnip(ogrnip) || !province.length || !locality.length) {
+          return false;
+        }
+      }
+
+      if (template === REQUEST_TEMPLATE_KEP_YUR) {
+        if (!ogrn || !ogrn.length || !validateOgrn(ogrn) ||
+         !innle || !innle.length || !validateInn(innle) ||
+         !inn || !inn.length || !validateInn(inn) ||
+          !province.length || !locality.length) {
           return false;
         }
       }
@@ -336,15 +352,11 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
         }
       }
 
-      if (template !== REQUEST_TEMPLATE_DEFAULT) {
-        if (inn && inn.length && !validateInn(inn)) {
-          return false;
-        }
-      }
-
       if (template === REQUEST_TEMPLATE_ADDITIONAL) {
         if (snils && snils.length && !validateSnils(snils) ||
-          ogrnip && ogrnip.length && !validateOgrnip(ogrnip)
+          ogrnip && ogrnip.length && !validateOgrnip(ogrnip) ||
+          ogrn && ogrn.length && !validateOgrn(ogrn) ||
+          inn && inn.length && !validateInn(inn)
         ) {
           return false;
         }
@@ -366,8 +378,8 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
 
   handelReady = () => {
     const { localize, locale } = this.context;
-    const { algorithm, cn, country, containerName, email, exportableKey, extKeyUsage, inn, keyLength,
-      keyUsage, locality, ogrnip, organization, organizationUnitName, province, selfSigned, snils, template, title } = this.state;
+    const { algorithm, cn, country, containerName, email, exportableKey, extKeyUsage, inn, innle, keyLength,
+      keyUsage, locality, ogrnip, ogrn, organization, organizationUnitName, province, selfSigned, snils, template, title } = this.state;
 
     const exts =
       new trusted.pki.ExtensionCollection();
@@ -458,7 +470,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       exts.push(ext);
     }
 
-    if (template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_ADDITIONAL || REQUEST_TEMPLATE_KEP_FIZ) {
+    if (template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_ADDITIONAL || REQUEST_TEMPLATE_KEP_FIZ || REQUEST_TEMPLATE_KEP_YUR) {
       oid = new trusted.pki.Oid("1.2.643.100.111");
       ext = new trusted.pki.Extension(oid, `КриптоПро CSP (версия ${this.getCPCSPVersion()})`);
       exts.push(ext);
@@ -513,6 +525,13 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
     if (template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_ADDITIONAL) {
       atrs.push(
         { type: "1.2.643.100.5", value: ogrnip },
+      );
+    }
+
+    if (template === REQUEST_TEMPLATE_KEP_YUR || template === REQUEST_TEMPLATE_ADDITIONAL) {
+      atrs.push(
+        { type: "1.2.643.100.1", value: ogrn },
+        { type: "1.2.643.100.4", value: innle },
       );
     }
 
@@ -893,6 +912,7 @@ const oidsName = [
   "title",
   "snils",
   "inn",
+  "innle",
   "ogrn",
   "ogrnip",
 ];
@@ -915,6 +935,7 @@ const oidValues: { [index: string]: string } = {
   emailAddress: "Email",
   snils: "1.2.643.100.3",
   inn: "1.2.643.3.131.1.1",
+  innle: "1.2.643.100.4",
   ogrn: "1.2.643.100.1",
   ogrnip: "1.2.643.100.5",
 };
@@ -932,6 +953,7 @@ const getTemplateByCertificate = (certificate: any) => {
     title: string,
     snils: string,
     inn: string,
+    innle: string,
     ogrn: string,
     ogrnip: string,
   } = {
@@ -946,6 +968,7 @@ const getTemplateByCertificate = (certificate: any) => {
     title: "",
     snils: "",
     inn: "",
+    innle: "",
     ogrn: "",
     ogrnip: "",
   };
