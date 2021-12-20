@@ -1,6 +1,6 @@
 {
   "name": "cryptoarm-gost",
-  "version": "2.5.11",
+  "version": "2.5.12",
   "dependencies": {
     "ansi-regex": {
       "version": "2.1.1",
