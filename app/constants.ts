@@ -276,6 +276,7 @@ export const KEY_USAGE_SIGN_AND_ENCIPHERMENT  = "signAndEncipherment";
 export const REQUEST_TEMPLATE_DEFAULT = "default";
 export const REQUEST_TEMPLATE_KEP_IP = "kepIp";
 export const REQUEST_TEMPLATE_KEP_FIZ = "kepFiz";
+export const REQUEST_TEMPLATE_KEP_YUR = "kepYur";
 export const REQUEST_TEMPLATE_CLIENT_AUTH = "clientAuth";
 export const REQUEST_TEMPLATE_ADDITIONAL = "additional";
 
