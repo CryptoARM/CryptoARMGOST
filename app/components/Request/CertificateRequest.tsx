@@ -63,6 +63,7 @@ interface ICertificateRequestState {
   organization: string;
   organizationUnitName?: string;
   province: string;
+  streetAddress: string;
   selfSigned: boolean;
   snils?: string;
   template: string;
@@ -127,6 +128,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       organization: props.organization1,
       organizationUnitName: template.OU,
       province: template.stateOrProvinceName,
+      streetAddress: template.streetAddress,
       selfSigned: !!props.selfSigned,
       snils: template.snils,
       template: template.snils || template.ogrnip || template.ogrn || template.inn || template.innle
@@ -215,7 +217,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
     const classDisabled = this.state.disabled ? "" : "disabled";
 
     const { activeSubjectNameInfoTab, algorithm, cn, containerName, country, formVerified, email, exportableKey, extKeyUsage, inn, innle, keyLength,
-      keyUsage, keyUsageGroup, locality, ogrnip, ogrn, organization, organizationUnitName, province, selfSigned, snils, template, title } = this.state;
+      keyUsage, keyUsageGroup, locality, ogrnip, ogrn, organization, organizationUnitName, province, streetAddress, selfSigned, snils, template, title } = this.state;
 
     return (
       <React.Fragment>
@@ -239,6 +241,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
                       locality={locality}
                       formVerified={formVerified}
                       province={province}
+                      streetAddress={streetAddress}
                       country={country}
                       inn={inn}
                       innle={innle}
@@ -316,7 +319,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
   }
 
   verifyFields = () => {
-    const { algorithm, cn, containerName, email, inn, innle, locality, ogrnip, ogrn, province, snils, template } = this.state;
+    const { algorithm, cn, containerName, email, inn, innle, locality, ogrnip, ogrn, province, streetAddress, snils, template } = this.state;
     const REQULAR_EXPRESSION = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
     if (!containerName.length || (containerName.trim() === "")) {
@@ -325,14 +328,16 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
 
     if (cn.length > 0) {
       if (template === REQUEST_TEMPLATE_KEP_FIZ) {
-        if (!snils || !snils.length || !validateSnils(snils) || !province.length || !locality.length ||
+        if (!snils || !snils.length || !validateSnils(snils) ||
           !inn || !inn.length || !validateInn(inn)) {
           return false;
         }
       }
 
       if (template === REQUEST_TEMPLATE_KEP_IP) {
-        if (!ogrnip || !ogrnip.length || !validateOgrnip(ogrnip) || !province.length || !locality.length) {
+        if (!ogrnip || !ogrnip.length || !validateOgrnip(ogrnip) ||
+          !snils || !snils.length || !validateSnils(snils) ||
+          !inn || !inn.length || !validateInn(inn)) {
           return false;
         }
       }
@@ -341,7 +346,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
         if (!ogrn || !ogrn.length || !validateOgrn(ogrn) ||
          !innle || !innle.length || !validateInn(innle) ||
          !inn || !inn.length || !validateInn(inn) ||
-          !province.length || !locality.length) {
+         !province || !province.length || !locality || !locality.length || !streetAddress || !streetAddress.length) {
           return false;
         }
       }
@@ -379,7 +384,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
   handelReady = () => {
     const { localize, locale } = this.context;
     const { algorithm, cn, country, containerName, email, exportableKey, extKeyUsage, inn, innle, keyLength,
-      keyUsage, locality, ogrnip, ogrn, organization, organizationUnitName, province, selfSigned, snils, template, title } = this.state;
+      keyUsage, locality, ogrnip, ogrn, organization, organizationUnitName, province, streetAddress, selfSigned, snils, template, title } = this.state;
 
     const exts =
       new trusted.pki.ExtensionCollection();
@@ -505,7 +510,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
     const certReq = new trusted.pki.CertificationRequest();
 
     const atrs = [
-      { type: "C", value: country },
+      { type: "C", value: "RU" },
       { type: "CN", value: cn },
       { type: "E", value: email },
       { type: "L", value: locality },
@@ -532,6 +537,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       atrs.push(
         { type: "1.2.643.100.1", value: ogrn },
         { type: "1.2.643.100.4", value: innle },
+        { type: "STREET", value: streetAddress}
       );
     }
 

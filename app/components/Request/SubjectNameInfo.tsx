@@ -16,6 +16,7 @@ interface ISubjectNameInfoProps {
   organizationUnitName?: string;
   locality: string;
   province: string;
+  streetAddress: string;
   country: string;
   formVerified: boolean;
   inn?: string;
@@ -55,7 +56,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
 
   render() {
     const { localize, locale } = this.context;
-    const { cn, email, organization, locality, province, country, template, handleCountryChange, handleInputChange, handleTemplateChange } = this.props;
+    const { cn, email, organization, locality, province, streetAddress, country, template, handleCountryChange, handleInputChange, handleTemplateChange } = this.props;
 
     return (
       <div className="row">
@@ -67,7 +68,6 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
               <option value={REQUEST_TEMPLATE_KEP_IP}>{localize("CSR.template_kep_ip", locale)}</option>
               <option value={REQUEST_TEMPLATE_KEP_YUR}>{localize("CSR.template_kep_yur", locale)}</option>
               <option value={REQUEST_TEMPLATE_ADDITIONAL}>{localize("CSR.template_additional_fields", locale)}</option>
-              <option value={REQUEST_TEMPLATE_CLIENT_AUTH}>{localize("CSR.template_client_auth", locale)}</option>
             </select>
             <label>{localize("CSR.template_label", locale)}</label>
           </div>
@@ -119,7 +119,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
             />
             <label htmlFor="localityName">
               {localize("CSR.locality_name", locale)}
-              {template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_KEP_FIZ || template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}</label>
+              { template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}</label>
           </div>
           <div className="input-field input-field-csr col s6">
             <input
@@ -135,9 +135,29 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
             />
             <label htmlFor="stateOrProvinceName">
               {localize("CSR.province_name", locale)}
-              {template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_KEP_FIZ || template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}
+              {template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}
             </label>
           </div>
+          {
+            template === REQUEST_TEMPLATE_KEP_YUR || template === REQUEST_TEMPLATE_ADDITIONAL ?
+          <div className="input-field input-field-csr col s6">
+            <input
+              id="streetAddress"
+              type="text"
+              className={!this.props.formVerified ||
+                template === REQUEST_TEMPLATE_ADDITIONAL ? "validate" : streetAddress.length > 0 ? "valid" : "invalid"}
+              name="streetAddress"
+              value={streetAddress}
+              onChange={handleInputChange}
+              placeholder={"Название улицы, номер дома"}
+              maxLength={128}
+            />
+            <label htmlFor="streetAddress">
+              {"Название улицы, номер дома"}
+              {template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}
+            </label>
+          </div>
+          : null}
         </div>
         <div className="row">
           <div className="input-field input-field-csr col s6">
@@ -156,7 +176,6 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
           <div className="input-field input-field-csr col s6">
             <select className="select" ref="countrySelect" value={country} onChange={handleCountryChange} >
               <option value="RU">Российская Федерация (RU)</option>
-              <option value="AU">Австралия (AU)</option>
             </select>
 
             <label>{localize("CSR.country", locale)}</label>
@@ -167,7 +186,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
   }
 
   getAditionalField = () => {
-    const { template, handleInputChange, inn, innle, ogrn, ogrnip, organizationUnitName, snils, title } = this.props;
+    const { template, handleInputChange, inn, innle, ogrn, ogrnip, streetAddress, organizationUnitName, snils, title } = this.props;
     const { localize, locale } = this.context;
 
     if (template === REQUEST_TEMPLATE_KEP_FIZ || template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_ADDITIONAL || template === REQUEST_TEMPLATE_KEP_YUR) {
@@ -205,7 +224,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
             template === REQUEST_TEMPLATE_KEP_YUR || template === REQUEST_TEMPLATE_ADDITIONAL ?
               (
                 <div className="row">
-                  <div className="input-field input-field-csr col s12">
+                  <div className="input-field input-field-csr col s6">
                     <input
                       placeholder={localize("CSR.ogrn", locale)}
                       id="ogrn"
@@ -218,7 +237,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
                     />
 
                     <div className={!ogrn || !ogrn.length ? "anim_none" : validateOgrn(ogrn) ? "valid" : "anim_block"} id="anim">
-                    { validateOgrn( ogrn ) ? "" :  <span className="tooltip" data-tooltip={err_ogrn}>!</span> }
+                      {validateOgrn(ogrn) ? "" : <span className="tooltip" data-tooltip={err_ogrn}>!</span>}
                     </div>
                     <label htmlFor="ogrn">
                       {localize("CSR.ogrn", locale)}
@@ -249,7 +268,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
               </div>
               <label htmlFor="snils">
                 {localize("CSR.snils", locale)}
-                {template === REQUEST_TEMPLATE_KEP_FIZ  ? " *" : ""}
+                {template === REQUEST_TEMPLATE_KEP_FIZ || template === REQUEST_TEMPLATE_KEP_IP ? " *" : ""}
               </label>
             </div>
             
@@ -290,7 +309,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
 
               <label htmlFor="inn">
                 {localize("CSR.inn", locale)}
-                {template === REQUEST_TEMPLATE_KEP_FIZ || template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}
+                {template === REQUEST_TEMPLATE_KEP_FIZ || template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}
               </label>
               <div className={!inn || !inn.length ? "anim_none" : validateInn(inn) ? "valid" : "anim_block"} id="anim">
                 {validateInn(inn) ? "" : <span className="tooltip" data-tooltip={err_inn}>!</span>}
