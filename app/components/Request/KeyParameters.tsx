@@ -5,6 +5,7 @@ import {
   ALG_GOST12_256, ALG_GOST12_512,
   KEY_USAGE_ENCIPHERMENT, KEY_USAGE_SIGN, KEY_USAGE_SIGN_AND_ENCIPHERMENT,
 } from "../../constants";
+import { identificationKindToLocalizedName, identificationKindToNumber } from "../../utils";
 
 interface IKeyUsage {
   cRLSign: boolean;
@@ -43,8 +44,11 @@ interface IKeyParametersProps {
   handleKeyUsageChange: (ev: any) => void;
   handleKeyUsageGroupChange: (ev: any) => void;
   handleExtendedKeyUsageChange: (ev: any) => void;
+  handleIdentificationKindChange: (ev: any) => void;
   toggleExportableKey: () => void;
   disabled: boolean;
+  identificationKind: string;
+  identificationKinds?: any;
 }
 
 class KeyParameters extends React.Component<IKeyParametersProps, {}> {
@@ -67,6 +71,7 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
 
     $(ReactDOM.findDOMNode(this.refs.algorithmSelect)).on("change", this.props.handleAlgorithmChange);
     $(ReactDOM.findDOMNode(this.refs.keyUsageGroup)).on("change", this.props.handleKeyUsageGroupChange);
+    $(ReactDOM.findDOMNode(this.refs.identificationKindSelect)).on("change", this.props.handleIdentificationKindChange);
 
     if (this.props.handleCATemplateChange) {
       $(ReactDOM.findDOMNode(this.refs.templateSelect)).on("change", this.props.handleCATemplateChange);
@@ -368,10 +373,49 @@ class KeyParameters extends React.Component<IKeyParametersProps, {}> {
               </div>
             </div>
           </div>
+          {
+            this.getSelectIdentificationKind()
+          }
         </div>
       </div>
     );
   }
+
+  getSelectIdentificationKind = () => {
+    const { identificationKinds } = this.props;
+
+    if (identificationKinds && identificationKinds.length) {
+      return (
+        <div className="row" >
+          <div className="input-field input-field-csr col s12">
+            <select
+              disabled={false}
+              id="1.2.643.100.114"
+              className="select"
+              defaultValue={this.props.identificationKind ? identificationKindToNumber(this.props.identificationKind) : ""}
+              name="Тип идентификации при выдаче сертификата"
+              value={this.props.identificationKind ? this.props.identificationKind : ""}
+              onChange={this.props.handleIdentificationKindChange}
+              ref="identificationKindSelect"
+            >
+              {
+                identificationKinds.map((settingsValue: any) =>
+                  <option key={settingsValue} value={identificationKindToNumber(settingsValue)}>
+                    {identificationKindToLocalizedName(settingsValue)}
+                  </option>)
+              }
+            </select>
+
+            <label>Тип идентификации при выдаче сертификата</label>
+          </div>
+        </div>
+      );
+
+    } else {
+      return null;
+    }
+  }
+
 }
 
 export default KeyParameters;

@@ -432,3 +432,57 @@ export const isCsp5R2 = () => {
     return false;
   }
 };
+
+export const identificationKindToLocalizedName = (value: string) => {
+  switch (value) {
+    case "personal":
+    case "0":
+      return "Личное присутствие";
+
+    case "remote_cert":
+    case "1":
+      return "С использованием квалифицированной ЭП";
+
+    case "remote_passport":
+    case "2":
+      return "Удостоверяющий личность документ, содержащий электронный носитель информации";
+
+    case "remote_system":
+    case "3":
+      return "С использованием сведений из ЕСИА и ЕБС";
+
+    case "none":
+    case "4":
+      return "Не указан";
+
+    default:
+      return "";
+  }
+}
+
+export const identificationKindToNumber = (value: string) => {
+  switch (value) {
+    case "personal":
+    case "0":
+      return "0";
+
+    case "remote_cert":
+    case "1":
+      return "1";
+
+    case "remote_passport":
+    case "2":
+      return "2";
+
+    case "remote_system":
+    case "3":
+      return "3";
+
+    case "none":
+    case "4":
+      return "4";
+
+    default:
+      return "";
+  }
+}

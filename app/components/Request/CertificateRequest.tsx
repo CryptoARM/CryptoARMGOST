@@ -13,7 +13,7 @@ import {
   REQUEST_TEMPLATE_DEFAULT, REQUEST_TEMPLATE_KEP_FIZ, REQUEST_TEMPLATE_CLIENT_AUTH, REQUEST_TEMPLATE_KEP_IP, REQUEST_TEMPLATE_KEP_YUR, ROOT, USER_NAME,
 } from "../../constants";
 import * as jwt from "../../trusted/jwt";
-import { formatDate, randomSerial, uuid, validateInn, validateOgrn, validateOgrnip, validateSnils } from "../../utils";
+import { formatDate, randomSerial, uuid, validateInn, validateOgrn, validateOgrnip, validateSnils, identificationKindToNumber } from "../../utils";
 import logger from "../../winstonLogger";
 import HeaderTabs from "./HeaderTabs";
 import KeyParameters from "./KeyParameters";
@@ -64,6 +64,7 @@ interface ICertificateRequestState {
   organizationUnitName?: string;
   province: string;
   streetAddress: string;
+  identificationKind: string;
   selfSigned: boolean;
   snils?: string;
   template: string;
@@ -129,6 +130,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       organizationUnitName: template.OU,
       province: template.stateOrProvinceName,
       streetAddress: template.streetAddress,
+      identificationKind: "4",
       selfSigned: !!props.selfSigned,
       snils: template.snils,
       template: template.snils || template.ogrnip || template.ogrn || template.inn || template.innle
@@ -269,6 +271,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
                       keyLength={keyLength}
                       keyUsage={keyUsage}
                       keyUsageGroup={keyUsageGroup}
+                      handleIdentificationKindChange={this.handleIdentificationKindChange}
                       handleAlgorithmChange={this.handleAlgorithmChange}
                       handleInputChange={this.handleInputChange}
                       handleKeyUsageChange={this.handleKeyUsageChange}
@@ -276,6 +279,8 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
                       handleExtendedKeyUsageChange={this.handleExtendedKeyUsageChange}
                       toggleExportableKey={this.toggleExportableKey}
                       disabled={template === REQUEST_TEMPLATE_CLIENT_AUTH}
+                      identificationKind={this.state.identificationKind}
+                      identificationKinds={["none", "personal", "remote_cert", "remote_passport", "remote_system"]}
                     />
                   </div>
                 </div>
@@ -384,7 +389,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
   handelReady = () => {
     const { localize, locale } = this.context;
     const { algorithm, cn, country, containerName, email, exportableKey, extKeyUsage, inn, innle, keyLength,
-      keyUsage, locality, ogrnip, ogrn, organization, organizationUnitName, province, streetAddress, selfSigned, snils, template, title } = this.state;
+      keyUsage, locality, ogrnip, ogrn, organization, organizationUnitName, province, streetAddress, selfSigned, snils, template, title, identificationKind } = this.state;
 
     const exts =
       new trusted.pki.ExtensionCollection();
@@ -478,6 +483,12 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
     if (template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_ADDITIONAL || REQUEST_TEMPLATE_KEP_FIZ || REQUEST_TEMPLATE_KEP_YUR) {
       oid = new trusted.pki.Oid("1.2.643.100.111");
       ext = new trusted.pki.Extension(oid, `КриптоПро CSP (версия ${this.getCPCSPVersion()})`);
+      exts.push(ext);
+    }
+
+    if (identificationKind && identificationKind !== "4") { // "none" Не указан
+      oid = new trusted.pki.Oid("1.2.643.100.114");
+      ext = new trusted.pki.Extension(oid, identificationKind);
       exts.push(ext);
     }
 
@@ -786,6 +797,10 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
 
   handleAlgorithmChange = (ev: any) => {
     this.setState({ algorithm: ev.target.value });
+  }
+
+  handleIdentificationKindChange = (ev: any) => {
+    this.setState({ identificationKind: ev.target.value });
   }
 
   handleInputChange = (ev: any) => {
