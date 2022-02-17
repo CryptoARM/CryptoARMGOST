@@ -160,9 +160,6 @@ app.post('/json', function (req, res) {
   } else if (req.body.method === "signAndEncrypt.outDirectResults") {
     console.log("outDirectResults", req.body.params.directResults);
     res.status(200).send("");
-  } else if (req.body.method === "signAndEncrypt.verifySignResults") {
-    console.log("verifyResults ", req.body.params.verifyResults);
-    res.status(200).send("");
   } else {
     console.log("Unsupported method: " + req.body.method);
     res.status(400).send('Incorrect token');
@@ -191,12 +188,6 @@ app.get('/json', function (req, res) {
 app.post('/upload', function (req, res) {
   let sampleFile;
   let uploadPath;
-
-  if (req.body.method === "signAndEncrypt.verifySignResults") {
-    console.log("verifySignResults", req.body);
-    // res.status(200).send({ success: true });
-  } 
- 
 
   if (!req.files || Object.keys(req.files).length === 0) {
     res.status(400).send('No files were uploaded.');

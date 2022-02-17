@@ -136,7 +136,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   componentWillMount() {
     this.props.activeSetting(this.props.setting.id);
 
-    $(document).ready(function () {
+    $(document).ready(function() {
       $(".tooltipped").tooltip();
     });
   }
@@ -504,7 +504,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
               <React.Fragment>
                 <div className="col s12">
                   <a className={`btn btn-outlined waves-effect waves-light ${this.checkEnableMultiOperations() ? "" : "disabled"}`}
-                    onClick={setting.operations.signing_operation ? this.checkCertificatesBeforePerformOperation : this.handleClickPerformOperations}
+                    onClick={setting.operations.signing_operation ?  this.checkCertificatesBeforePerformOperation : this.handleClickPerformOperations}
                     style={{ width: "100%" }}>
                     {localize("Common.perform", locale)}
                   </a>
@@ -674,7 +674,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   showModalWrongCertificate = () => {
     const { localize, locale } = this.context;
     const { showModalWrongCertificate } = this.state;
-    const { signer } = this.props;
+    const {signer } = this.props;
     const isSignCertFromDSS = (signer && (signer.service || signer.dssUserID)) ? true : false;
 
     if (!showModalWrongCertificate) {
@@ -698,7 +698,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   isGostRecipients(recipients: any) {
-    return recipients.filter(function (recipient: any) {
+    return recipients.filter(function(recipient: any) {
       return recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
         && recipient.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
         && recipient.publicKeyAlgorithm !== "1.2.643.2.2.19";
@@ -721,7 +721,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
     if (isSignCertFromDSS && signer && !signer.status) {
       this.handleshowModalWrongCertificate();
       return;
-    } else if (isSignCertFromDSS) {
+    } else if ( isSignCertFromDSS) {
       this.handleClickSign();
       return;
     }
@@ -741,10 +741,10 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
 
       for (const items of recipients) {
         const isItemGost =
-          items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
-            && items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
-            && items.publicKeyAlgorithm !== "1.2.643.2.2.19" ?
-            false : true;
+        items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.1"
+          && items.publicKeyAlgorithm !== "1.2.643.7.1.1.1.2"
+          && items.publicKeyAlgorithm !== "1.2.643.2.2.19" ?
+           false : true;
         if (isGost !== isItemGost) {
           $(".toast-ca_req_error").remove();
           Materialize.toast(
@@ -893,7 +893,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
           $(".toast-files_unsigned_detached").remove();
           Materialize.toast(localize("Sign.files_unsigned_detached", window.locale), 2000, "toast-files_unsigned_detached");
           return;
-        }
+         }
       }
       for (const activeFileItem of activeFilesArr) {
 
@@ -1377,7 +1377,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   resignDss = (filesAtt: IFilePackage, filesDet: IFilePackage, setting: any, cert: any,
-    multipackage: boolean = false) => {
+               multipackage: boolean = false) => {
     const { signer, tokensAuth, users, policyDSS, uploader,
       createTransactionDSS, packageReSign } = this.props;
     const { pinCode } = this.state;
@@ -1409,7 +1409,7 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
         documentsId)
         .then(
           (data1: any) => {
-            //resign
+          //resign
             $(".toast-transaction_created_successful").remove();
             Materialize.toast(localize("DSS.transaction_created_successful", locale), 3000, "toast-transaction_created_successful");
 
@@ -1907,100 +1907,32 @@ class SignatureAndEncryptRightColumnSettings extends React.Component<ISignatureA
   }
 
   verifySign = () => {
-    const { activeFilesArr, signatures, operationRemoteAction, uploader } = this.props;
+    const { activeFilesArr, signatures } = this.props;
     // tslint:disable-next-line:no-shadowed-variable
     const { verifySignature } = this.props;
     const { localize, locale } = this.context;
+
+    let res = true;
 
     activeFilesArr.forEach((file) => {
       verifySignature(file.id);
     });
 
-    if (uploader) {
-      const verifySignResults: any[] = [];
-
+    signatures.forEach((signature: any) => {
       for (const file of activeFilesArr) {
-        if (file && file.remoteId) {
-          const signers: any[] = [];
-          let res = true;
-  
-          for (const signature of signatures) {
-            if (file.id === signature.fileId) {
-              if (!signature.status_verify) {
-                res = false;
-              }
-  
-              const subjectCert = signature.certs[signature.certs.length - 1];
-              let x509;
-  
-              if (subjectCert.object) {
-                try {
-                  let cmsContext = subjectCert.object.export(trusted.DataFormat.PEM).toString();
-  
-                  cmsContext = cmsContext.replace("-----BEGIN CERTIFICATE-----", "");
-                  cmsContext = cmsContext.replace("-----END CERTIFICATE-----", "");
-                  cmsContext = cmsContext.replace(/\r\n|\n|\r/gm, "");
-  
-                  x509 = cmsContext;
-                } catch (e) {
-                  //
-                }
-              }
-  
-              signers.push({
-                signerCertificate: {
-                  serialNumber: subjectCert.serial,
-                  subjectFriendlyName: signature.subject,
-                  status: subjectCert.status,
-                  issuerFriendlyName: subjectCert.issuerFriendlyName,
-                  notBefore: new Date(subjectCert.notBefore).getTime(),
-                  notAfter: new Date(subjectCert.notAfter).getTime(),
-                  digestAlgorithm: subjectCert.signatureDigestAlgorithm,
-                  organizationName: subjectCert.organizationName,
-                  signingTime: signature.signingTime ? new Date(signature.signingTime).getTime() : undefined,
-                  subjectName: subjectCert.subjectName,
-                  issuerName: subjectCert.issuerName,
-                  x509,
-                },
-                status: signature.status_verify,
-              });
-            }
-          };
-  
-          verifySignResults.push({
-            id: file.remoteId,
-            status: res,
-            signers: [...signers]
-          })
+        if (file.id === signature.fileId && !signature.status_verify) {
+          res = false;
+          break;
         }
       }
-  
-      const infoRequest = {
-        jsonrpc: "2.0",
-        method: "signAndEncrypt.verifySignResults",
-        params: {
-          verifyResults: [...verifySignResults],
-          id: operationRemoteAction.id,
-        },
-      };
- 
-      postRequest(uploader, JSON.stringify(infoRequest)).then(
-        (respData: any) => {
-          this.props.removeAllFiles();
-          removeUrlAction();
-          const remote = window.electron.remote;
-          remote.getCurrentWindow().minimize();
-          store.dispatch(finishCurrentUrlCmd());
-          removeWarningMessage();
-        },
-        (error) => {
-          store.dispatch(finishCurrentUrlCmd(false));
-          removeWarningMessage();
-          // tslint:disable-next-line: no-console
-          console.log("Error sending of diagnostics info with id " + operationRemoteAction.id
-            + ". Error description: " + error);
-        },
-      );
+    });
+
+    if (res) {
+      $(".toast-verify_sign_ok").remove();
+      Materialize.toast(localize("Sign.verify_sign_ok", locale), 2000, "toast-verify_sign_ok");
+    } else {
+      $(".toast-verify_sign_founds_errors").remove();
+      Materialize.toast(localize("Sign.verify_sign_founds_errors", locale), 2000, "toast-verify_sign_founds_errors");
     }
   }
 
