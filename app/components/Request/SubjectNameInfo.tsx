@@ -25,6 +25,8 @@ interface ISubjectNameInfoProps {
   ogrnip?: string;
   snils?: string;
   title?: string;
+  givenName?: string;
+  surname?: string;
   handleCountryChange: (ev: any) => void;
   handleTemplateChange: (ev: any) => void;
   handleInputChange: (ev: any) => void;
@@ -56,7 +58,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
 
   render() {
     const { localize, locale } = this.context;
-    const { cn, email, organization, locality, province, streetAddress, country, template, handleCountryChange, handleInputChange, handleTemplateChange } = this.props;
+    const { cn, email, organization, locality, province, streetAddress, title, givenName, surname, country, template, handleCountryChange, handleInputChange, handleTemplateChange } = this.props;
 
     return (
       <div className="row">
@@ -119,7 +121,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
             />
             <label htmlFor="localityName">
               {localize("CSR.locality_name", locale)}
-              { template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}</label>
+              {template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}</label>
           </div>
           <div className="input-field input-field-csr col s6">
             <input
@@ -140,24 +142,24 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
           </div>
           {
             template === REQUEST_TEMPLATE_KEP_YUR || template === REQUEST_TEMPLATE_ADDITIONAL ?
-          <div className="input-field input-field-csr col s6">
-            <input
-              id="streetAddress"
-              type="text"
-              className={!this.props.formVerified ||
-                template === REQUEST_TEMPLATE_ADDITIONAL ? "validate" : streetAddress.length > 0 ? "valid" : "invalid"}
-              name="streetAddress"
-              value={streetAddress}
-              onChange={handleInputChange}
-              placeholder={"Название улицы, номер дома"}
-              maxLength={128}
-            />
-            <label htmlFor="streetAddress">
-              {"Название улицы, номер дома"}
-              {template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}
-            </label>
-          </div>
-          : null}
+              <div className="input-field input-field-csr col s6">
+                <input
+                  id="streetAddress"
+                  type="text"
+                  className={!this.props.formVerified ||
+                    template === REQUEST_TEMPLATE_ADDITIONAL ? "validate" : streetAddress.length > 0 ? "valid" : "invalid"}
+                  name="streetAddress"
+                  value={streetAddress}
+                  onChange={handleInputChange}
+                  placeholder={"Название улицы, номер дома"}
+                  maxLength={128}
+                />
+                <label htmlFor="streetAddress">
+                  {"Название улицы, номер дома"}
+                  {template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}
+                </label>
+              </div>
+              : null}
         </div>
         <div className="row">
           <div className="input-field input-field-csr col s6">
@@ -186,7 +188,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
   }
 
   getAditionalField = () => {
-    const { template, handleInputChange, inn, innle, ogrn, ogrnip, streetAddress, organizationUnitName, snils, title } = this.props;
+    const { template, handleInputChange, inn, innle, ogrn, ogrnip, streetAddress, organizationUnitName, snils, title, givenName, surname } = this.props;
     const { localize, locale } = this.context;
 
     if (template === REQUEST_TEMPLATE_KEP_FIZ || template === REQUEST_TEMPLATE_KEP_IP || template === REQUEST_TEMPLATE_ADDITIONAL || template === REQUEST_TEMPLATE_KEP_YUR) {
@@ -209,7 +211,7 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
                     />
 
                     <div className={!ogrnip || !ogrnip.length ? "anim_none" : validateOgrnip(ogrnip) ? "valid" : "anim_block"} id="anim">
-                    { validateOgrnip( ogrnip ) ? "" :  <span className="tooltip" data-tooltip={err_ogrnip}>!</span> }
+                      {validateOgrnip(ogrnip) ? "" : <span className="tooltip" data-tooltip={err_ogrnip}>!</span>}
                     </div>
                     <label htmlFor="ogrnip">
                       {localize("CSR.ogrnip", locale)}
@@ -223,30 +225,73 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
           {
             template === REQUEST_TEMPLATE_KEP_YUR || template === REQUEST_TEMPLATE_ADDITIONAL ?
               (
-                <div className="row">
-                  <div className="input-field input-field-csr col s6">
-                    <input
-                      placeholder={localize("CSR.ogrn", locale)}
-                      id="ogrn"
-                      type="text"
-                      className={!ogrn || !ogrn.length ? "validate" : validateOgrn(ogrn) ? "valid" : "invalid"}
-                      name="ogrn"
-                      value={ogrn}
-                      maxLength={13}
-                      onChange={handleInputChange}
-                    />
-
-                    <div className={!ogrn || !ogrn.length ? "anim_none" : validateOgrn(ogrn) ? "valid" : "anim_block"} id="anim">
-                      {validateOgrn(ogrn) ? "" : <span className="tooltip" data-tooltip={err_ogrn}>!</span>}
+                <React.Fragment>
+                  <div className="row">
+                    <div className="input-field input-field-csr col s6">
+                      <input
+                        id="surname"
+                        type="text"
+                        className="validate"
+                        name="surname"
+                        value={surname}
+                        onChange={handleInputChange}
+                        placeholder={"Фамилия"}
+                        maxLength={64}
+                      />
+                      <label htmlFor="givenName">{"Фамилия"}</label>
                     </div>
-                    <label htmlFor="ogrn">
-                      {localize("CSR.ogrn", locale)}
-                      {template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}
-
-                    </label>
-
+                    <div className="input-field input-field-csr col s6">
+                      <input
+                        id="givenName"
+                        type="text"
+                        className="validate"
+                        name="givenName"
+                        value={givenName}
+                        onChange={handleInputChange}
+                        placeholder={"Имя и отчество (если имеется) физического лица"}
+                        maxLength={64}
+                      />
+                      <label htmlFor="givenName">{"Приобретенное имя"}</label>
+                    </div>
                   </div>
-                </div>) :
+                  <div className="row">
+                    <div className="input-field input-field-csr col s6">
+                      <input
+                        placeholder={localize("CSR.title", locale)}
+                        id="title"
+                        type="text"
+                        className="validate"
+                        name="title"
+                        value={title}
+                        onChange={handleInputChange}
+                        maxLength={64}
+                      />
+                      <label htmlFor="title">{localize("CSR.title", locale)}</label>
+                    </div>
+                    <div className="input-field input-field-csr col s6">
+                      <input
+                        placeholder={localize("CSR.ogrn", locale)}
+                        id="ogrn"
+                        type="text"
+                        className={!ogrn || !ogrn.length ? "validate" : validateOgrn(ogrn) ? "valid" : "invalid"}
+                        name="ogrn"
+                        value={ogrn}
+                        maxLength={13}
+                        onChange={handleInputChange}
+                      />
+
+                      <div className={!ogrn || !ogrn.length ? "anim_none" : validateOgrn(ogrn) ? "valid" : "anim_block"} id="anim">
+                        {validateOgrn(ogrn) ? "" : <span className="tooltip" data-tooltip={err_ogrn}>!</span>}
+                      </div>
+                      <label htmlFor="ogrn">
+                        {localize("CSR.ogrn", locale)}
+                        {template === REQUEST_TEMPLATE_KEP_YUR ? " *" : ""}
+
+                      </label>
+
+                    </div>
+                  </div>
+                </ React.Fragment>) :
               null
           }
           <div className="row">
@@ -264,14 +309,14 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
               />
 
               <div className={!snils || !snils.length ? "anim_none" : validateSnils(snils) ? "valid" : "anim_block"} id="anim">
-              { validateSnils( snils ) ? "" :  <span className="tooltip" data-tooltip={err_snils}>!</span> }
+                {validateSnils(snils) ? "" : <span className="tooltip" data-tooltip={err_snils}>!</span>}
               </div>
               <label htmlFor="snils">
                 {localize("CSR.snils", locale)}
                 {template === REQUEST_TEMPLATE_KEP_FIZ || template === REQUEST_TEMPLATE_KEP_IP ? " *" : ""}
               </label>
             </div>
-            
+
             {
               template === REQUEST_TEMPLATE_KEP_YUR || template === REQUEST_TEMPLATE_ADDITIONAL ?
                 (
@@ -332,19 +377,6 @@ class CertificateRequest extends React.Component<ISubjectNameInfoProps, {}> {
                       maxLength={64}
                     />
                     <label htmlFor="organizationUnitName">{localize("CSR.organizational_unit_name", locale)}</label>
-                  </div>
-                  <div className="input-field input-field-csr col s6">
-                    <input
-                      placeholder={localize("CSR.title", locale)}
-                      id="title"
-                      type="text"
-                      className="validate"
-                      name="title"
-                      value={title}
-                      onChange={handleInputChange}
-                      maxLength={64}
-                    />
-                    <label htmlFor="title">{localize("CSR.title", locale)}</label>
                   </div>
                 </div>
               </React.Fragment> :

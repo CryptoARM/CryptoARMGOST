@@ -69,6 +69,8 @@ interface ICertificateRequestState {
   snils?: string;
   template: string;
   title?: string;
+  surname?: string;
+  givenName?: string;
   organization1?: string;
 }
 
@@ -136,6 +138,8 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       template: template.snils || template.ogrnip || template.ogrn || template.inn || template.innle
         || template.OU || template.title ? REQUEST_TEMPLATE_ADDITIONAL : REQUEST_TEMPLATE_DEFAULT,
       title: template.title,
+      surname: template.surname,
+      givenName: template.givenName,
     };
   }
 
@@ -219,7 +223,7 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
     const classDisabled = this.state.disabled ? "" : "disabled";
 
     const { activeSubjectNameInfoTab, algorithm, cn, containerName, country, formVerified, email, exportableKey, extKeyUsage, inn, innle, keyLength,
-      keyUsage, keyUsageGroup, locality, ogrnip, ogrn, organization, organizationUnitName, province, streetAddress, selfSigned, snils, template, title } = this.state;
+      keyUsage, keyUsageGroup, locality, ogrnip, ogrn, organization, organizationUnitName, province, streetAddress, selfSigned, snils, template, title, givenName, surname } = this.state;
 
     return (
       <React.Fragment>
@@ -251,6 +255,8 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
                       ogrnip={ogrnip}
                       snils={snils}
                       title={title}
+                      givenName={givenName}
+                      surname={surname}
                       handleCountryChange={this.handleCountryChange}
                       handleTemplateChange={this.handleTemplateChange}
                       handleInputChange={this.handleInputChange}
@@ -349,9 +355,9 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
 
       if (template === REQUEST_TEMPLATE_KEP_YUR) {
         if (!ogrn || !ogrn.length || !validateOgrn(ogrn) ||
-         !innle || !innle.length || !validateInn(innle) ||
-         !inn || !inn.length || !validateInn(inn) ||
-         !province || !province.length || !locality || !locality.length || !streetAddress || !streetAddress.length) {
+          !innle || !innle.length || !validateInn(innle) ||
+          !inn || !inn.length || !validateInn(inn) ||
+          !province || !province.length || !locality || !locality.length || !streetAddress || !streetAddress.length) {
           return false;
         }
       }
@@ -389,7 +395,8 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
   handelReady = () => {
     const { localize, locale } = this.context;
     const { algorithm, cn, country, containerName, email, exportableKey, extKeyUsage, inn, innle, keyLength,
-      keyUsage, locality, ogrnip, ogrn, organization, organizationUnitName, province, streetAddress, selfSigned, snils, template, title, identificationKind } = this.state;
+      keyUsage, locality, ogrnip, ogrn, organization, organizationUnitName, province, streetAddress, selfSigned, snils, template, title, identificationKind,
+      givenName, surname } = this.state;
 
     const exts =
       new trusted.pki.ExtensionCollection();
@@ -528,7 +535,6 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       { type: "S", value: province },
       { type: "O", value: organization },
       { type: "OU", value: organizationUnitName },
-      { type: "T", value: title },
     ];
 
     if (template !== REQUEST_TEMPLATE_DEFAULT) {
@@ -548,7 +554,10 @@ class CertificateRequest extends React.Component<ICertificateRequestProps, ICert
       atrs.push(
         { type: "1.2.643.100.1", value: ogrn },
         { type: "1.2.643.100.4", value: innle },
-        { type: "STREET", value: streetAddress}
+        { type: "STREET", value: streetAddress },
+        { type: "T", value: title },
+        { type: "G", value: givenName },
+        { type: "SN", value: surname },
       );
     }
 
@@ -950,6 +959,8 @@ const oidValues: { [index: string]: string } = {
   O: "O",
   OU: "OU",
   title: "Title",
+  givenName: "G",
+  surname: "SN",
   postalCode: "2.5.4.17",
   GN: "GivenName",
   initials: "Initials",
